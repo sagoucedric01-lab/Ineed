@@ -132,7 +132,8 @@ jobs:
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-node@v5
-        with: { node-version: '${{ env.NODE_VERSION }}' }
+        # Pas de pnpm dans ce job : on désactive le cache automatique du gestionnaire de paquets.
+        with: { node-version: '${{ env.NODE_VERSION }}', package-manager-cache: false }
       - uses: actions/setup-java@v5
         with: { distribution: temurin, java-version: '17' }
       - uses: subosito/flutter-action@v2
