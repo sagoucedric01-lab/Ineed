@@ -9,7 +9,7 @@
     "copy:check": "node scripts/check-copy.mjs",
     "maquettes": "node scripts/build-maquettes.mjs",
     "render": "node scripts/render.mjs",
-    "check": "node scripts/check-contrast.mjs && node scripts/check-copy.mjs && node scripts/build-tokens.mjs --check && node --test scripts/design.test.mjs",
+    "check": "node scripts/check-contrast.mjs && node scripts/check-copy.mjs && node scripts/build-tokens.mjs --check && node scripts/merge-arb.mjs --check && node --test scripts/design.test.mjs",
     "test": "node --test scripts/design.test.mjs"
   },
   "exports": {

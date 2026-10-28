@@ -274,5 +274,41 @@
   "supportTitle": "Aide et assistance",
   "supportBody": "Une question sur une mission ou un paiement ? Ouvrez une réclamation : l’équipe Ineed vous répond dans l’application.",
   "supportOpenComplaint": "Ouvrir une réclamation",
-  "supportMyComplaints": "Mes réclamations"
+  "supportMyComplaints": "Mes réclamations",
+  "devScreenTitle": "Version de développement",
+  "devScreenBody": "Les écrans de l’application arrivent dans les prochaines étapes du projet. Cet écran vérifie la connexion à l’API Ineed.",
+  "devScreenApiChecking": "Vérification de la connexion à l’API…",
+  "devScreenApiOk": "API joignable : tous les services répondent.",
+  "devScreenApiDegraded": "API joignable, mais un service est indisponible : {services}.",
+  "@devScreenApiDegraded": {
+    "placeholders": {
+      "services": {
+        "type": "String",
+        "example": "stockage des fichiers"
+      }
+    }
+  },
+  "devScreenApiUnreachable": "Impossible de joindre l’API à l’adresse {url}.",
+  "@devScreenApiUnreachable": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "http://10.0.2.2:3000"
+      }
+    }
+  },
+  "environmentBadge": "Environnement : {name}",
+  "@environmentBadge": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "développement"
+      }
+    }
+  },
+  "environmentDev": "développement",
+  "environmentStaging": "préproduction",
+  "dependencyDatabase": "base de données",
+  "dependencyRedis": "file de tâches",
+  "dependencyStorage": "stockage des fichiers"
 }

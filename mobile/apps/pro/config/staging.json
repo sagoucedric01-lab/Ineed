@@ -1,0 +1,4 @@
+{
+  "INEED_ENV": "staging",
+  "INEED_API_URL": "https://api.staging.ineed.example"
+}

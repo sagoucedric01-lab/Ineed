@@ -86,7 +86,7 @@ export function buildTailwindTheme(t) {
 
 export function outputs(t) {
   return {
-    'generated/flutter/ineed_tokens.dart': buildDart(t),
+    '../mobile/packages/ineed_ui/lib/src/tokens/ineed_tokens.dart': buildDart(t),
     'generated/web/tokens.css': buildCss(t),
     'generated/web/tailwind-theme.css': buildTailwindTheme(t),
   };

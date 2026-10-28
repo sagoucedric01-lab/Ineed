@@ -8,7 +8,7 @@ Source unique de l'identité visuelle et des textes des trois interfaces (Ineed,
 | Dossier / fichier | Rôle |
 |---|---|
 | `tokens.json` | Couleurs (palette + rôles pour les thèmes clair et sombre), typographie, espacements, rayons, ombres, tailles, animations, paires de contraste à vérifier |
-| `generated/flutter/ineed_tokens.dart` | Tokens pour Flutter (`IneedColorScheme.light/dark`, `IneedTypography`, `IneedSpacing`…) — **généré** |
+| `mobile/packages/ineed_ui/lib/src/tokens/ineed_tokens.dart` | Tokens pour Flutter (`IneedColorScheme.light/dark`, `IneedTypography`, `IneedSpacing`…) — **généré** dans le paquet mobile |
 | `generated/web/tokens.css`, `tailwind-theme.css` | Variables CSS (`--in-*`, thèmes clair/sombre) et thème Tailwind 4 (`@theme`) pour l'admin — **générés** |
 | `brand/` | Symbole, logo horizontal (positif/négatif), icônes d'application client et pro, avant-plan Android adaptatif ; exports PNG dans `brand/png/` |
 | `icons/categories/` | 12 icônes de métiers (24 px, trait 1,75, `currentColor`) ; le nom de fichier correspond à `categories.icon_key` en base |
@@ -26,13 +26,14 @@ Source unique de l'identité visuelle et des textes des trois interfaces (Ineed,
 cd design
 node scripts/build-tokens.mjs        # régénère Dart / CSS / thème Tailwind depuis tokens.json
 node scripts/check-copy.mjs --fix    # corrige la typographie française des textes
+node scripts/merge-arb.mjs           # fusionne les textes communs + application dans mobile/apps/*/lib/l10n
 node scripts/build-maquettes.mjs     # assemble maquettes/index.html
 node scripts/render.mjs              # exporte icônes et écrans en PNG (Chromium via Playwright)
 pnpm run check                       # contrastes + textes + fichiers générés à jour + tests unitaires
-bash scripts/check-flutter.sh        # compile les tokens Dart et passe les ARB dans `flutter gen-l10n`
+bash ../mobile/tool/check.sh         # côté mobile : tokens et textes à jour, gen-l10n, analyse, tests Flutter
 ```
 
-`pnpm run check` et `check-flutter.sh` seront exécutés par la CI à partir de la phase 3.
+`pnpm run check` et `mobile/tool/check.sh` sont exécutés par la CI.
 
 ## Principes
 

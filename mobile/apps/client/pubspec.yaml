@@ -1,0 +1,30 @@
+name: ineed_client
+description: "Ineed : trouvez un professionnel de confiance près de chez vous."
+publish_to: none
+version: 0.3.0+1
+resolution: workspace
+
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  ineed_api:
+    path: ../../packages/ineed_api
+  ineed_core:
+    path: ../../packages/ineed_core
+  ineed_ui:
+    path: ../../packages/ineed_ui
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+flutter:
+  uses-material-design: true
+  generate: true

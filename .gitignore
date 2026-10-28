@@ -19,3 +19,7 @@ build/
 mobile/**/android/local.properties
 mobile/**/ios/Flutter/Generated.xcconfig
 mobile/**/ios/Flutter/flutter_export_environment.sh
+mobile/**/android/key.properties
+*.jks
+*.keystore
+mobile/apps/*/lib/l10n/gen/
