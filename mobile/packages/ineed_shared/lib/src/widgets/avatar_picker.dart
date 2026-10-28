@@ -94,6 +94,8 @@ class _AvatarPickerState extends ConsumerState<AvatarPicker> {
               radius: widget.size / 2,
               backgroundColor: c.actionSoft,
               foregroundImage: widget.avatarUrl != null ? NetworkImage(widget.avatarUrl!) : null,
+              // Photo injoignable (réseau faible) : les initiales restent affichées.
+              onForegroundImageError: widget.avatarUrl != null ? (_, _) {} : null,
               child: Text(widget.initials, style: Theme.of(context).textTheme.titleLarge?.copyWith(color: c.onActionSoft)),
             ),
             if (_busy) const CircularProgressIndicator(),

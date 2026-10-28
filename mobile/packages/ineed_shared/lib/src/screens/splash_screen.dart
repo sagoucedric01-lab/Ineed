@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:ineed_shared/ineed_shared.dart';
 import 'package:ineed_ui/ineed_ui.dart';
+
+import '../../l10n/gen/common_localizations.dart';
+import '../errors.dart';
+import '../session/session.dart';
 
 /// Démarrage : restauration de la session ; en cas d'échec réseau, propose de réessayer.
 class SplashScreen extends ConsumerWidget {
-  const SplashScreen({super.key});
+  const SplashScreen({this.pro = false, super.key});
+
+  /// Logo de l'application Ineed Pro.
+  final bool pro;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -18,7 +24,7 @@ class SplashScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const IneedLogo(size: 96),
+              IneedLogo(size: 96, pro: pro),
               const SizedBox(height: IneedSpacing.s6),
               if (session.hasError && !session.hasValue) ...[
                 IneedBanner(message: failureMessage(l, session.error!), tone: IneedBannerTone.danger),

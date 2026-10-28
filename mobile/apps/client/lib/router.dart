@@ -8,7 +8,6 @@ import 'package:ineed_shared/ineed_shared.dart';
 import 'dev_status_screen.dart';
 import 'screens/home_screen.dart';
 import 'screens/onboarding_screen.dart';
-import 'screens/splash_screen.dart';
 
 /// Écrans accessibles sans être connecté.
 const publicRoutes = {'/bienvenue', '/connexion', '/connexion/code'};
