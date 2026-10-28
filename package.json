@@ -3,7 +3,9 @@
   "private": true,
   "description": "Ineed : marketplace de services de proximité (Abidjan)",
   "packageManager": "pnpm@10.28.0",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev:infra": "docker compose -f infra/docker-compose.yml up -d postgres redis minio mailpit",
     "migrate": "pnpm --filter @ineed/backend migrate:deploy",
@@ -14,5 +16,10 @@
     "test": "pnpm -r --if-present test",
     "build": "pnpm -r --if-present build",
     "check": "pnpm lint && pnpm typecheck && pnpm test"
+  },
+  "pnpm": {
+    "overrides": {
+      "multer": "2.5.0"
+    }
   }
 }

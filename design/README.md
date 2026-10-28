@@ -9,7 +9,7 @@ Source unique de l'identité visuelle et des textes des trois interfaces (Ineed,
 |---|---|
 | `tokens.json` | Couleurs (palette + rôles pour les thèmes clair et sombre), typographie, espacements, rayons, ombres, tailles, animations, paires de contraste à vérifier |
 | `generated/flutter/ineed_tokens.dart` | Tokens pour Flutter (`IneedColorScheme.light/dark`, `IneedTypography`, `IneedSpacing`…) — **généré** |
-| `generated/web/tokens.css`, `tailwind-preset.cjs` | Variables CSS (`--in-*`, thèmes clair/sombre) et preset Tailwind pour l'admin — **générés** |
+| `generated/web/tokens.css`, `tailwind-theme.css` | Variables CSS (`--in-*`, thèmes clair/sombre) et thème Tailwind 4 (`@theme`) pour l'admin — **générés** |
 | `brand/` | Symbole, logo horizontal (positif/négatif), icônes d'application client et pro, avant-plan Android adaptatif ; exports PNG dans `brand/png/` |
 | `icons/categories/` | 12 icônes de métiers (24 px, trait 1,75, `currentColor`) ; le nom de fichier correspond à `categories.icon_key` en base |
 | `icons/ui/` | 20 icônes d'interface du même style |
@@ -24,7 +24,7 @@ Source unique de l'identité visuelle et des textes des trois interfaces (Ineed,
 
 ```bash
 cd design
-node scripts/build-tokens.mjs        # régénère Dart / CSS / Tailwind depuis tokens.json
+node scripts/build-tokens.mjs        # régénère Dart / CSS / thème Tailwind depuis tokens.json
 node scripts/check-copy.mjs --fix    # corrige la typographie française des textes
 node scripts/build-maquettes.mjs     # assemble maquettes/index.html
 node scripts/render.mjs              # exporte icônes et écrans en PNG (Chromium via Playwright)

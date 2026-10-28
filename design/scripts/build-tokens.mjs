@@ -69,30 +69,26 @@ export function buildCss(t) {
   return L.join('\n');
 }
 
-export function buildTailwindPreset(t) {
-  const colors = Object.fromEntries(Object.keys(t.themes.light).map((r) => [kebab(r), `var(--in-${kebab(r)})`]));
-  const fontSize = Object.fromEntries(
-    Object.entries(t.typography.scale).map(([k, s]) => [kebab(k), [`${s.size / 16}rem`, { lineHeight: `${s.lineHeight / 16}rem`, fontWeight: String(s.weight), letterSpacing: `${s.letterSpacing}px` }]]),
-  );
-  const preset = {
-    theme: {
-      extend: {
-        colors,
-        fontFamily: { display: 'var(--in-font-display)', body: 'var(--in-font-body)' },
-        fontSize,
-        borderRadius: Object.fromEntries(Object.keys(t.radius).map((k) => [k === 'pill' ? 'pill' : `in-${k}`, `var(--in-radius-${k})`])),
-        boxShadow: Object.fromEntries(Object.keys(t.elevation).map((k) => [`in-${k}`, `var(--in-shadow-${k})`])),
-      },
-    },
-  };
-  return `// ${HEADER}\n// À utiliser avec tokens.css (variables CSS, thèmes clair et sombre).\nmodule.exports = ${JSON.stringify(preset, null, 2)};\n`;
+export function buildTailwindTheme(t) {
+  // Tailwind 4 : thème déclaré en CSS. Les utilitaires (bg-surface, text-text-muted, rounded-in-md…)
+  // pointent vers les variables de tokens.css, qui changent avec le thème clair/sombre.
+  const L = [`/* ${HEADER} Version ${t.version} */`, '/* À importer après tokens.css et `@import "tailwindcss";`. */', '@theme inline {'];
+  for (const r of Object.keys(t.themes.light)) L.push(`  --color-${kebab(r)}: var(--in-${kebab(r)});`);
+  L.push('  --font-display: var(--in-font-display);', '  --font-body: var(--in-font-body);');
+  for (const k of Object.keys(t.radius)) L.push(`  --radius-in-${k}: var(--in-radius-${k});`);
+  for (const k of Object.keys(t.elevation)) L.push(`  --shadow-in-${k}: var(--in-shadow-${k});`);
+  for (const [k, s] of Object.entries(t.typography.scale)) {
+    L.push(`  --text-${kebab(k)}: ${s.size / 16}rem;`, `  --text-${kebab(k)}--line-height: ${s.lineHeight / 16}rem;`, `  --text-${kebab(k)}--font-weight: ${s.weight};`);
+  }
+  L.push('}', '');
+  return L.join('\n');
 }
 
 export function outputs(t) {
   return {
     'generated/flutter/ineed_tokens.dart': buildDart(t),
     'generated/web/tokens.css': buildCss(t),
-    'generated/web/tailwind-preset.cjs': buildTailwindPreset(t),
+    'generated/web/tailwind-theme.css': buildTailwindTheme(t),
   };
 }
 
