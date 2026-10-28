@@ -1,7 +1,7 @@
 // Génère les tokens pour Flutter (Dart) et le web (CSS + preset Tailwind) à partir de tokens.json.
 // Usage : node scripts/build-tokens.mjs          -> écrit les fichiers
 //         node scripts/build-tokens.mjs --check  -> échoue si les fichiers générés ne sont pas à jour (CI)
-import { writeFileSync, readFileSync, mkdirSync, existsSync } from 'node:fs';
+import { writeFileSync, readFileSync, mkdirSync, existsSync, readdirSync } from 'node:fs';
 import { join, dirname, relative } from 'node:path';
 import { loadTokens, resolve, kebab, camel, DESIGN_DIR } from './tokens-lib.mjs';
 
@@ -85,10 +85,17 @@ export function buildTailwindTheme(t) {
 }
 
 export function outputs(t) {
+  const icons = Object.fromEntries(
+    readdirSync(join(DESIGN_DIR, 'icons/categories'))
+      .filter((f) => f.endsWith('.svg'))
+      .map((f) => [`../mobile/packages/ineed_ui/assets/categories/${f}`, readFileSync(join(DESIGN_DIR, 'icons/categories', f), 'utf8')]),
+  );
   return {
     '../mobile/packages/ineed_ui/lib/src/tokens/ineed_tokens.dart': buildDart(t),
     'generated/web/tokens.css': buildCss(t),
     'generated/web/tailwind-theme.css': buildTailwindTheme(t),
+    // Icônes de métiers copiées dans le paquet Flutter (clé = categories.icon_key).
+    ...icons,
   };
 }
 

@@ -310,5 +310,40 @@
   "environmentStaging": "préproduction",
   "dependencyDatabase": "base de données",
   "dependencyRedis": "file de tâches",
-  "dependencyStorage": "stockage des fichiers"
+  "dependencyStorage": "stockage des fichiers",
+  "photoTake": "Prendre une photo",
+  "photoGallery": "Choisir dans la galerie",
+  "photoUploading": "Envoi de la photo…",
+  "photoPermissionDenied": "L’accès aux photos est refusé. Vous pouvez l’autoriser dans les réglages du téléphone.",
+  "authOtpCodeLabel": "Code de vérification",
+  "authOtpSent": "Nouveau code envoyé.",
+  "authOtpVerifying": "Vérification du code…",
+  "profileDevicesTitle": "Appareils connectés",
+  "profileDevicesHelp": "Déconnectez un appareil que vous n’utilisez plus ou que vous ne reconnaissez pas.",
+  "profileDevicesLastUsed": "Dernière activité le {date}",
+  "@profileDevicesLastUsed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileDevicesUnknown": "Appareil sans nom",
+  "profileDevicesRevoked": "Appareil déconnecté.",
+  "sessionAppClient": "Application Ineed",
+  "sessionAppPro": "Application Ineed Pro",
+  "sessionAppAdmin": "Administration",
+  "profileDeleteCodeTitle": "Confirmez avec le code reçu par SMS",
+  "profileDeleteCodeSubtitle": "Saisissez le code envoyé au {phone} pour supprimer définitivement votre compte.",
+  "@profileDeleteCodeSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNameRequired": "Indiquez votre prénom et votre nom.",
+  "profileNameInvalid": "Utilisez uniquement des lettres, des espaces, des tirets ou des apostrophes.",
+  "actionRefresh": "Actualiser",
+  "apiStatusLink": "État de la connexion à l’API"
 }

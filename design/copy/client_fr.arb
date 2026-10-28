@@ -476,5 +476,8 @@
   "complaintStatusInReview": "En cours d’examen",
   "complaintStatusWaitingUser": "Réponse attendue de votre part",
   "complaintStatusResolved": "Résolue",
-  "complaintStatusRejected": "Close sans suite"
+  "complaintStatusRejected": "Close sans suite",
+  "homeComingSoonTitle": "La recherche de professionnels arrive bientôt",
+  "homeComingSoonBody": "Votre compte est prêt. Vous pourrez bientôt décrire votre besoin et trouver un professionnel vérifié près de chez vous. Voici les métiers qui seront proposés :",
+  "homeCategoriesEmpty": "Aucun métier n’est encore proposé. Revenez bientôt."
 }

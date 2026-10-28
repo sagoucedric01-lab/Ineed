@@ -5,7 +5,7 @@ import 'package:ineed_ui/ineed_ui.dart';
 
 import 'l10n/gen/app_localizations.dart';
 
-/// Écran technique de la phase 3 : vérifie la connexion à l'API. Remplacé par l'accueil en phase 4.
+/// Diagnostic technique (hors production, depuis « Mon compte ») : vérifie la connexion à l'API et à ses services.
 class DevStatusScreen extends StatefulWidget {
   const DevStatusScreen({required this.environment, required this.checkApi, super.key});
 

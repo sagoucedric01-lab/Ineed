@@ -9,6 +9,7 @@ workspace:
   - apps/pro
   - packages/ineed_core
   - packages/ineed_ui
+  - packages/ineed_shared
   - packages/ineed_api
 dev_dependencies:
   flutter_lints: 6.0.0
