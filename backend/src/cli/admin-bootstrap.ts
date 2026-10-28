@@ -23,7 +23,7 @@ const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: env.
 try {
   const existing = await prisma.userRole.count({ where: { role: { code: 'ADMIN_SUPER' } } });
   if (existing > 0) {
-    console.error('Un super-administrateur existe déjà. Les autres comptes se créent depuis l’administration.');
+    console.error('Un super-administrateur existe déjà : cet outil ne crée que le premier compte administrateur.');
     process.exitCode = 1;
   } else {
     const password = randomBytes(18).toString('base64url');
@@ -37,7 +37,7 @@ try {
     });
     console.log(`Super-administrateur créé : ${email}`);
     console.log(`Mot de passe provisoire (affiché une seule fois, à changer après la première connexion) : ${password}`);
-    console.log('À la première connexion, l’administration demandera d’enregistrer la double authentification.');
+    console.log('À la première connexion, une graine TOTP est fournie : la double authentification est obligatoire.');
   }
 } finally {
   await prisma.$disconnect();

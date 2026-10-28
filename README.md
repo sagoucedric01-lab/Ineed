@@ -2,8 +2,10 @@
 
 Marketplace de services de proximité (plombiers, électriciens, mécaniciens…) — marché initial : Abidjan, Côte d'Ivoire.
 
-**État actuel : phase 3 (socle technique) terminée.** API, base de données, administration et applications mobiles
-démarrent et sont testées ; les fonctionnalités métier commencent en phase 4. Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
+**État actuel : phase 4 (authentification, profils, inscription des professionnels) terminée, en mode développement pour les SMS.**
+Connexion par code SMS, sessions, compte, suppression de compte, dossier professionnel et validation par l'administration (API)
+fonctionnent et sont testés ; aucun SMS réel n'est envoyé tant qu'un fournisseur n'est pas configuré.
+Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
 
 ## Organisation du dépôt
 
@@ -21,6 +23,10 @@ démarrent et sont testées ; les fonctionnalités métier commencent en phase 4
 Voir [docs/installation-locale.md](docs/installation-locale.md). En bref, avec Docker :
 
 ```bash
+node tools/generate-dev-secrets.mjs --write infra/.env.secrets
+```
+
+```bash
 docker compose -f infra/docker-compose.yml up --build
 ```
 
@@ -31,3 +37,4 @@ Puis http://localhost:3000/health/ready (API), http://localhost:3000/docs (docum
 - Phase 1 : [analyse](docs/phase-1/01-analyse-et-ambiguites.md), [architecture](docs/phase-1/02-architecture.md), [base de données](docs/phase-1/03-base-de-donnees.md), [parcours et états](docs/phase-1/04-parcours-et-etats.md), [prestataires et coûts](docs/phase-1/05-prestataires-externes.md), [plan](docs/phase-1/06-plan-de-developpement.md), [décisions](docs/phase-1/07-decisions-a-valider.md)
 - Phase 2 : [rapport](docs/phase-2/rapport-phase-2.md), [inventaire des écrans](docs/phase-2/inventaire-ecrans.md), [système de design](design/README.md)
 - Phase 3 : [rapport](docs/phase-3/rapport-phase-3.md), [installation locale](docs/installation-locale.md), [API (OpenAPI)](docs/api/openapi.json)
+- Phase 4 : [rapport](docs/phase-4/rapport-phase-4.md)

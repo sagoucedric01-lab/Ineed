@@ -25,6 +25,12 @@ cd Ineed && pnpm install
 
 ## 2. Option A : tout lancer dans Docker
 
+Générer une fois les secrets locaux (clé de signature des sessions, clé de chiffrement, sel des codes SMS). Le fichier n'est pas versionné :
+
+```bash
+node tools/generate-dev-secrets.mjs --write infra/.env.secrets
+```
+
 ```bash
 docker compose -f infra/docker-compose.yml up --build
 ```
@@ -64,7 +70,7 @@ pnpm dev:infra
 Préparer l'API (une seule fois) :
 
 ```bash
-cp backend/.env.example backend/.env
+cp backend/.env.example backend/.env && node tools/generate-dev-secrets.mjs --write backend/.env
 ```
 
 ```bash
@@ -87,7 +93,36 @@ cp admin/.env.example admin/.env.local && pnpm --filter @ineed/admin dev
 
 > L'API est compilée par `tsc` en continu (`scripts/dev.mjs`) : NestJS a besoin des métadonnées de décorateurs, que `tsx` et esbuild ne produisent pas.
 
-## 4. Applications mobiles
+## 4. Connexion en mode développement (codes SMS)
+
+Aucun fournisseur SMS n'est configuré : avec `OTP_PROVIDER=dev_console` (valeur par défaut hors production), **aucun SMS n'est envoyé**.
+Le code à 6 chiffres est écrit dans les journaux de l'API, par exemple :
+
+```text
+WARN [OTP (développement)] [DÉVELOPPEMENT — aucun SMS envoyé] Code pour +2250712345678 : 483920
+```
+
+Les applications affichent « Mode développement » sur l'écran de saisie du code. Ce mode est refusé au démarrage quand `APP_ENV=production`.
+Pour de vrais SMS, renseignez `OTP_PROVIDER=twilio_verify` et les trois variables `TWILIO_*` (voir `backend/.env.example`).
+
+## 5. Premier compte administrateur
+
+Aucun compte administrateur n'existe par défaut et aucun mot de passe n'est écrit dans le code. Le premier super-administrateur se crée en ligne de commande (refusé s'il en existe déjà un) :
+
+```bash
+pnpm --filter @ineed/backend admin:bootstrap --email exploitation@exemple.ci --first-name Aminata --last-name Diallo
+```
+
+Avec Docker :
+
+```bash
+docker compose -f infra/docker-compose.yml run --rm setup node dist/cli/admin-bootstrap.js --email exploitation@exemple.ci --first-name Aminata --last-name Diallo
+```
+
+Le mot de passe provisoire s'affiche **une seule fois**. À la première connexion (`POST /v1/admin/auth/login`), l'API renvoie une graine TOTP à enregistrer dans une application d'authentification ;
+la connexion se termine avec un code TOTP (`POST /v1/admin/auth/totp`). L'interface web de connexion arrive en phase 9 ; d'ici là, ces routes s'utilisent depuis `/docs`.
+
+## 6. Applications mobiles
 
 ```bash
 cd mobile && flutter pub get
@@ -104,12 +139,12 @@ Même commande dans `mobile/apps/pro` pour Ineed Pro.
 - Sur un téléphone réel, remplacez `INEED_API_URL` dans `config/dev.json` par l'adresse IP de votre ordinateur sur le réseau local.
 - Sur iOS, lancez sans `--flavor` : les variantes iOS (schémas Xcode) seront configurées lors de la préparation de la publication, sur un Mac.
 
-## 5. Tests et vérifications
+## 7. Tests et vérifications
 
 | Commande | Vérifie |
 |---|---|
 | `pnpm --filter @ineed/backend test` | Tests unitaires de l'API |
-| `pnpm --filter @ineed/backend test:integration` | Tests d'intégration (nécessite `pnpm dev:infra` et des buckets créés) |
+| `pnpm --filter @ineed/backend test:integration` | Tests d'intégration (nécessite `pnpm dev:infra` et des buckets créés ; secrets de test générés automatiquement) |
 | `pnpm --filter @ineed/backend migrate:check-drift` | Cohérence migrations SQL ↔ `schema.prisma` (base temporaire `SHADOW_DATABASE_URL`) |
 | `pnpm --filter @ineed/admin test` | Tests de l'administration |
 | `pnpm --filter @ineed/design run check` | Contrastes, textes, fichiers générés |
