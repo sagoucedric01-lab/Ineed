@@ -24,3 +24,6 @@ mobile/**/android/key.properties
 *.keystore
 mobile/apps/*/lib/l10n/gen/
 mobile/packages/ineed_shared/lib/l10n/gen/
+
+# Sauvegarde Redis créée par un redis-server lancé à la racine
+dump.rdb
