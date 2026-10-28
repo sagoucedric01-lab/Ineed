@@ -2,7 +2,7 @@
 
 Mis à jour à la fin de chaque phase. Légende : ✅ terminé et testé · 🟡 partiel · 🧪 simulé (développement uniquement) · ⏳ pas commencé.
 
-Dernière mise à jour : fin de la phase 4 (28/10/2026).
+Dernière mise à jour : fin de la phase 5 (28/10/2026).
 
 ## Socle technique
 
@@ -11,12 +11,12 @@ Dernière mise à jour : fin de la phase 4 (28/10/2026).
 | Monorepo (pnpm, Node 22, TypeScript 6.0) | ✅ | `backend`, `admin`, `design`, `mobile` |
 | Base PostgreSQL 16 + PostGIS, migrations versionnées | ✅ | 2 migrations Prisma ; zéro dérive avec `schema.prisma` (vérifié en CI) |
 | Invariants critiques en base (attribution unique, devis, paiements, grand livre, avis, audit) | ✅ | 10 vérifications exécutées en test d'intégration |
-| Référentiel (communes d'Abidjan, rôles et permissions, catégories, prestations, règles d'attribution, paramètres, gabarits de notification) | 🟡 | Chargé et idempotent. Centroïdes des communes **approximatifs** ; **aucun tarif** saisi (à fixer par l'équipe commerciale) |
+| Référentiel (communes d'Abidjan, rôles et permissions, catégories, prestations, règles d'attribution, paramètres, gabarits de notification) | 🟡 | Chargé et idempotent. Centres des communes **approximatifs** et **aucun contour** saisi (la commune d'un point est déduite du centre le plus proche) ; **aucun tarif** saisi |
 | Données de démonstration | ✅ | Fictives, marquées « démo », refusées hors local/test |
 | API : configuration validée, garde-fous de production | ✅ | Simulateurs OTP et paiement refusés quand `APP_ENV=production` |
 | API : santé (`/health/live`, `/health/ready`) | ✅ | Base + PostGIS, Redis, stockage S3, présence du worker |
 | API : format d'erreur français, identifiant de requête, journaux structurés masqués | ✅ | |
-| Documentation OpenAPI (`/docs`, `docs/api/openapi.json`) | ✅ | 32 routes (santé, authentification, compte, fichiers, référentiel, espace pro, validation admin) |
+| Documentation OpenAPI (`/docs`, `docs/api/openapi.json`) | ✅ | 63 routes |
 | Worker (tâches de fond) | 🟡 | Démarre et signale sa présence ; aucune file de tâches métier avant la phase 6 |
 | Stockage S3 | ✅ | Dépôt direct par URL présignée, contrôle du contenu réel, photos ré-encodées sans métadonnées (GPS compris), justificatifs dans un bucket privé |
 | Administration web | 🟡 | Page « État de la plateforme » uniquement. L'API d'administration (connexion avec TOTP, file de validation des pros) existe ; l'interface arrive en phase 9 |
@@ -42,8 +42,15 @@ Dernière mise à jour : fin de la phase 4 (28/10/2026).
 | Disponibilité du professionnel | 🟡 | Enregistrée sur le serveur ; les demandes reçues arrivent en phase 6 |
 | Connexion administrateur (mot de passe argon2id + TOTP obligatoire) | ✅ | API uniquement ; premier compte créé en ligne de commande |
 | Création des autres comptes administrateurs | ⏳ | Phase 9 (interface d'administration) |
-| Notifications | 🟡 | Enregistrées en base (notifications dans l'application) ; **aucun envoi push** avant la phase 8 |
-| Catalogue, recherche, géolocalisation, création de demande | ⏳ | Phase 5 (le catalogue et les communes sont déjà lisibles) |
+| Catalogue administrable (métiers, prestations, compétences, désactivation immédiate) | 🟡 | API terminée et testée ; écrans d'administration en phase 9 |
+| Villes, communes, quartiers, contours GeoJSON | 🟡 | API d'administration terminée ; contours officiels à saisir |
+| Recherche par mots du client (synonymes, sans accents), recherches récentes | ✅ | |
+| Adresses avec repère, commune vérifiée, point sur la carte | ✅ | Carte affichée seulement si un fond de carte est configuré (`INEED_MAP_TILE_URL`) ; **aucun géocodage d'adresse textuelle** (pas de clé Google Maps) |
+| Recherche de professionnels proches (urgence et programmé), classement, délai estimé, pistes sans résultat | ✅ | T4, T6. Délai = estimation à vitesse urbaine moyenne, pas un calcul d'itinéraire |
+| Profil public d'un professionnel | 🟡 | Sans avis (phase 8) |
+| Création de demande (photos, note vocale, budget, relecture, publication, annulation) | ✅ | T5. **Une demande publiée n'est encore transmise à aucun professionnel** : la mise en relation arrive en phase 6, et l'application le dit |
+| Position du professionnel disponible, point de départ, rayon | ✅ | Une seule position conservée, effacée au passage hors ligne |
+| Notifications dans l'application (liste, lecture) | 🟡 | Sans push (phase 8) |
 | Propositions, attribution, suivi de mission | ⏳ | Phase 6 |
 | Devis, paiements, remboursements, reversements | ⏳ | Phase 7 |
 | Notifications push, messagerie, avis, réclamations | ⏳ | Phase 8 |

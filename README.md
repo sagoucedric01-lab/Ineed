@@ -2,10 +2,10 @@
 
 Marketplace de services de proximité (plombiers, électriciens, mécaniciens…) — marché initial : Abidjan, Côte d'Ivoire.
 
-**État actuel : phase 4 (authentification, profils, inscription des professionnels) terminée, en mode développement pour les SMS.**
-Connexion par code SMS, sessions, compte, suppression de compte, dossier professionnel et validation par l'administration (API)
-fonctionnent et sont testés ; aucun SMS réel n'est envoyé tant qu'un fournisseur n'est pas configuré.
-Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
+**État actuel : phase 5 (catalogue, géolocalisation, demandes) terminée, en mode développement pour les SMS.**
+Connexion, compte, inscription et validation des professionnels, recherche de professionnels proches, adresses avec repères
+et création de demandes fonctionnent et sont testés. Une demande publiée n'est pas encore transmise aux professionnels
+(mise en relation : phase 6). Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
 
 ## Organisation du dépôt
 
@@ -38,3 +38,4 @@ Puis http://localhost:3000/health/ready (API), http://localhost:3000/docs (docum
 - Phase 2 : [rapport](docs/phase-2/rapport-phase-2.md), [inventaire des écrans](docs/phase-2/inventaire-ecrans.md), [système de design](design/README.md)
 - Phase 3 : [rapport](docs/phase-3/rapport-phase-3.md), [installation locale](docs/installation-locale.md), [API (OpenAPI)](docs/api/openapi.json)
 - Phase 4 : [rapport](docs/phase-4/rapport-phase-4.md)
+- Phase 5 : [rapport](docs/phase-5/rapport-phase-5.md)

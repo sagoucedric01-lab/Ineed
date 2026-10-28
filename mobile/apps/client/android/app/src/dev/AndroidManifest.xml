@@ -1,0 +1,5 @@
+<!-- Variante « dev » uniquement : l'API locale (http://10.0.2.2:3000 depuis l'émulateur) n'a pas de HTTPS.
+     Staging et production n'autorisent que HTTPS (comportement par défaut d'Android). -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:usesCleartextTraffic="true" />
+</manifest>

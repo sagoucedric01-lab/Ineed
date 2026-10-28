@@ -2,6 +2,14 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Ineed utilise l’appareil photo pour joindre une photo du problème à votre demande et pour votre photo de profil.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ineed accède à vos photos pour joindre une image à votre demande ou choisir votre photo de profil.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ineed utilise votre position pour placer l’adresse d’intervention sur la carte et trouver les professionnels proches.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Ineed utilise le micro pour enregistrer une note vocale décrivant votre problème.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>

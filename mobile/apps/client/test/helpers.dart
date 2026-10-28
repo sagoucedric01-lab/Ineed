@@ -1,4 +1,6 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ineed_api/ineed_api.dart';
 import 'package:ineed_api/testing.dart';
@@ -33,10 +35,16 @@ Map<String, Object?> challengeJson() => {
     };
 
 /// Démarre l'application client complète sur un faux serveur.
-Future<ProviderContainer> pumpClientApp(WidgetTester tester, FakeServer server, TokenStore store) async {
+Future<ProviderContainer> pumpClientApp(WidgetTester tester, FakeServer server, TokenStore store, {List<Override> overrides = const [], bool tallScreen = false}) async {
+  if (tallScreen) {
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+  }
   late final ProviderContainer container;
-  final api = IneedApiClient(baseUrl: devEnv.apiBaseUrl, tokenStore: store, adapter: server, onSessionExpired: () => container.read(sessionProvider.notifier).expired());
-  container = ProviderContainer(overrides: [apiProvider.overrideWithValue(api), appKindProvider.overrideWithValue('CLIENT')]);
+  final api = IneedApiClient(baseUrl: devEnv.apiBaseUrl, tokenStore: store, adapter: server, uploadAdapter: server, onSessionExpired: () => container.read(sessionProvider.notifier).expired());
+  // Pas de relance automatique dans les tests : chaque requête est explicite.
+  container = ProviderContainer(retry: (_, _) => null, overrides: [apiProvider.overrideWithValue(api), appKindProvider.overrideWithValue('CLIENT'), ...overrides]);
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: IneedApp(environment: devEnv)));
   await tester.pumpAndSettle();

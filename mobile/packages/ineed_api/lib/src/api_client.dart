@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
 import 'api_failure.dart';
+import 'marketplace.dart';
 import 'models.dart';
 import 'readiness.dart';
 import 'tokens.dart';
@@ -240,6 +241,90 @@ class IneedApiClient {
   Future<ProProfile> setAvailability({required bool isOnline}) => _guard(
         () async => ProProfile.fromJson(await _json(_dio.patch('/v1/pro/availability', data: {'isOnline': isOnline}, options: _auth()))),
       );
+
+  /// Point de départ et distance maximale (modifiables à tout moment, sans nouvelle vérification).
+  Future<ProProfile> setServiceArea({LatLng? baseLocation, int? serviceRadiusM}) => _guard(
+        () async => ProProfile.fromJson(await _json(_dio.put('/v1/pro/service-area',
+            data: {'baseLocation': ?baseLocation?.toJson(), 'serviceRadiusM': ?serviceRadiusM}, options: _auth()))),
+      );
+
+  /// Position du moment, envoyée seulement quand le professionnel est disponible.
+  Future<void> updateProLocation(LatLng position) => _guard(() => _dio.put<void>('/v1/pro/location', data: position.toJson(), options: _auth()));
+
+  // ---------------------------------------------------------------- Recherche et lieux (application client)
+
+  Future<CatalogSearchResult> searchCatalog(String query) => _guard(
+        () async => CatalogSearchResult.fromJson(await _json(_dio.get('/v1/catalog/search', queryParameters: {'q': query}, options: _auth()))),
+      );
+
+  Future<List<RecentSearch>> recentSearches() =>
+      _guard(() async => (await _jsonList(_dio.get('/v1/catalog/recent-searches', options: _auth()))).map(RecentSearch.fromJson).toList());
+
+  /// Ville et commune d'un point (calcul fait par le serveur, sans service de géocodage externe).
+  Future<Located> locate(LatLng point) =>
+      _guard(() async => Located.fromJson(await _json(_dio.get('/v1/geo/locate', queryParameters: point.toJson(), options: _auth()))));
+
+  Future<List<Address>> addresses() => _guard(() async => (await _jsonList(_dio.get('/v1/me/addresses', options: _auth()))).map(Address.fromJson).toList());
+
+  Future<Address> createAddress(PlaceInput place) =>
+      _guard(() async => Address.fromJson(await _json(_dio.post('/v1/me/addresses', data: place.toJson(), options: _auth()))));
+
+  Future<Address> updateAddress(String id, PlaceInput place) =>
+      _guard(() async => Address.fromJson(await _json(_dio.put('/v1/me/addresses/$id', data: place.toJson(), options: _auth()))));
+
+  Future<void> deleteAddress(String id) => _guard(() => _dio.delete<void>('/v1/me/addresses/$id', options: _auth()));
+
+  Future<ProSearchResult> searchPros({
+    required String categoryId,
+    required RequestMode mode,
+    required LatLng location,
+    String? serviceId,
+    String? zoneId,
+    int? radiusM,
+    TimeWindow? window,
+  }) =>
+      _guard(() async => ProSearchResult.fromJson(await _json(_dio.get('/v1/pros/search',
+          queryParameters: {
+            'categoryId': categoryId,
+            'mode': mode.code,
+            ...location.toJson(),
+            'serviceId': ?serviceId,
+            'zoneId': ?zoneId,
+            'radiusM': ?radiusM,
+            ...?window?.toJson(),
+          },
+          options: _auth()))));
+
+  Future<PublicProProfile> publicProProfile(String id) =>
+      _guard(() async => PublicProProfile.fromJson(await _json(_dio.get('/v1/pros/$id', options: _auth()))));
+
+  // ---------------------------------------------------------------- Demandes
+
+  Future<ServiceRequest> createRequest(RequestDraft draft) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests', data: draft.toJson(), options: _auth()))));
+
+  Future<ServiceRequest> updateRequest(String id, RequestDraft draft) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.put('/v1/requests/$id', data: draft.toJson(), options: _auth()))));
+
+  Future<ServiceRequest> request(String id) => _guard(() async => ServiceRequest.fromJson(await _json(_dio.get('/v1/requests/$id', options: _auth()))));
+
+  /// Mes demandes : `active` (en cours) ou `history` (terminées, annulées).
+  Future<List<RequestSummary>> requests({String scope = 'active'}) => _guard(
+        () async => (await _jsonList(_dio.get('/v1/requests', queryParameters: {'scope': scope}, options: _auth()))).map(RequestSummary.fromJson).toList(),
+      );
+
+  Future<ServiceRequest> publishRequest(String id) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$id/publish', options: _auth()))));
+
+  Future<ServiceRequest> cancelRequest(String id, {String? reason}) => _guard(
+        () async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$id/cancel', data: {'reason': ?reason}, options: _auth()))),
+      );
+
+  // ---------------------------------------------------------------- Notifications
+
+  Future<NotificationsPage> notifications() => _guard(() async => NotificationsPage.fromJson(await _json(_dio.get('/v1/me/notifications', options: _auth()))));
+
+  Future<void> markNotificationsRead() => _guard(() => _dio.post<void>('/v1/me/notifications/read', options: _auth()));
 
   void close() {
     _dio.close(force: true);

@@ -1,12 +1,11 @@
 // Modèles des réponses de l'API (contrat : docs/api/openapi.json).
 
-T _req<T>(Map<String, Object?> j, String k) {
-  final v = j[k];
-  if (v is! T) throw FormatException('Champ « $k » manquant ou invalide');
-  return v;
-}
+import 'json.dart';
+import 'marketplace.dart';
 
-List<Map<String, Object?>> _list(Map<String, Object?> j, String k) => (j[k] as List<Object?>? ?? const []).cast<Map<String, Object?>>();
+T _req<T>(Map<String, Object?> j, String k) => req<T>(j, k);
+
+List<Map<String, Object?>> _list(Map<String, Object?> j, String k) => listOf(j, k);
 
 class OtpChallenge {
   const OtpChallenge({required this.challengeId, required this.expiresAt, required this.resendAvailableAt, required this.devMode});
@@ -86,26 +85,39 @@ class Skill {
 }
 
 class Category {
-  const Category({required this.id, required this.slug, required this.name, required this.iconKey, required this.skills});
+  const Category({required this.id, required this.slug, required this.name, required this.iconKey, required this.skills, this.description, this.services = const []});
   factory Category.fromJson(Map<String, Object?> j) => Category(
         id: _req<String>(j, 'id'),
         slug: _req<String>(j, 'slug'),
         name: _req<String>(j, 'name'),
         iconKey: _req<String>(j, 'iconKey'),
+        description: j['description'] as String?,
         skills: _list(j, 'skills').map(Skill.fromJson).toList(),
+        services: _list(j, 'services').map(Service.fromJson).toList(),
       );
   final String id;
   final String slug;
   final String name;
   final String iconKey;
+  final String? description;
   final List<Skill> skills;
+
+  /// Prestations (sous-catégories) proposées aux clients.
+  final List<Service> services;
 }
 
 class Zone {
-  const Zone({required this.id, required this.name});
-  factory Zone.fromJson(Map<String, Object?> j) => Zone(id: _req<String>(j, 'id'), name: _req<String>(j, 'name'));
+  const Zone({required this.id, required this.name, this.centroid});
+  factory Zone.fromJson(Map<String, Object?> j) => Zone(
+        id: _req<String>(j, 'id'),
+        name: _req<String>(j, 'name'),
+        centroid: j['centroid'] == null ? null : LatLng.fromJson(j['centroid']! as Map<String, Object?>),
+      );
   final String id;
   final String name;
+
+  /// Centre approximatif de la commune (pour centrer la carte).
+  final LatLng? centroid;
 }
 
 class WeeklyHour {
@@ -163,6 +175,8 @@ class ProProfile {
     required this.lastDecisionNote,
     required this.isOnline,
     required this.missing,
+    this.serviceRadiusM = 10000,
+    this.baseLocation,
     required this.canSubmit,
   });
   factory ProProfile.fromJson(Map<String, Object?> j) => ProProfile(
@@ -179,6 +193,8 @@ class ProProfile {
         verificationStatus: _req<String>(j, 'verificationStatus'),
         lastDecisionNote: j['lastDecisionNote'] as String?,
         isOnline: j['isOnline'] == true,
+        serviceRadiusM: (j['serviceRadiusM'] as num?)?.toInt() ?? 10000,
+        baseLocation: j['baseLocation'] == null ? null : LatLng.fromJson(j['baseLocation']! as Map<String, Object?>),
         missing: (j['missing'] as List<Object?>? ?? const []).whereType<String>().toList(),
         canSubmit: j['canSubmit'] == true,
       );
@@ -196,6 +212,10 @@ class ProProfile {
   final String? lastDecisionNote;
   final bool isOnline;
   final List<String> missing;
+
+  /// Distance maximale acceptée (m) et point de départ habituel : réglages modifiables à tout moment.
+  final int serviceRadiusM;
+  final LatLng? baseLocation;
   final bool canSubmit;
 
   bool get isEditable => verificationStatus == 'DRAFT' || verificationStatus == 'INFO_REQUESTED';

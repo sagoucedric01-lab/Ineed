@@ -478,5 +478,133 @@
   "complaintStatusRejected": "Close sans suite",
   "homeComingSoonTitle": "La recherche de professionnels arrive bientôt",
   "homeComingSoonBody": "Votre compte est prêt. Vous pourrez bientôt décrire votre besoin et trouver un professionnel vérifié près de chez vous. Voici les métiers qui seront proposés :",
-  "homeCategoriesEmpty": "Aucun métier n’est encore proposé. Revenez bientôt."
+  "homeCategoriesEmpty": "Aucun métier n’est encore proposé. Revenez bientôt.",
+  "addressesTitle": "Mes adresses",
+  "addressAdd": "Ajouter une adresse",
+  "addressesEmpty": "Aucune adresse enregistrée. Ajoutez celle où le professionnel doit intervenir.",
+  "addressEditTitle": "Adresse d’intervention",
+  "addressMapUnavailable": "La carte n’est pas disponible. Utilisez votre position ou choisissez votre commune, puis décrivez un repère.",
+  "addressCommuneApproximate": "Commune déduite de la position : vérifiez-la.",
+  "addressLandmarkRequired": "Indiquez un repère (ou une rue) pour que le professionnel trouve l’endroit.",
+  "addressSave": "Enregistrer l’adresse",
+  "addressDelete": "Supprimer l’adresse",
+  "addressDeleteConfirm": "Supprimer cette adresse ? Les demandes passées en gardent une copie.",
+  "mapAttributionOsm": "© contributeurs OpenStreetMap",
+  "resultsTitle": "Professionnels disponibles",
+  "resultsRadius": "Dans un rayon de {km} km",
+  "@resultsRadius": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsRadiusZone": "Dans un rayon de {km} km autour de {zone}",
+  "@resultsRadiusZone": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      },
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsDistance": "À {km} km",
+  "@resultsDistance": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "resultsEta": "Arrivée estimée : {minutes} min",
+  "@resultsEta": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsZoneOnly": "Intervient dans votre commune",
+  "resultsFromBase": "Distance depuis son point de départ habituel",
+  "resultsVerified": "Vérifié par Ineed",
+  "resultsMissions": "{count, plural, =0{Nouveau sur Ineed} =1{1 mission réalisée} other{{count} missions réalisées}}",
+  "@resultsMissions": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsRating": "{rating} sur 5 ({count} avis)",
+  "@resultsRating": {
+    "placeholders": {
+      "rating": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "resultsAvailableNow": "Disponible maintenant",
+  "resultsDescribeNeed": "Décrire mon besoin",
+  "resultsPickSlot": "Choisir un créneau",
+  "resultsNeedAddress": "Choisissez d’abord l’adresse d’intervention.",
+  "requestNewTitle": "Nouvelle demande",
+  "requestCategoryLabel": "Métier",
+  "requestWhereLabel": "Adresse d’intervention",
+  "requestChooseAddress": "Choisir l’adresse",
+  "requestBudgetInvalid": "Indiquez un montant entier en F CFA, 500 au minimum.",
+  "requestVoiceStart": "Enregistrer une note vocale",
+  "requestVoiceStop": "Arrêter l’enregistrement",
+  "requestVoiceRecorded": "Note vocale de {seconds} s",
+  "@requestVoiceRecorded": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "requestVoiceDelete": "Supprimer la note vocale",
+  "requestPhotoRemove": "Retirer la photo",
+  "requestReviewCta": "Relire ma demande",
+  "requestSlotSummary": "Le {date}, de {start} à {end}",
+  "@requestSlotSummary": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "requestSlotRequired": "Choisissez le jour et les heures de l’intervention.",
+  "requestDetailTitle": "Ma demande",
+  "requestsTitle": "Mes demandes",
+  "requestsTabActive": "En cours",
+  "requestsTabHistory": "Terminées",
+  "requestsEmptyHistory": "Vos demandes terminées ou annulées apparaîtront ici.",
+  "requestStatusDraft": "Brouillon",
+  "requestStatusPublished": "Publiée",
+  "requestStatusMatching": "Recherche de professionnels",
+  "requestStatusOffersReceived": "Propositions reçues",
+  "requestStatusNoProvider": "Aucun professionnel trouvé",
+  "requestStatusReserved": "Professionnel réservé",
+  "requestStatusAwaitingConfirmation": "À confirmer",
+  "requestStatusAssigned": "Professionnel confirmé",
+  "requestStatusExpired": "Expirée",
+  "requestStatusCancelled": "Annulée",
+  "requestPublishedPending": "Votre demande est enregistrée. Les professionnels ne sont pas encore prévenus automatiquement : la mise en relation arrive dans la prochaine version d’Ineed.",
+  "requestCancelConfirm": "Annuler cette demande ?",
+  "requestCancelled": "Demande annulée.",
+  "requestHistory": "Historique",
+  "requestEditDraft": "Modifier la demande",
+  "requestDraftSaved": "Brouillon enregistré.",
+  "searchServices": "Prestations"
 }

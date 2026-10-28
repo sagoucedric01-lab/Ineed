@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Ineed Pro utilise l’appareil photo pour vos justificatifs et votre photo de profil.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Ineed Pro accède à vos photos pour envoyer vos justificatifs et votre photo de profil.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Ineed Pro utilise votre position, uniquement quand vous êtes disponible, pour vous proposer les demandes proches.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>CFBundleDevelopmentRegion</key>
