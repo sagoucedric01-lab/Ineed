@@ -14,12 +14,16 @@ dependencies:
   flutter_localizations:
     sdk: flutter
   intl: any
+  flutter_riverpod: 3.4.3
+  go_router: 18.0.2
   ineed_api:
     path: ../../packages/ineed_api
   ineed_core:
     path: ../../packages/ineed_core
   ineed_ui:
     path: ../../packages/ineed_ui
+  ineed_shared:
+    path: ../../packages/ineed_shared
 
 dev_dependencies:
   flutter_test:

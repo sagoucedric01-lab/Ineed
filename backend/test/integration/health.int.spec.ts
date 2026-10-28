@@ -3,7 +3,7 @@ import request from 'supertest';
 import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
 import { createApp } from '../../src/bootstrap.js';
 import { createTestDatabase, migrate, type TestDatabase } from '../helpers/db.js';
-import { apiEnv } from '../helpers/env.js';
+import { apiEnv, productionOverrides } from '../helpers/env.js';
 
 /** Démarre l'API avec une configuration donnée (process.env est restauré après chaque test). */
 async function startApi(env: Record<string, string>): Promise<INestApplication> {
@@ -93,7 +93,7 @@ describe('API : santé et format des erreurs', () => {
   });
 
   it('ne sert pas la documentation en production (sauf demande explicite)', async () => {
-    app = await startApi(apiEnv(db.url, { APP_ENV: 'production', NODE_ENV: 'production', OTP_PROVIDER: 'twilio_verify', PAYMENT_PROVIDER: 'cinetpay' }));
+    app = await startApi(apiEnv(db.url, productionOverrides));
     await request(app.getHttpServer()).get('/docs/openapi.json').expect(404);
   });
 

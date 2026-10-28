@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:ineed_api/ineed_api.dart';
 import 'package:ineed_core/ineed_core.dart';
+import 'package:ineed_shared/ineed_shared.dart';
 import 'package:ineed_ui/ineed_ui.dart';
 
-import 'l10n/gen/app_localizations.dart';
-
-/// Écran technique de la phase 3 : vérifie la connexion à l'API. Remplacé par l'accueil en phase 4.
+/// Diagnostic technique (hors production, depuis « Mon compte ») : vérifie la connexion à l'API et à ses services.
 class DevStatusScreen extends StatefulWidget {
   const DevStatusScreen({required this.environment, required this.checkApi, super.key});
 
@@ -46,7 +45,7 @@ class _DevStatusScreenState extends State<DevStatusScreen> {
     }
   }
 
-  String _message(AppLocalizations l10n) {
+  String _message(CommonLocalizations l10n) {
     String dependency(ApiDependency d) => switch (d) {
           ApiDependency.database => l10n.dependencyDatabase,
           ApiDependency.redis => l10n.dependencyRedis,
@@ -66,7 +65,7 @@ class _DevStatusScreenState extends State<DevStatusScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
+    final l10n = CommonLocalizations.of(context);
     final env = widget.environment;
     return DevStatusView(
       appName: l10n.appNameClient,

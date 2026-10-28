@@ -1,0 +1,348 @@
+{
+  "@@locale": "fr",
+  "appNameClient": "Ineed",
+  "appNamePro": "Ineed Pro",
+  "brandSignature": "Le bon pro, tout près.",
+  "actionContinue": "Continuer",
+  "actionCancel": "Annuler",
+  "actionRetry": "Réessayer",
+  "actionClose": "Fermer",
+  "actionSave": "Enregistrer",
+  "actionConfirm": "Confirmer",
+  "actionBack": "Retour",
+  "actionEdit": "Modifier",
+  "actionDelete": "Supprimer",
+  "actionSend": "Envoyer",
+  "actionSeeAll": "Tout voir",
+  "actionReport": "Signaler",
+  "actionHelp": "Aide",
+  "actionAccept": "Accepter",
+  "actionDecline": "Refuser",
+  "actionUnderstood": "J’ai compris",
+  "actionUpdateApp": "Mettre à jour",
+  "authWelcomeTitle": "Trouvez un professionnel de confiance près de chez vous",
+  "authWelcomeTitlePro": "Recevez des missions près de chez vous",
+  "authPhoneTitle": "Votre numéro de téléphone",
+  "authPhoneSubtitle": "Nous vous envoyons un code par SMS pour vérifier qu’il s’agit bien de vous.",
+  "authPhoneLabel": "Numéro de téléphone",
+  "authPhoneHint": "07 12 34 56 78",
+  "authPhoneInvalid": "Ce numéro n’est pas valide. Un numéro ivoirien compte 10 chiffres, par exemple 07 12 34 56 78.",
+  "authSendCode": "Recevoir le code",
+  "authOtpTitle": "Saisissez le code",
+  "authOtpSubtitle": "Code à 6 chiffres envoyé au {phone}.",
+  "@authOtpSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String",
+        "example": "+225 07 12 34 56 78"
+      }
+    }
+  },
+  "authOtpResendIn": "Renvoyer le code dans {seconds} s",
+  "@authOtpResendIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpResend": "Renvoyer le code",
+  "authOtpWrong": "Code incorrect. {attempts, plural, =1{Il vous reste 1 essai.} other{Il vous reste {attempts} essais.}}",
+  "@authOtpWrong": {
+    "placeholders": {
+      "attempts": {
+        "type": "int"
+      }
+    }
+  },
+  "authOtpExpired": "Ce code a expiré. Demandez-en un nouveau.",
+  "authOtpTooMany": "Trop de tentatives. Réessayez dans {minutes} min.",
+  "@authOtpTooMany": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "authChangeNumber": "Modifier le numéro",
+  "authTermsNotice": "En continuant, vous acceptez les conditions d’utilisation et la politique de confidentialité d’Ineed.",
+  "authDevModeBanner": "Mode développement : aucun SMS n’est envoyé, le code est affiché dans les journaux du serveur.",
+  "authSessionRevoked": "Vous avez été déconnecté de cet appareil. Reconnectez-vous pour continuer.",
+  "profileTitle": "Mon profil",
+  "profileFirstName": "Prénom",
+  "profileLastName": "Nom",
+  "profilePhoto": "Photo de profil",
+  "profilePhotoChange": "Changer la photo",
+  "profileCompleteTitle": "Comment vous appelez-vous ?",
+  "profileCompleteSubtitle": "Votre prénom est communiqué au professionnel une fois l’intervention confirmée.",
+  "profilePhone": "Téléphone",
+  "profileAddresses": "Mes adresses",
+  "profileNotifications": "Notifications",
+  "profileDevices": "Appareils connectés",
+  "profileDevicesCurrent": "Cet appareil",
+  "profileDevicesRevoke": "Déconnecter",
+  "profileSupport": "Aide et assistance",
+  "profileLegal": "Conditions et confidentialité",
+  "profileLogout": "Se déconnecter",
+  "profileLogoutConfirm": "Voulez-vous vous déconnecter de cet appareil ?",
+  "profileDeleteAccount": "Supprimer mon compte",
+  "profileDeleteTitle": "Supprimer votre compte ?",
+  "profileDeleteBody": "Vos informations personnelles seront effacées. L’historique de vos missions payées est conservé sans votre nom, pour des raisons comptables. Cette action est définitive.",
+  "profileDeleteBlocked": "Vous avez une mission en cours. Terminez-la ou annulez-la avant de supprimer votre compte.",
+  "profileDeleteConfirm": "Supprimer définitivement",
+  "profileDeleteDone": "Votre demande de suppression est enregistrée. Votre compte est désactivé.",
+  "profileSaved": "Profil enregistré.",
+  "errorNetwork": "Pas de connexion internet. Vérifiez votre réseau ; vos informations sont conservées.",
+  "errorTimeout": "Le serveur met trop de temps à répondre. Réessayez dans un instant.",
+  "errorServer": "Un problème est survenu de notre côté. Réessayez ; si cela continue, contactez l’assistance.",
+  "errorSessionExpired": "Votre session a expiré. Reconnectez-vous pour continuer.",
+  "errorForbidden": "Vous n’avez pas accès à cette information.",
+  "errorNotFound": "Cet élément n’existe plus ou a été supprimé.",
+  "errorValidation": "Certaines informations sont incomplètes. Vérifiez les champs signalés en rouge.",
+  "errorRequired": "Ce champ est obligatoire.",
+  "errorFileTooLarge": "Ce fichier dépasse {maxMb} Mo. Choisissez un fichier plus léger.",
+  "@errorFileTooLarge": {
+    "placeholders": {
+      "maxMb": {
+        "type": "int"
+      }
+    }
+  },
+  "errorFileType": "Ce type de fichier n’est pas accepté. Formats possibles : {formats}.",
+  "@errorFileType": {
+    "placeholders": {
+      "formats": {
+        "type": "String",
+        "example": "JPG, PNG, PDF"
+      }
+    }
+  },
+  "errorUploadFailed": "L’envoi du fichier a échoué. Vérifiez votre connexion puis réessayez.",
+  "errorAppOutdated": "Une nouvelle version de l’application est nécessaire pour continuer.",
+  "errorRateLimited": "Trop de demandes en peu de temps. Patientez une minute puis réessayez.",
+  "offlineBanner": "Hors connexion. Reconnexion en cours…",
+  "onlineAgain": "Connexion rétablie.",
+  "locationPermissionTitle": "Où faut-il intervenir ?",
+  "locationPermissionBody": "Ineed utilise votre position uniquement pour trouver des professionnels proches et préciser le lieu d’intervention.",
+  "locationUseCurrent": "Utiliser ma position actuelle",
+  "locationEnterManually": "Saisir une adresse",
+  "locationSearching": "Recherche de votre position…",
+  "locationDenied": "La localisation est désactivée. Saisissez l’adresse ou placez le repère sur la carte.",
+  "locationOpenSettings": "Ouvrir les réglages",
+  "locationLowAccuracy": "Position imprécise (environ {meters} m). Vérifiez le repère sur la carte.",
+  "@locationLowAccuracy": {
+    "placeholders": {
+      "meters": {
+        "type": "int"
+      }
+    }
+  },
+  "locationAdjustPin": "Déplacez la carte pour placer le repère à l’endroit exact.",
+  "locationOutsideZone": "Ineed n’est pas encore disponible à cet endroit. Pour le moment, nous intervenons dans les communes d’Abidjan.",
+  "addressCommune": "Commune",
+  "addressQuartier": "Quartier",
+  "addressStreet": "Rue ou voie (facultatif)",
+  "addressLandmark": "Point de repère",
+  "addressLandmarkHint": "Ex. : en face de la pharmacie, portail bleu",
+  "addressInstructions": "Indications pour le professionnel (facultatif)",
+  "addressInstructionsHint": "Ex. : 2ᵉ étage, sonner chez M. Kouassi",
+  "addressLabel": "Nom de l’adresse (facultatif)",
+  "addressLabelHint": "Ex. : Maison, Bureau",
+  "addressSaveForLater": "Enregistrer cette adresse",
+  "addressSaved": "Adresse enregistrée.",
+  "distanceApprox": "environ {km} km",
+  "@distanceApprox": {
+    "placeholders": {
+      "km": {
+        "type": "String",
+        "example": "2,4"
+      }
+    }
+  },
+  "etaApprox": "arrivée estimée dans {minutes} min",
+  "@etaApprox": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "etaUnavailable": "Durée de trajet non disponible",
+  "amountXof": "{amount} F CFA",
+  "@amountXof": {
+    "placeholders": {
+      "amount": {
+        "type": "String",
+        "example": "15 000"
+      }
+    }
+  },
+  "dateToday": "Aujourd’hui",
+  "dateTomorrow": "Demain",
+  "timeSlot": "{day}, {start} – {end}",
+  "@timeSlot": {
+    "placeholders": {
+      "day": {
+        "type": "String"
+      },
+      "start": {
+        "type": "String"
+      },
+      "end": {
+        "type": "String"
+      }
+    }
+  },
+  "pricingFixed": "Prix fixe",
+  "pricingQuote": "Sur devis",
+  "pricingTravelPlusDiagnosis": "Déplacement + devis sur place",
+  "pricingTravelFee": "Frais de déplacement",
+  "statusDraft": "Brouillon",
+  "statusPublished": "Demande publiée",
+  "statusMatching": "Recherche de professionnels",
+  "statusOffersReceived": "Propositions reçues",
+  "statusProvisionallyReserved": "Professionnel réservé",
+  "statusAwaitingClientConfirmation": "À confirmer",
+  "statusNoProviderFound": "Aucun professionnel disponible",
+  "statusExpired": "Demande expirée",
+  "statusAwaitingQuote": "En attente de devis",
+  "statusQuotePendingApproval": "Devis à valider",
+  "statusConfirmed": "Intervention confirmée",
+  "statusPaymentPending": "Paiement en attente",
+  "statusPaymentConfirmed": "Paiement confirmé",
+  "statusEnRoute": "Professionnel en route",
+  "statusArrived": "Professionnel arrivé",
+  "statusInProgress": "Intervention en cours",
+  "statusWorkCompleted": "Intervention terminée",
+  "statusClosed": "Mission clôturée",
+  "statusCancelled": "Annulée",
+  "statusDisputed": "En litige",
+  "verifiedBadge": "Identité vérifiée par Ineed",
+  "verifiedBadgeHelp": "L’équipe Ineed a contrôlé la pièce d’identité et les justificatifs de ce professionnel.",
+  "notVerifiedBadge": "Vérification en cours",
+  "ratingValue": "{rating} sur 5",
+  "@ratingValue": {
+    "placeholders": {
+      "rating": {
+        "type": "String",
+        "example": "4,8"
+      }
+    }
+  },
+  "ratingCount": "{count, plural, =0{Aucun avis} =1{1 avis} other{{count} avis}}",
+  "@ratingCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "missionsCompleted": "{count, plural, =0{Aucune mission terminée} =1{1 mission terminée} other{{count} missions terminées}}",
+  "@missionsCompleted": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "paymentTestBadge": "PAIEMENT DE TEST : aucun argent réel n’est débité",
+  "chatTitle": "Messages",
+  "chatInputHint": "Écrire un message",
+  "chatEmpty": "Aucun message pour l’instant. Posez vos questions ici, l’historique reste attaché à la mission.",
+  "chatPhoneWarning": "Pour votre sécurité, gardez les échanges et les paiements dans Ineed. En cas de problème, l’assistance pourra vous aider.",
+  "chatSendFailed": "Message non envoyé. Touchez pour réessayer.",
+  "chatReportMessage": "Signaler ce message",
+  "chatLocked": "Cette conversation est terminée. Elle reste consultable mais vous ne pouvez plus écrire.",
+  "chatPhoto": "Photo",
+  "reportTitle": "Signaler un problème",
+  "reportReasonSpam": "Message indésirable",
+  "reportReasonHarassment": "Propos insultants ou harcèlement",
+  "reportReasonFraud": "Tentative d’arnaque",
+  "reportReasonOffPlatform": "Demande de paiement en dehors d’Ineed",
+  "reportReasonInappropriate": "Contenu inapproprié",
+  "reportReasonOther": "Autre raison",
+  "reportDetailsHint": "Décrivez ce qui s’est passé (facultatif)",
+  "reportSent": "Merci. Votre signalement a été transmis à l’équipe Ineed.",
+  "notificationsTitle": "Notifications",
+  "notificationsEmpty": "Aucune notification. Vous serez prévenu ici de chaque étape de vos missions.",
+  "notificationsMarkAllRead": "Tout marquer comme lu",
+  "notificationsPermissionTitle": "Activer les notifications ?",
+  "notificationsPermissionBody": "Elles vous préviennent quand un professionnel répond, arrive ou envoie un devis, même si l’application est fermée.",
+  "notificationsEnable": "Activer",
+  "notificationsLater": "Plus tard",
+  "supportTitle": "Aide et assistance",
+  "supportBody": "Une question sur une mission ou un paiement ? Ouvrez une réclamation : l’équipe Ineed vous répond dans l’application.",
+  "supportOpenComplaint": "Ouvrir une réclamation",
+  "supportMyComplaints": "Mes réclamations",
+  "devScreenTitle": "Version de développement",
+  "devScreenBody": "Les écrans de l’application arrivent dans les prochaines étapes du projet. Cet écran vérifie la connexion à l’API Ineed.",
+  "devScreenApiChecking": "Vérification de la connexion à l’API…",
+  "devScreenApiOk": "API joignable : tous les services répondent.",
+  "devScreenApiDegraded": "API joignable, mais un service est indisponible : {services}.",
+  "@devScreenApiDegraded": {
+    "placeholders": {
+      "services": {
+        "type": "String",
+        "example": "stockage des fichiers"
+      }
+    }
+  },
+  "devScreenApiUnreachable": "Impossible de joindre l’API à l’adresse {url}.",
+  "@devScreenApiUnreachable": {
+    "placeholders": {
+      "url": {
+        "type": "String",
+        "example": "http://10.0.2.2:3000"
+      }
+    }
+  },
+  "environmentBadge": "Environnement : {name}",
+  "@environmentBadge": {
+    "placeholders": {
+      "name": {
+        "type": "String",
+        "example": "développement"
+      }
+    }
+  },
+  "environmentDev": "développement",
+  "environmentStaging": "préproduction",
+  "dependencyDatabase": "base de données",
+  "dependencyRedis": "file de tâches",
+  "dependencyStorage": "stockage des fichiers",
+  "photoTake": "Prendre une photo",
+  "photoGallery": "Choisir dans la galerie",
+  "photoUploading": "Envoi de la photo…",
+  "photoPermissionDenied": "L’accès aux photos est refusé. Vous pouvez l’autoriser dans les réglages du téléphone.",
+  "authOtpCodeLabel": "Code de vérification",
+  "authOtpSent": "Nouveau code envoyé.",
+  "authOtpVerifying": "Vérification du code…",
+  "profileDevicesTitle": "Appareils connectés",
+  "profileDevicesHelp": "Déconnectez un appareil que vous n’utilisez plus ou que vous ne reconnaissez pas.",
+  "profileDevicesLastUsed": "Dernière activité le {date}",
+  "@profileDevicesLastUsed": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "profileDevicesUnknown": "Appareil sans nom",
+  "profileDevicesRevoked": "Appareil déconnecté.",
+  "sessionAppClient": "Application Ineed",
+  "sessionAppPro": "Application Ineed Pro",
+  "sessionAppAdmin": "Administration",
+  "profileDeleteCodeTitle": "Confirmez avec le code reçu par SMS",
+  "profileDeleteCodeSubtitle": "Saisissez le code envoyé au {phone} pour supprimer définitivement votre compte.",
+  "@profileDeleteCodeSubtitle": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "profileNameRequired": "Indiquez votre prénom et votre nom.",
+  "profileNameInvalid": "Utilisez uniquement des lettres, des espaces, des tirets ou des apostrophes.",
+  "actionRefresh": "Actualiser",
+  "apiStatusLink": "État de la connexion à l’API"
+}

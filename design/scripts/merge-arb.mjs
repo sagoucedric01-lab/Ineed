@@ -1,31 +1,36 @@
-// Fusionne common_fr.arb avec le fichier de chaque application (client, pro) en un ARB unique par application.
-// Usage : node scripts/merge-arb.mjs            -> écrit mobile/apps/<app>/lib/l10n/app_fr.arb
-//         node scripts/merge-arb.mjs --check    -> échoue si ces fichiers ne sont pas à jour (CI)
-//         node scripts/merge-arb.mjs <dossier>  -> écrit <dossier>/l10n_<app>/app_fr.arb (validation isolée)
+// Répartit les textes de design/copy vers le mobile :
+//   common_fr.arb -> mobile/packages/ineed_shared/lib/l10n/common_fr.arb (classe CommonLocalizations)
+//   client_fr.arb -> mobile/apps/client/lib/l10n/app_fr.arb, pro_fr.arb -> mobile/apps/pro/lib/l10n/app_fr.arb
+// Usage : node scripts/merge-arb.mjs          -> écrit les fichiers
+//         node scripts/merge-arb.mjs --check  -> échoue si ces fichiers ne sont pas à jour (CI)
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { DESIGN_DIR } from './tokens-lib.mjs';
 
+const MOBILE = join(DESIGN_DIR, '..', 'mobile');
 const read = (f) => JSON.parse(readFileSync(join(DESIGN_DIR, 'copy', f), 'utf8'));
 
-export function mergedArb(app) {
-  const merged = { ...read('common_fr.arb'), ...read(`${app}_fr.arb`), '@@locale': 'fr' };
-  delete merged['@@context'];
-  return JSON.stringify(merged, null, 2) + '\n';
+export function arbFor(source) {
+  const data = { ...read(source), '@@locale': 'fr' };
+  delete data['@@context'];
+  return JSON.stringify(data, null, 2) + '\n';
 }
 
+export const TARGETS = {
+  [join(MOBILE, 'packages', 'ineed_shared', 'lib', 'l10n', 'common_fr.arb')]: 'common_fr.arb',
+  [join(MOBILE, 'apps', 'client', 'lib', 'l10n', 'app_fr.arb')]: 'client_fr.arb',
+  [join(MOBILE, 'apps', 'pro', 'lib', 'l10n', 'app_fr.arb')]: 'pro_fr.arb',
+};
+
 if (import.meta.url === `file://${process.argv[1]}`) {
-  const arg = process.argv[2];
-  const check = arg === '--check';
+  const check = process.argv.includes('--check');
   let stale = 0;
-  for (const app of ['client', 'pro']) {
-    const dir = arg && !check ? join(arg, `l10n_${app}`) : join(DESIGN_DIR, '..', 'mobile', 'apps', app, 'lib', 'l10n');
-    const path = join(dir, 'app_fr.arb');
-    const content = mergedArb(app);
+  for (const [path, source] of Object.entries(TARGETS)) {
+    const content = arbFor(source);
     if (check) {
       if (!existsSync(path) || readFileSync(path, 'utf8') !== content) { stale++; console.error(`Pas à jour : ${path}`); }
     } else {
-      mkdirSync(dir, { recursive: true });
+      mkdirSync(dirname(path), { recursive: true });
       writeFileSync(path, content);
       console.log(`Écrit : ${path}`);
     }

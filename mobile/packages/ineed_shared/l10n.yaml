@@ -1,0 +1,7 @@
+# Textes communs aux deux applications, générés depuis design/copy/common_fr.arb (via design/scripts/merge-arb.mjs).
+arb-dir: lib/l10n
+template-arb-file: common_fr.arb
+output-dir: lib/l10n/gen
+output-localization-file: common_localizations.dart
+output-class: CommonLocalizations
+nullable-getter: false

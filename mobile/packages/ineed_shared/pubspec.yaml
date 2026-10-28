@@ -1,0 +1,28 @@
+name: ineed_shared
+description: Parcours communs aux applications Ineed et Ineed Pro (connexion par SMS, compte, session) et textes communs.
+publish_to: none
+version: 0.4.0
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+  flutter: ">=3.47.0"
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  flutter_riverpod: 3.4.3
+  flutter_secure_storage: 11.2.0
+  image_picker: 1.2.4
+  ineed_api:
+    path: ../ineed_api
+  ineed_core:
+    path: ../ineed_core
+  ineed_ui:
+    path: ../ineed_ui
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+flutter:
+  generate: true
