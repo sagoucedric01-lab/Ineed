@@ -7,7 +7,7 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev:infra": "docker compose -f infra/docker-compose.yml up -d postgres redis minio mailpit",
+    "dev:infra": "docker compose -f infra/docker-compose.yml up -d postgres redis s3",
     "migrate": "pnpm --filter @ineed/backend migrate:deploy",
     "seed": "pnpm --filter @ineed/backend seed",
     "seed:demo": "pnpm --filter @ineed/backend seed:demo",
