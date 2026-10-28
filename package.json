@@ -19,7 +19,12 @@
   },
   "pnpm": {
     "overrides": {
-      "multer": "2.5.0"
+      "multer": "2.5.0",
+      "@napi-rs/wasm-runtime": "1.2.5",
+      "rolldown": "1.2.14",
+      "body-parser": "2.4.0",
+      "fast-uri": "3.1.9",
+      "qs": "6.16.1"
     }
   }
 }
