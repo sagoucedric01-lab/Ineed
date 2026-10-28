@@ -9,7 +9,7 @@ Date : 28/10/2026. Branche : `phase-3-socle`.
 | `docker compose up` démarre PostGIS, Redis, stockage S3, API et admin | ✅ | Exécuté dans cet environnement avec `--wait` : 6 services sains, `setup` terminé avec le code 0 ; également en CI (job « docker ») |
 | `pnpm migrate` sur base vide passe | ✅ | Test d'intégration + CI + service `setup` de docker compose |
 | `/health/ready` = 200 | ✅ | `{"status":"ok"}` avec PostGIS 3.5.2, Redis, S3 et worker actif ; 503 qui nomme la dépendance en panne |
-| CI verte (lint, typage, tests) | voir § CI | `.github/workflows/ci.yml` |
+| CI verte (lint, typage, tests) | ✅ | 7 jobs verts sur GitHub Actions (exécution 40686010301) |
 | `flutter analyze` et `flutter test` passent | ✅ | Aucune remarque ; 40 tests |
 | Swagger servi sur `/docs` | ✅ | Hors production uniquement (testé) ; export `docs/api/openapi.json` vérifié à jour en CI |
 
@@ -53,7 +53,23 @@ Scénarios de reprise vérifiés manuellement sur la pile Docker :
 
 ## CI GitHub
 
-Résultat de la première exécution : voir § Résultat CI en fin de document.
+Exécution finale : **7 jobs sur 7 réussis** — https://github.com/sagoucedric01-lab/Ineed/actions/runs/40686010301
+
+| Job | Résultat |
+|---|---|
+| Système de design | ✅ |
+| Audit des dépendances (aucune vulnérabilité haute ou critique) | ✅ |
+| Backend : lint, typage, 50 tests unitaires, migrations sur base vide, contrôle de dérive, seeds, 20 tests d'intégration sur services réels, OpenAPI à jour | ✅ |
+| Administration : lint, typage, tests, build | ✅ |
+| Mobile : analyse, 40 tests, **APK de développement construits** (Ineed et Ineed Pro) | ✅ |
+| Images Docker et démarrage complet `docker compose` (API prête, `setup` terminé avec 0, admin répond) | ✅ |
+
+Les deux premières exécutions avaient échoué ; corrections apportées :
+1. **APK** : le plugin Android 9 désactive `resValue` par défaut, alors que le nom de l'application par variante l'utilise. Activé explicitement.
+2. **Docker** : l'option `--wait` de certaines versions de Compose échoue quand un service ponctuel (`setup`) se termine. Remplacée par une attente explicite de `/health/ready` et du code de sortie de `setup`.
+3. **Mobile** : `setup-node` v5 activait un cache pnpm dans un job sans pnpm. Désactivé.
+
+Les journaux complets de GitHub Actions ne sont pas téléchargeables depuis l'environnement de développement (stockage bloqué par le proxy). Les erreurs de build sont donc aussi publiées en **annotations** GitHub, lisibles partout.
 
 ## Écarts par rapport au plan, et pourquoi
 
@@ -70,7 +86,7 @@ Résultat de la première exécution : voir § Résultat CI en fin de document.
 ## Limites restantes
 
 - **iOS** : identifiants et noms configurés, mais ni variantes (schémas Xcode), ni build, ni test sur iPhone : un Mac est nécessaire (phase 10).
-- **Android** : APK de développement construit en CI uniquement (le SDK Android n'est pas installé dans cet environnement). Aucun test sur un téléphone réel.
+- **Android** : APK de développement construits en CI uniquement (le téléchargement du SDK Android est bloqué dans cet environnement). Aucun test sur un téléphone ou un émulateur.
 - **Image Docker de l'API** : 804 Mo, à alléger avant la production.
 - **Communes d'Abidjan** : centroïdes approximatifs, contours non saisis.
 - **Catalogue** : aucune prestation n'a de prix ; les tarifs restent à fixer par l'équipe commerciale (décision D9).
@@ -79,5 +95,3 @@ Résultat de la première exécution : voir § Résultat CI en fin de document.
 ## Variables et accès à configurer
 
 Aucun accès externe n'est nécessaire pour cette phase. Pour la **phase 4 (authentification)** : un compte chez le fournisseur de SMS retenu (décision D5) ; sans lui, la connexion fonctionnera uniquement en mode développement (code affiché dans les journaux), signalé comme tel.
-
-## Résultat CI
