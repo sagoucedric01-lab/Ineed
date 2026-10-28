@@ -31,6 +31,11 @@ android {
         versionName = flutter.versionName
     }
 
+    // Le plugin Android 9 désactive resValue par défaut : nécessaire pour le nom de l'application par variante.
+    buildFeatures {
+        resValues = true
+    }
+
     // Environnements : flutter run --flavor dev --dart-define-from-file=config/dev.json
     flavorDimensions += "env"
     productFlavors {

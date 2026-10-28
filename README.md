@@ -2,29 +2,32 @@
 
 Marketplace de services de proximité (plombiers, électriciens, mécaniciens…) — marché initial : Abidjan, Côte d'Ivoire.
 
-**État actuel : phases 1 (architecture) et 2 (parcours, écrans, système de design) terminées.** Aucun code applicatif (backend, mobile, admin) n'est encore écrit.
+**État actuel : phase 3 (socle technique) terminée.** API, base de données, administration et applications mobiles
+démarrent et sont testées ; les fonctionnalités métier commencent en phase 4. Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
 
-## Documentation de la phase 1
+## Organisation du dépôt
 
-1. [Analyse et ambiguïtés](docs/phase-1/01-analyse-et-ambiguites.md)
-2. [Architecture technique, arborescence, modules](docs/phase-1/02-architecture.md)
-3. [Base de données](docs/phase-1/03-base-de-donnees.md) — schéma exécutable : [schema-initial.sql](docs/phase-1/schema-initial.sql)
-4. [Parcours utilisateur et machines à états](docs/phase-1/04-parcours-et-etats.md)
-5. [Prestataires externes, coûts, points juridiques](docs/phase-1/05-prestataires-externes.md)
-6. [Plan de développement et critères d'acceptation](docs/phase-1/06-plan-de-developpement.md)
-7. [Décisions à valider](docs/phase-1/07-decisions-a-valider.md)
+| Dossier | Contenu |
+|---|---|
+| `backend/` | API et worker NestJS, schéma Prisma, migrations SQL, seeds, tests |
+| `admin/` | Administration web Next.js |
+| `mobile/` | Applications Flutter Ineed (`apps/client`) et Ineed Pro (`apps/pro`), paquets partagés |
+| `design/` | Système de design : tokens, marque, icônes, textes français, maquettes |
+| `infra/` | Docker, docker compose, configuration du stockage local |
+| `docs/` | Analyse, architecture, rapports de phase, documentation de l'API |
 
-## Vérifier le schéma
+## Démarrer
 
-Prérequis : PostgreSQL 16 avec PostGIS 3.
+Voir [docs/installation-locale.md](docs/installation-locale.md). En bref, avec Docker :
 
 ```bash
-createdb ineed_p1
-psql -v ON_ERROR_STOP=1 -d ineed_p1 -f docs/phase-1/schema-initial.sql -f docs/phase-1/schema-invariants-check.sql
+docker compose -f infra/docker-compose.yml up --build
 ```
 
-## Phase 2 — Parcours, écrans et système de design
+Puis http://localhost:3000/health/ready (API), http://localhost:3000/docs (documentation de l'API) et http://localhost:3001 (administration).
 
-- [Rapport de phase 2](docs/phase-2/rapport-phase-2.md)
-- [Inventaire des écrans et de leurs états](docs/phase-2/inventaire-ecrans.md)
-- [Système de design](design/README.md) : tokens, logo, icônes, textes FR, maquettes (`design/maquettes/index.html`)
+## Documentation
+
+- Phase 1 : [analyse](docs/phase-1/01-analyse-et-ambiguites.md), [architecture](docs/phase-1/02-architecture.md), [base de données](docs/phase-1/03-base-de-donnees.md), [parcours et états](docs/phase-1/04-parcours-et-etats.md), [prestataires et coûts](docs/phase-1/05-prestataires-externes.md), [plan](docs/phase-1/06-plan-de-developpement.md), [décisions](docs/phase-1/07-decisions-a-valider.md)
+- Phase 2 : [rapport](docs/phase-2/rapport-phase-2.md), [inventaire des écrans](docs/phase-2/inventaire-ecrans.md), [système de design](design/README.md)
+- Phase 3 : [rapport](docs/phase-3/rapport-phase-3.md), [installation locale](docs/installation-locale.md), [API (OpenAPI)](docs/api/openapi.json)
