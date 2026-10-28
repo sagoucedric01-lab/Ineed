@@ -1,6 +1,163 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/admin/settings": {
+      "get": {
+        "operationId": "AdminSettingsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — paramètres"
+        ]
+      }
+    },
+    "/v1/admin/settings/{key}": {
+      "put": {
+        "operationId": "AdminSettingsController_updateSetting",
+        "parameters": [
+          {
+            "name": "key",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSettingDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie un paramètre existant (la valeur garde son type)",
+        "tags": [
+          "Administration — paramètres"
+        ]
+      }
+    },
+    "/v1/admin/dispatch-rules": {
+      "get": {
+        "operationId": "AdminSettingsController_dispatchRules",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Règles d’attribution (rayons de recherche, vagues, délais)",
+        "tags": [
+          "Administration — paramètres"
+        ]
+      }
+    },
+    "/v1/admin/dispatch-rules/{id}": {
+      "patch": {
+        "operationId": "AdminSettingsController_updateDispatchRule",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateDispatchRuleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie une règle d’attribution (rayon initial, rayon maximal…)",
+        "tags": [
+          "Administration — paramètres"
+        ]
+      }
+    },
+    "/v1/me/notifications": {
+      "get": {
+        "operationId": "NotificationsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mes notifications (les 50 plus récentes) et le nombre de non lues",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/notifications/read": {
+      "post": {
+        "operationId": "NotificationsController_markRead",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Marque toutes mes notifications comme lues",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
     "/v1/auth/otp/request": {
       "post": {
         "description": "Réponse identique que le numéro ait un compte ou non.",
@@ -408,6 +565,374 @@
         ]
       }
     },
+    "/v1/geo/zones": {
+      "get": {
+        "operationId": "GeoController_zones",
+        "parameters": [
+          {
+            "name": "cityId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicZoneDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Communes actives d’une ville (la première ville active par défaut)",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/geo/locate": {
+      "get": {
+        "operationId": "GeoController_locate",
+        "parameters": [
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": 5.36,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": -3.97,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LocatedDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ville et commune d’un point choisi sur la carte (aucun service de géocodage externe)",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/admin/geo/cities": {
+      "get": {
+        "operationId": "AdminGeoController_cities",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — zones géographiques"
+        ]
+      }
+    },
+    "/v1/admin/geo/cities/{id}": {
+      "patch": {
+        "operationId": "AdminGeoController_updateCity",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Active ou désactive une ville, ou déplace son centre",
+        "tags": [
+          "Administration — zones géographiques"
+        ]
+      }
+    },
+    "/v1/admin/geo/zones": {
+      "get": {
+        "operationId": "AdminGeoController_zones",
+        "parameters": [
+          {
+            "name": "cityId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — zones géographiques"
+        ]
+      },
+      "post": {
+        "operationId": "AdminGeoController_createZone",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateZoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajoute une commune, un quartier ou un secteur",
+        "tags": [
+          "Administration — zones géographiques"
+        ]
+      }
+    },
+    "/v1/admin/geo/zones/{id}": {
+      "patch": {
+        "operationId": "AdminGeoController_updateZone",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateZoneDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Renomme, désactive, déplace le centre ou enregistre le contour d’une zone",
+        "tags": [
+          "Administration — zones géographiques"
+        ]
+      }
+    },
+    "/v1/me/addresses": {
+      "get": {
+        "operationId": "AddressesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AddressDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Mon compte"
+        ]
+      },
+      "post": {
+        "operationId": "AddressesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistre une adresse (point sur la carte, commune, repère)",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/addresses/{id}": {
+      "put": {
+        "operationId": "AddressesController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddressInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddressDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Mon compte"
+        ]
+      },
+      "delete": {
+        "operationId": "AddressesController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
     "/v1/catalog/categories": {
       "get": {
         "operationId": "CatalogController_categories",
@@ -427,20 +952,400 @@
             }
           }
         },
-        "summary": "Métiers actifs, dans l’ordre défini par l’administration",
+        "summary": "Métiers actifs avec leurs prestations et compétences, dans l’ordre défini par l’administration",
         "tags": [
           "Référentiel"
         ]
       }
     },
-    "/v1/geo/zones": {
+    "/v1/catalog/search": {
       "get": {
-        "operationId": "CatalogController_zones",
+        "operationId": "CatalogController_search",
         "parameters": [
           {
-            "name": "cityId",
+            "name": "q",
+            "required": true,
+            "in": "query",
+            "description": "Métier, prestation ou description du problème",
+            "schema": {
+              "example": "fuite",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Recherche d’un métier ou d’une prestation (mots du client, synonymes, compétences)",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/catalog/recent-searches": {
+      "get": {
+        "operationId": "CatalogController_recent",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mes dernières recherches (sans doublon)",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/admin/catalog/categories": {
+      "get": {
+        "operationId": "AdminCatalogController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Tout le catalogue, éléments désactivés compris",
+        "tags": [
+          "Administration — catalogue"
+        ]
+      },
+      "post": {
+        "operationId": "AdminCatalogController_createCategory",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/admin/catalog/categories/{id}": {
+      "patch": {
+        "operationId": "AdminCatalogController_updateCategory",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCategoryDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifie ou désactive un métier (pris en compte immédiatement, sans redéploiement)",
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/admin/catalog/services": {
+      "post": {
+        "operationId": "AdminCatalogController_createService",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/admin/catalog/services/{id}": {
+      "patch": {
+        "operationId": "AdminCatalogController_updateService",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateServiceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/admin/catalog/skills": {
+      "post": {
+        "operationId": "AdminCatalogController_createSkill",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/admin/catalog/skills/{id}": {
+      "patch": {
+        "operationId": "AdminCatalogController_updateSkill",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateSkillDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — catalogue"
+        ]
+      }
+    },
+    "/v1/pros/search": {
+      "get": {
+        "description": "Classement : distance, note vérifiée, taux d’acceptation, annulations. Sans résultat, des pistes sont proposées (élargir le rayon, programmer, changer de créneau).",
+        "operationId": "SearchController_find",
+        "parameters": [
+          {
+            "name": "categoryId",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "serviceId",
             "required": false,
             "in": "query",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "mode",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "URGENT",
+                "SCHEDULED"
+              ]
+            }
+          },
+          {
+            "name": "lat",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": 5.36,
+              "type": "number"
+            }
+          },
+          {
+            "name": "lng",
+            "required": true,
+            "in": "query",
+            "schema": {
+              "example": -3.97,
+              "type": "number"
+            }
+          },
+          {
+            "name": "zoneId",
+            "required": false,
+            "in": "query",
+            "description": "Commune choisie par le client",
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "name": "radiusM",
+            "required": false,
+            "in": "query",
+            "description": "Rayon (m), borné par la règle d’attribution ; rayon initial par défaut",
+            "schema": {
+              "type": "number"
+            }
+          },
+          {
+            "name": "start",
+            "required": false,
+            "in": "query",
+            "description": "Début du créneau (mode programmé)",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          },
+          {
+            "name": "end",
+            "required": false,
+            "in": "query",
+            "description": "Fin du créneau (mode programmé)",
+            "schema": {
+              "format": "date-time",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Professionnels validés proches et disponibles pour un métier",
+        "tags": [
+          "Recherche"
+        ]
+      }
+    },
+    "/v1/pros/{id}": {
+      "get": {
+        "operationId": "SearchController_profile",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
             "schema": {
               "type": "string"
             }
@@ -448,22 +1353,295 @@
         ],
         "responses": {
           "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ZoneDto"
-                  }
-                }
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Profil public d’un professionnel validé",
+        "tags": [
+          "Recherche"
+        ]
+      }
+    },
+    "/v1/requests": {
+      "post": {
+        "operationId": "RequestsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestInputDto"
               }
             }
           }
         },
-        "summary": "Communes actives d’une ville (Abidjan par défaut)",
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée un brouillon de demande (à relire puis publier)",
         "tags": [
-          "Référentiel"
+          "Demandes"
+        ]
+      },
+      "get": {
+        "operationId": "RequestsController_list",
+        "parameters": [
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "description": "active : en cours ; history : terminées ou annulées",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "history"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mes demandes (en cours ou terminées)",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}": {
+      "get": {
+        "operationId": "RequestsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Demandes"
+        ]
+      },
+      "put": {
+        "operationId": "RequestsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestInputDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Remplace le contenu d’un brouillon",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/publish": {
+      "post": {
+        "operationId": "RequestsController_publish",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Publie la demande après relecture (métier actif, lieu desservi, créneau valide si programmée)",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/cancel": {
+      "post": {
+        "operationId": "RequestsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Annule une demande tant qu’aucun professionnel n’est réservé",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/admin/requests": {
+      "get": {
+        "operationId": "AdminRequestsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — demandes"
+        ]
+      }
+    },
+    "/v1/admin/requests/{id}": {
+      "get": {
+        "operationId": "AdminRequestsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — demandes"
         ]
       }
     },
@@ -610,6 +1788,66 @@
           }
         ],
         "summary": "Disponible maintenant / pause (professionnels validés)",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/service-area": {
+      "put": {
+        "operationId": "ProController_serviceArea",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ServiceAreaDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Point de départ et distance maximale (modifiables à tout moment, sans nouvelle vérification)",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/location": {
+      "put": {
+        "operationId": "ProController_location",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GeoPointDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Position du moment (uniquement quand le professionnel est disponible ; aucune conservation d’historique)",
         "tags": [
           "Professionnel"
         ]
@@ -1045,6 +2283,53 @@
       }
     },
     "schemas": {
+      "UpdateSettingDto": {
+        "type": "object",
+        "properties": {
+          "value": {
+            "type": "object",
+            "description": "Nouvelle valeur, du même type que la valeur actuelle"
+          }
+        },
+        "required": [
+          "value"
+        ]
+      },
+      "UpdateDispatchRuleDto": {
+        "type": "object",
+        "properties": {
+          "initialRadiusM": {
+            "type": "number",
+            "description": "Rayon de recherche initial (m)"
+          },
+          "radiusStepM": {
+            "type": "number",
+            "description": "Élargissement à chaque vague (m)"
+          },
+          "maxRadiusM": {
+            "type": "number",
+            "description": "Rayon maximal (m)"
+          },
+          "prosPerWave": {
+            "type": "number"
+          },
+          "waveIntervalS": {
+            "type": "number"
+          },
+          "offerTtlS": {
+            "type": "number"
+          },
+          "reservationTtlS": {
+            "type": "number"
+          },
+          "clientConfirmTtlS": {
+            "type": "number"
+          },
+          "maxOffersShown": {
+            "type": "number"
+          }
+        }
+      },
       "RequestOtpDto": {
         "type": "object",
         "properties": {
@@ -1220,7 +2505,9 @@
             "type": "string",
             "enum": [
               "AVATAR",
-              "VERIFICATION_DOC"
+              "VERIFICATION_DOC",
+              "REQUEST_PHOTO",
+              "REQUEST_VOICE"
             ]
           },
           "mimeType": {
@@ -1453,55 +2740,24 @@
           "code"
         ]
       },
-      "SkillDto": {
+      "LatLngDto": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
+          "lat": {
+            "type": "number",
+            "example": 5.36
           },
-          "name": {
-            "type": "string"
+          "lng": {
+            "type": "number",
+            "example": -3.97
           }
         },
         "required": [
-          "id",
-          "name"
+          "lat",
+          "lng"
         ]
       },
-      "CategoryDto": {
-        "type": "object",
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "slug": {
-            "type": "string"
-          },
-          "name": {
-            "type": "string"
-          },
-          "iconKey": {
-            "type": "string",
-            "description": "Clé de l’icône (design/icons/categories)"
-          },
-          "skills": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SkillDto"
-            }
-          }
-        },
-        "required": [
-          "id",
-          "slug",
-          "name",
-          "iconKey",
-          "skills"
-        ]
-      },
-      "ZoneDto": {
+      "PublicZoneDto": {
         "type": "object",
         "properties": {
           "id": {
@@ -1518,6 +2774,15 @@
               "QUARTIER",
               "SECTEUR"
             ]
+          },
+          "centroid": {
+            "nullable": true,
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
           }
         },
         "required": [
@@ -1525,6 +2790,584 @@
           "name",
           "kind"
         ]
+      },
+      "LocatedDto": {
+        "type": "object",
+        "properties": {
+          "inServiceArea": {
+            "type": "boolean"
+          },
+          "cityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cityName": {
+            "type": "string"
+          },
+          "zoneId": {
+            "type": "object",
+            "format": "uuid",
+            "nullable": true
+          },
+          "zoneName": {
+            "type": "object",
+            "nullable": true
+          },
+          "zoneApproximate": {
+            "type": "boolean",
+            "description": "Commune déduite du centre le plus proche (contours pas encore saisis)"
+          }
+        },
+        "required": [
+          "inServiceArea"
+        ]
+      },
+      "UpdateCityDto": {
+        "type": "object",
+        "properties": {
+          "isActive": {
+            "type": "boolean"
+          },
+          "center": {
+            "$ref": "#/components/schemas/LatLngDto"
+          }
+        }
+      },
+      "CreateZoneDto": {
+        "type": "object",
+        "properties": {
+          "cityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "COMMUNE",
+              "QUARTIER",
+              "SECTEUR"
+            ]
+          },
+          "name": {
+            "type": "string",
+            "example": "Riviera 2"
+          },
+          "centroid": {
+            "$ref": "#/components/schemas/LatLngDto"
+          }
+        },
+        "required": [
+          "cityId",
+          "kind",
+          "name"
+        ]
+      },
+      "UpdateZoneDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          },
+          "centroid": {
+            "$ref": "#/components/schemas/LatLngDto"
+          },
+          "boundary": {
+            "type": "object",
+            "description": "Contour GeoJSON (Polygon ou MultiPolygon, WGS 84). null pour l’effacer.",
+            "nullable": true
+          }
+        }
+      },
+      "AddressDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "label": {
+            "type": "object",
+            "nullable": true
+          },
+          "location": {
+            "$ref": "#/components/schemas/LatLngDto"
+          },
+          "cityId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "cityName": {
+            "type": "string"
+          },
+          "zoneId": {
+            "type": "object",
+            "nullable": true
+          },
+          "zoneName": {
+            "type": "object",
+            "nullable": true
+          },
+          "street": {
+            "type": "object",
+            "nullable": true
+          },
+          "landmark": {
+            "type": "object",
+            "nullable": true
+          },
+          "instructions": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "location",
+          "cityId",
+          "cityName"
+        ]
+      },
+      "AddressInputDto": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "description": "Point choisi ou déplacé sur la carte",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LatLngDto"
+              }
+            ]
+          },
+          "zoneId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Commune choisie par le client (sinon déduite du point)"
+          },
+          "label": {
+            "type": "string",
+            "example": "Maison"
+          },
+          "street": {
+            "type": "string",
+            "example": "Rue des Jardins, villa 12",
+            "description": "Facultatif : beaucoup d’adresses n’ont pas de numéro"
+          },
+          "landmark": {
+            "type": "string",
+            "example": "Derrière la pharmacie des Deux-Plateaux, portail bleu"
+          },
+          "instructions": {
+            "type": "string",
+            "example": "Appeler en arrivant, 2e étage"
+          }
+        },
+        "required": [
+          "location"
+        ]
+      },
+      "SkillDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ServiceDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "pricingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED",
+              "QUOTE",
+              "TRAVEL_PLUS_DIAGNOSIS"
+            ],
+            "description": "Prix fixe, sur devis, ou déplacement puis diagnostic"
+          },
+          "referenceMinXof": {
+            "type": "object",
+            "nullable": true,
+            "description": "Fourchette indicative en F CFA (entiers)"
+          },
+          "referenceMaxXof": {
+            "type": "object",
+            "nullable": true
+          },
+          "fixedPriceXof": {
+            "type": "object",
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "pricingModel"
+        ]
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "object",
+            "nullable": true
+          },
+          "iconKey": {
+            "type": "string",
+            "description": "Clé de l’icône (design/icons/categories)"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillDto"
+            }
+          },
+          "services": {
+            "description": "Prestations (sous-catégories) proposées aux clients",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServiceDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "iconKey",
+          "skills",
+          "services"
+        ]
+      },
+      "CreateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "jardinage"
+          },
+          "name": {
+            "type": "string",
+            "example": "Jardinage"
+          },
+          "description": {
+            "type": "string"
+          },
+          "searchTerms": {
+            "description": "Synonymes et mots utilisés par les clients",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "iconKey": {
+            "type": "string",
+            "example": "autres"
+          },
+          "sortOrder": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "slug",
+          "name",
+          "iconKey"
+        ]
+      },
+      "UpdateCategoryDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "searchTerms": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "iconKey": {
+            "type": "string"
+          },
+          "sortOrder": {
+            "type": "number"
+          },
+          "isActive": {
+            "type": "boolean",
+            "description": "false : le métier disparaît immédiatement des applications"
+          }
+        }
+      },
+      "CreateServiceDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string",
+            "example": "plomberie-robinet"
+          },
+          "name": {
+            "type": "string",
+            "example": "Remplacement de robinet"
+          },
+          "description": {
+            "type": "string"
+          },
+          "pricingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED",
+              "QUOTE",
+              "TRAVEL_PLUS_DIAGNOSIS"
+            ]
+          },
+          "referenceMinXof": {
+            "type": "number"
+          },
+          "referenceMaxXof": {
+            "type": "number"
+          },
+          "fixedPriceXof": {
+            "type": "number"
+          },
+          "defaultTravelFeeXof": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "categoryId",
+          "slug",
+          "name",
+          "pricingModel"
+        ]
+      },
+      "UpdateServiceDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "pricingModel": {
+            "type": "string",
+            "enum": [
+              "FIXED",
+              "QUOTE",
+              "TRAVEL_PLUS_DIAGNOSIS"
+            ]
+          },
+          "referenceMinXof": {
+            "type": "object",
+            "nullable": true
+          },
+          "referenceMaxXof": {
+            "type": "object",
+            "nullable": true
+          },
+          "fixedPriceXof": {
+            "type": "object",
+            "nullable": true
+          },
+          "defaultTravelFeeXof": {
+            "type": "object",
+            "nullable": true
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreateSkillDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string",
+            "example": "Pose de chauffe-eau"
+          }
+        },
+        "required": [
+          "categoryId",
+          "name"
+        ]
+      },
+      "UpdateSkillDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ]
+      },
+      "PlaceInputDto": {
+        "type": "object",
+        "properties": {
+          "location": {
+            "$ref": "#/components/schemas/LatLngDto"
+          },
+          "zoneId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "street": {
+            "type": "string"
+          },
+          "landmark": {
+            "type": "string",
+            "example": "Face à l’école primaire, maison au portail vert"
+          },
+          "instructions": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "location"
+        ]
+      },
+      "WindowDto": {
+        "type": "object",
+        "properties": {
+          "start": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "end": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "start",
+          "end"
+        ]
+      },
+      "RequestInputDto": {
+        "type": "object",
+        "properties": {
+          "categoryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "serviceId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Prestation précise (sous-catégorie), si le client l’a choisie"
+          },
+          "mode": {
+            "type": "string",
+            "enum": [
+              "URGENT",
+              "SCHEDULED"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "minLength": 10,
+            "maxLength": 2000,
+            "example": "L’eau fuit sous l’évier de la cuisine depuis ce matin."
+          },
+          "addressId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Adresse enregistrée (sinon, indiquer « place »)"
+          },
+          "place": {
+            "$ref": "#/components/schemas/PlaceInputDto"
+          },
+          "window": {
+            "description": "Créneau souhaité (obligatoire pour publier une demande programmée)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WindowDto"
+              }
+            ]
+          },
+          "budgetXof": {
+            "type": "number",
+            "description": "Budget indicatif en F CFA (entier)"
+          },
+          "photoFileIds": {
+            "description": "Photos (fichiers REQUEST_PHOTO finalisés)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "voiceFileId": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Note vocale (fichier REQUEST_VOICE finalisé)"
+          }
+        },
+        "required": [
+          "categoryId",
+          "mode",
+          "description"
+        ]
+      },
+      "CancelRequestDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Problème réglé entre-temps"
+          }
+        }
       },
       "GeoPointDto": {
         "type": "object",
@@ -1662,6 +3505,25 @@
             "format": "date-time",
             "nullable": true,
             "description": "null pour reprendre immédiatement"
+          }
+        }
+      },
+      "ServiceAreaDto": {
+        "type": "object",
+        "properties": {
+          "baseLocation": {
+            "description": "Point de départ habituel",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/GeoPointDto"
+              }
+            ]
+          },
+          "serviceRadiusM": {
+            "type": "number",
+            "minimum": 500,
+            "maximum": 100000,
+            "description": "Distance maximale acceptée (m)"
           }
         }
       },

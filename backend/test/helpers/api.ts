@@ -7,7 +7,7 @@ import { OTP_PROVIDER } from '../../src/auth/otp/otp-provider.js';
 import { createApp } from '../../src/bootstrap.js';
 import { SecretBox } from '../../src/common/crypto/secret-box.js';
 import { generateTotpSecret, totp } from '../../src/common/crypto/totp.js';
-import type { PrismaClient } from '../../src/generated/prisma/client.js';
+import { Prisma, type PrismaClient } from '../../src/generated/prisma/client.js';
 import { seedReference } from '../../prisma/seed/reference.js';
 import { createTestDatabase, migrate, prismaFor, type TestDatabase } from './db.js';
 import { apiEnv, testSecrets, testServices } from './env.js';
@@ -113,7 +113,7 @@ export async function adminLogin(ctx: TestContext, admin: TestAdmin, at = Date.n
 export async function uploadFile(
   ctx: TestContext,
   tokens: Tokens,
-  purpose: 'AVATAR' | 'VERIFICATION_DOC',
+  purpose: 'AVATAR' | 'VERIFICATION_DOC' | 'REQUEST_PHOTO' | 'REQUEST_VOICE',
   body: Buffer,
   mimeType: string,
   expectStatus = 200,
@@ -130,3 +130,56 @@ export const TINY_PDF = Buffer.from(
   '%PDF-1.4\n1 0 obj<</Type/Catalog/Pages 2 0 R>>endobj 2 0 obj<</Type/Pages/Kids[3 0 R]/Count 1>>endobj ' +
     '3 0 obj<</Type/Page/Parent 2 0 R/MediaBox[0 0 200 200]>>endobj\ntrailer<</Root 1 0 R>>\n%%EOF\n',
 );
+
+export interface TestProOptions {
+  phone: string;
+  businessName: string;
+  categorySlugs: string[];
+  /** Point de départ habituel. */
+  base?: { lat: number; lng: number };
+  /** Position du moment (envoyée il y a `liveMinutesAgo` minutes, 1 par défaut). */
+  live?: { lat: number; lng: number };
+  liveMinutesAgo?: number;
+  online?: boolean;
+  zoneNames?: string[];
+  /** Jours travaillés (1 = lundi), de 08:00 à 18:00. */
+  weekdays?: number[];
+  status?: 'APPROVED' | 'SUBMITTED' | 'SUSPENDED';
+  pausedUntil?: Date;
+  radiusM?: number;
+  urgent?: boolean;
+}
+
+/**
+ * Professionnel créé directement en base, pour préparer une recherche (le parcours réel d'inscription
+ * et de validation est couvert par pro-onboarding.int.spec.ts).
+ */
+export async function createTestPro(ctx: TestContext, o: TestProOptions): Promise<{ userId: string; tokens: Tokens }> {
+  // Compteurs de limitation vidés : la préparation crée de nombreux comptes depuis la même adresse IP.
+  await flushRedis();
+  const login = await loginWithPhone(ctx, o.phone, 'PRO');
+  const city = await ctx.prisma.city.findFirstOrThrow({ where: { isActive: true } });
+  const status = o.status ?? 'APPROVED';
+  const verifiedAt = status === 'SUBMITTED' ? null : new Date();
+  const pt = (p?: { lat: number; lng: number }) => (p ? Prisma.sql`ST_SetSRID(ST_MakePoint(${p.lng}, ${p.lat}), 4326)::geography` : Prisma.sql`NULL`);
+  await ctx.prisma.$executeRaw`
+    INSERT INTO pro_profiles (user_id, business_name, city_id, verification_status, verified_at, is_online, paused_until,
+                              base_location, last_location, last_location_at, service_radius_m)
+    VALUES (${login.userId}::uuid, ${o.businessName}, ${city.id}::uuid, ${status}::verification_status, ${verifiedAt},
+            ${o.online ?? false}, ${o.pausedUntil ?? null}, ${pt(o.base)}, ${pt(o.live)},
+            ${o.live ? new Date(Date.now() - (o.liveMinutesAgo ?? 1) * 60_000) : null}, ${o.radiusM ?? 20_000})`;
+  for (const slug of o.categorySlugs) {
+    const c = await ctx.prisma.category.findUniqueOrThrow({ where: { slug } });
+    await ctx.prisma.proCategory.create({ data: { proId: login.userId, categoryId: c.id, acceptsUrgent: o.urgent ?? true } });
+  }
+  for (const name of o.zoneNames ?? []) {
+    const z = await ctx.prisma.zone.findFirstOrThrow({ where: { name, parentId: null } });
+    await ctx.prisma.proServiceZone.create({ data: { proId: login.userId, zoneId: z.id } });
+  }
+  for (const weekday of o.weekdays ?? []) {
+    await ctx.prisma.proWeeklyHour.create({
+      data: { proId: login.userId, weekday, startTime: new Date('1970-01-01T08:00:00Z'), endTime: new Date('1970-01-01T18:00:00Z') },
+    });
+  }
+  return { userId: login.userId, tokens: login.tokens };
+}

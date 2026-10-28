@@ -44,6 +44,8 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - name: Aucune vulnérabilité haute ou critique
         run: pnpm audit --audit-level high
+      - name: Âge des paquets npm (14 jours minimum, dépendances indirectes comprises, hors correctifs de sécurité déclarés)
+        run: node tools/check-lock-age.mjs
 
   backend:
     name: Backend (lint, types, tests unitaires et d'intégration)
@@ -140,6 +142,8 @@ jobs:
         with: { distribution: temurin, java-version: '17' }
       - uses: subosito/flutter-action@v2
         with: { flutter-version: '${{ env.FLUTTER_VERSION }}', channel: stable, cache: true }
+      - name: Âge des dépendances Dart (14 jours minimum, dépendances indirectes comprises)
+        run: python3 mobile/tool/check_pub_age.py mobile/pubspec.lock
       - name: Textes, analyse statique et tests
         run: bash mobile/tool/check.sh
       - name: APK de développement (client et pro)

@@ -37,6 +37,11 @@ export class AddDocumentDto {
   @ApiProperty({ format: 'uuid' }) @IsUUID() fileId!: string;
 }
 
+export class ServiceAreaDto {
+  @ApiPropertyOptional({ type: GeoPointDto, description: 'Point de départ habituel' }) @IsOptional() @ValidateNested() @Type(() => GeoPointDto) baseLocation?: GeoPointDto;
+  @ApiPropertyOptional({ minimum: 500, maximum: 100000, description: 'Distance maximale acceptée (m)' }) @IsOptional() @IsInt() @Min(500) @Max(100_000) serviceRadiusM?: number;
+}
+
 export class AvailabilityDto {
   @ApiPropertyOptional() @IsOptional() @IsBoolean() isOnline?: boolean;
   @ApiPropertyOptional({ format: 'date-time', nullable: true, type: String, description: 'null pour reprendre immédiatement' })

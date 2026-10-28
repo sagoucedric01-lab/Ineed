@@ -137,6 +137,10 @@ cd mobile/apps/client && flutter run --flavor dev --dart-define-from-file=config
 Même commande dans `mobile/apps/pro` pour Ineed Pro.
 
 - Sur un téléphone réel, remplacez `INEED_API_URL` dans `config/dev.json` par l'adresse IP de votre ordinateur sur le réseau local.
+- Fond de carte (`INEED_MAP_TILE_URL`, application client) : en développement et en préproduction, les tuiles publiques
+  OpenStreetMap ; elles sont **refusées en production** (règles d'usage d'OpenStreetMap). Sans valeur, la carte est masquée
+  et l'adresse se saisit avec la position du téléphone, la commune et un repère.
+- La variante « dev » autorise HTTP en clair (API locale) ; staging et production n'acceptent que HTTPS.
 - Sur iOS, lancez sans `--flavor` : les variantes iOS (schémas Xcode) seront configurées lors de la préparation de la publication, sur un Mac.
 
 ## 7. Tests et vérifications

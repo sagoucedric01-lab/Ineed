@@ -11,3 +11,17 @@ onlyBuiltDependencies:
   - unrs-resolver
   - '@swc/core'
   - msgpackr-extract
+# Politique de versions : uniquement des versions publiées depuis au moins 14 jours (20 160 minutes),
+# dépendances indirectes comprises. Exceptions : correctifs de sécurité (phase 3 : next, prisma, multer ;
+# phase 5 : body-parser, fast-uri, qs, signalés par pnpm audit), épinglés dans package.json > pnpm.overrides.
+minimumReleaseAge: 20160
+minimumReleaseAgeExclude:
+  - next
+  - '@next/*'
+  - eslint-config-next
+  - prisma
+  - '@prisma/*'
+  - multer
+  - body-parser
+  - fast-uri
+  - qs

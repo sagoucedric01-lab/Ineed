@@ -273,5 +273,22 @@
   "documentChoosePdf": "Choisir un fichier PDF",
   "documentAdded": "Justificatif ajouté.",
   "statusRefreshHelp": "Cette page se met à jour quand l’équipe Ineed a examiné votre dossier.",
-  "dashboardApprovedTitle": "Votre compte est validé"
+  "dashboardApprovedTitle": "Votre compte est validé",
+  "serviceAreaTitle": "Zone d’intervention",
+  "serviceAreaHelp": "Votre point de départ habituel et la distance maximale que vous acceptez. Modifiable à tout moment, sans nouvelle vérification.",
+  "serviceAreaUseLocation": "Utiliser ma position actuelle comme point de départ",
+  "serviceAreaRadius": "Distance maximale : {km} km",
+  "@serviceAreaRadius": {
+    "placeholders": {
+      "km": {
+        "type": "int"
+      }
+    }
+  },
+  "serviceAreaSaved": "Zone d’intervention enregistrée.",
+  "serviceAreaNoBase": "Point de départ non renseigné : vous êtes proposé aux clients de vos communes.",
+  "serviceAreaBaseSet": "Point de départ enregistré.",
+  "serviceAreaOutside": "Ce point est en dehors de la zone desservie par Ineed.",
+  "locationDeniedPro": "La localisation est refusée : vous êtes proposé aux clients de vos communes et autour de votre point de départ.",
+  "dashboardLocationShared": "Votre position est utilisée tant que vous êtes disponible, puis effacée."
 }

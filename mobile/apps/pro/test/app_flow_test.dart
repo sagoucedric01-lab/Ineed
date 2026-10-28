@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ineed_api/ineed_api.dart';
+import 'package:ineed_pro/location.dart';
 import 'package:ineed_pro/router.dart';
 import 'package:ineed_shared/ineed_shared.dart';
 
@@ -145,6 +146,36 @@ void main() {
     await tapAndSettle(tester, find.byType(Switch));
     expect(backend.server.last('PATCH /v1/pro/availability').data, {'isOnline': true});
     expect(find.text('Vous recevez les demandes urgentes autour de vous.'), findsOneWidget);
+  });
+
+  testWidgets('disponible : position du moment envoyée ; point de départ et distance maximale enregistrés', (tester) async {
+    final backend = ProBackend(avatarUrl: 'http://storage.test/a.jpg', proStatus: 'APPROVED', profile: filledProfile());
+    await pumpProApp(tester, backend, signedInStore());
+    expect(find.text('Point de départ non renseigné\u00A0: vous êtes proposé aux clients de vos communes.'), findsOneWidget);
+    await tapAndSettle(tester, find.byType(Switch));
+    expect(backend.locations, [{'lat': 5.36, 'lng': -3.97}]);
+    expect(find.text('Votre position est utilisée tant que vous êtes disponible, puis effacée.'), findsOneWidget);
+
+    await tapAndSettle(tester, find.text('Utiliser ma position actuelle comme point de départ'));
+    expect(backend.server.last('PUT /v1/pro/service-area').data, {'baseLocation': {'lat': 5.36, 'lng': -3.97}});
+    expect(find.text('Point de départ enregistré.'), findsOneWidget);
+    expect(find.textContaining('Point de départ non renseigné'), findsNothing);
+
+    expect(find.text('Distance maximale\u00A0: 10 km'), findsOneWidget);
+    await tester.drag(find.byType(Slider), const Offset(200, 0));
+    await tester.pumpAndSettle();
+    final radius = (backend.server.last('PUT /v1/pro/service-area').data as Map)['serviceRadiusM'] as int;
+    expect(radius, greaterThan(10000));
+    expect(radius % 1000, 0);
+  });
+
+  testWidgets('localisation refusée : le professionnel reste disponible, message explicatif', (tester) async {
+    final backend = ProBackend(avatarUrl: 'http://storage.test/a.jpg', proStatus: 'APPROVED', profile: filledProfile());
+    await pumpProApp(tester, backend, signedInStore(), position: () async => throw const LocationUnavailable());
+    await tapAndSettle(tester, find.byType(Switch));
+    expect(backend.server.last('PATCH /v1/pro/availability').data, {'isOnline': true});
+    expect(backend.locations, isEmpty);
+    expect(find.textContaining('La localisation est refusée'), findsOneWidget);
   });
 
   group('redirections', () {

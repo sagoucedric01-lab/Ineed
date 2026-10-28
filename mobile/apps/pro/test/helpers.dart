@@ -7,6 +7,7 @@ import 'package:ineed_api/ineed_api.dart';
 import 'package:ineed_api/testing.dart';
 import 'package:ineed_core/ineed_core.dart';
 import 'package:ineed_pro/app.dart';
+import 'package:ineed_pro/location.dart';
 import 'package:ineed_pro/providers.dart';
 import 'package:ineed_shared/ineed_shared.dart';
 
@@ -49,6 +50,9 @@ class ProBackend {
   String? avatarUrl;
   String? proStatus;
   Map<String, Object?>? profile;
+
+  /// Positions envoyées par l'application.
+  final locations = <Map<String, Object?>>[];
 
   Map<String, Object?> me() => {
         'id': 'u1',
@@ -127,6 +131,16 @@ class ProBackend {
       proStatus = 'SUBMITTED';
       return jsonResponse(200, profileJson());
     },
+    'PUT /v1/pro/location': (o) async {
+      locations.add(Map<String, Object?>.from(o.data as Map));
+      return jsonResponse(200, {'recordedAt': '2026-10-28T10:00:00.000Z'});
+    },
+    'PUT /v1/pro/service-area': (o) async {
+      final b = o.data as Map;
+      if (b['serviceRadiusM'] != null) profile!['serviceRadiusM'] = b['serviceRadiusM'];
+      if (b['baseLocation'] != null) profile!['baseLocation'] = b['baseLocation'];
+      return jsonResponse(200, profileJson());
+    },
     'PATCH /v1/pro/availability': (o) async {
       profile!['isOnline'] = (o.data as Map)['isOnline'];
       return jsonResponse(200, profileJson());
@@ -151,7 +165,7 @@ Map<String, Object?> filledProfile({List<Map<String, Object?>> documents = const
     };
 
 /// Démarre l'application Pro complète sur le faux serveur, sur un écran de téléphone haut.
-Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, TokenStore store) async {
+Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, TokenStore store, {PositionFinder? position}) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
@@ -163,11 +177,12 @@ Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, To
     uploadAdapter: backend.server,
     onSessionExpired: () => container.read(sessionProvider.notifier).expired(),
   );
-  container = ProviderContainer(overrides: [
+  container = ProviderContainer(retry: (_, _) => null, overrides: [
     apiProvider.overrideWithValue(api),
     appKindProvider.overrideWithValue('PRO'),
     photoPickerProvider.overrideWithValue((_) async => jpegBytes),
     pdfPickerProvider.overrideWithValue(() async => pdfBytes),
+    positionFinderProvider.overrideWithValue(position ?? () async => const LatLng(5.36, -3.97)),
   ]);
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: IneedProApp(environment: devEnv)));

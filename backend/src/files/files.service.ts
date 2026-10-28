@@ -9,7 +9,9 @@ import { AppError } from '../common/http/api-error.js';
 import type { File as FileRow } from '../generated/prisma/client.js';
 import { PrismaService } from '../infra/prisma.service.js';
 import { StorageService } from '../infra/storage.service.js';
-import { FILE_RULES, type FilePurpose, MAX_IMAGE_SIDE, MAX_INPUT_PIXELS } from './file-rules.js';
+import { mp4DurationSeconds } from './audio-duration.js';
+import { AUDIO_MP4, DETECTED_ALIASES, FILE_RULES, type FilePurpose, MAX_IMAGE_SIDE, MAX_INPUT_PIXELS } from './file-rules.js';
+import { SettingsService } from '../settings/settings.service.js';
 
 export interface UploadTicket {
   fileId: string;
@@ -33,6 +35,7 @@ export class FilesService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly storage: StorageService,
+    private readonly settings: SettingsService,
     @Inject(ENV) private readonly env: Env,
   ) {
     // Client distinct pour signer avec l'adresse vue par les applications.
@@ -101,12 +104,21 @@ export class FilesService {
     const object = await s3.send(new GetObjectCommand(location));
     const body = Buffer.from(await object.Body!.transformToByteArray());
     const detected = await fileTypeFromBuffer(body);
-    if (!detected || !rule.mimeTypes.includes(detected.mime) || detected.mime !== file.mimeType) {
-      return reject('Le contenu du fichier ne correspond pas à son type. Formats acceptés : JPG, PNG, WebP' + (rule.mimeTypes.includes('application/pdf') ? ', PDF.' : '.'));
+    const accepted = DETECTED_ALIASES[file.mimeType] ?? [file.mimeType];
+    if (!detected || !rule.mimeTypes.includes(file.mimeType) || !accepted.includes(detected.mime)) {
+      const formats = file.purpose === 'REQUEST_VOICE' ? 'M4A (AAC).' : 'JPG, PNG, WebP' + (rule.mimeTypes.includes('application/pdf') ? ', PDF.' : '.');
+      return reject(`Le contenu du fichier ne correspond pas à son type. Formats acceptés : ${formats}`);
+    }
+    if (file.mimeType === AUDIO_MP4) {
+      const seconds = mp4DurationSeconds(body);
+      const max = await this.settings.number('request.max_voice_seconds', 120);
+      if (seconds === null) return reject('Cette note vocale est illisible.');
+      // Petite tolérance : l'enregistreur s'arrête parfois une fraction de seconde après la limite.
+      if (seconds > max + 2) return reject(`La note vocale dépasse ${max} secondes.`);
     }
 
     let finalBody = body;
-    let finalMime = detected.mime;
+    let finalMime = file.mimeType;
     if (detected.mime.startsWith('image/')) {
       try {
         // rotate() applique l'orientation EXIF puis toutes les métadonnées (dont la position GPS) sont abandonnées.

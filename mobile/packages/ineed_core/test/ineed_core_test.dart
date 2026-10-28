@@ -45,6 +45,13 @@ void main() {
       expect(() => AppEnvironment.parse(name: 'prod', apiBaseUrl: 'http://api.ineed.ci'), throwsStateError);
       expect(AppEnvironment.parse(name: 'prod', apiBaseUrl: 'https://api.ineed.ci').isProduction, isTrue);
     });
+    test('fond de carte : adresse HTTPS avec {z}/{x}/{y} ; tuiles publiques OSM interdites en production', () {
+      const osm = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+      expect(AppEnvironment.parse(name: 'dev', apiBaseUrl: 'http://x', mapTileUrl: osm).mapTileUrl, osm);
+      expect(AppEnvironment.parse(name: 'dev', apiBaseUrl: 'http://x').mapTileUrl, isNull);
+      expect(() => AppEnvironment.parse(name: 'dev', apiBaseUrl: 'http://x', mapTileUrl: 'http://tiles/{z}/{x}/{y}'), throwsStateError);
+      expect(() => AppEnvironment.parse(name: 'prod', apiBaseUrl: 'https://x', mapTileUrl: osm), throwsStateError);
+    });
     test('refuse une URL invalide', () => expect(() => AppEnvironment.parse(name: 'dev', apiBaseUrl: 'pas une url'), throwsStateError));
   });
 }

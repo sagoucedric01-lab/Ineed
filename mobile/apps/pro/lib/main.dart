@@ -17,6 +17,6 @@ void main() {
     tokenStore: SecureTokenStore(key: 'ineed.pro.session'),
     onSessionExpired: () => container.read(sessionProvider.notifier).expired(),
   );
-  container = ProviderContainer(overrides: [apiProvider.overrideWithValue(api), appKindProvider.overrideWithValue('PRO')]);
+  container = ProviderContainer(retry: ineedRetry, overrides: [apiProvider.overrideWithValue(api), appKindProvider.overrideWithValue('PRO')]);
   runApp(UncontrolledProviderScope(container: container, child: IneedProApp(environment: env)));
 }
