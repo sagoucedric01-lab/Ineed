@@ -1,10 +1,11 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsIn, IsInt, IsString, Max, Min } from 'class-validator';
+import { FILE_PURPOSES, type FilePurpose } from './file-rules.js';
 
 export class CreateUploadDto {
-  @ApiProperty({ enum: ['AVATAR', 'VERIFICATION_DOC'] })
-  @IsIn(['AVATAR', 'VERIFICATION_DOC'])
-  purpose!: 'AVATAR' | 'VERIFICATION_DOC';
+  @ApiProperty({ enum: FILE_PURPOSES })
+  @IsIn(FILE_PURPOSES)
+  purpose!: FilePurpose;
 
   @ApiProperty({ example: 'image/jpeg' })
   @IsString()

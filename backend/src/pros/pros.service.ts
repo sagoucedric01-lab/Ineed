@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { type AuditContext, AuditService } from '../audit/audit.service.js';
 import { AppError } from '../common/http/api-error.js';
 import { FilesService } from '../files/files.service.js';
+import { GeoService, type LatLng, pointSql } from '../geo/geo.service.js';
 import type { Prisma } from '../generated/prisma/client.js';
 import { PrismaService } from '../infra/prisma.service.js';
 import { EDITABLE_STATUSES, type MissingItem, missingRequirements, VERIFICATION_TRANSITIONS } from './pro-requirements.js';
@@ -49,6 +50,7 @@ export class ProsService {
     private readonly prisma: PrismaService,
     private readonly files: FilesService,
     private readonly audit: AuditService,
+    private readonly geo: GeoService,
   ) {}
 
   private async load(userId: string): Promise<ProWithRelations | null> {
@@ -65,6 +67,8 @@ export class ProsService {
     if (!p) return null;
     const required = await this.requiredDocumentTypes(p.kind);
     const lastEvent = p.proVerificationEvents[0];
+    const [base] = await this.prisma.$queryRaw<{ lat: number | null; lng: number | null }[]>`
+      SELECT ST_Y(base_location::geometry) AS lat, ST_X(base_location::geometry) AS lng FROM pro_profiles WHERE user_id = ${userId}::uuid`;
     const missing: MissingItem[] = missingRequirements({
       kind: p.kind,
       hasNames: !!(p.user.firstName && p.user.lastName),
@@ -84,6 +88,8 @@ export class ProsService {
       bio: p.bio,
       yearsExperience: p.yearsExperience,
       serviceRadiusM: p.serviceRadiusM,
+      /** Point de départ habituel (sert à la recherche quand la position du moment n'est pas connue). */
+      baseLocation: base?.lat != null && base.lng != null ? { lat: base.lat, lng: base.lng } : null,
       categories: p.proCategories.map((c) => ({ id: c.category.id, name: c.category.name, iconKey: c.category.iconKey })),
       skills: p.proSkills.map((s) => ({ id: s.skill.id, name: s.skill.name })),
       zones: p.proServiceZones.map((z) => ({ id: z.zone.id, name: z.zone.name })),
@@ -140,17 +146,15 @@ export class ProsService {
         companyRegNumber: input.kind === 'COMPANY' ? input.companyRegNumber?.trim() || null : null,
         bio: input.bio?.trim() || null,
         yearsExperience: input.yearsExperience ?? null,
-        serviceRadiusM: input.serviceRadiusM ?? 10_000,
+        serviceRadiusM: input.serviceRadiusM ?? existing?.serviceRadiusM ?? 10_000,
         updatedAt: new Date(),
       };
       await tx.proProfile.upsert({ where: { userId }, create: { userId, cityId: city.id, ...data }, update: data });
       if (input.baseLocation) {
-        const inCity = await tx.$queryRaw<{ ok: boolean }[]>`
-          SELECT ST_DWithin(center, ST_SetSRID(ST_MakePoint(${input.baseLocation.lng}, ${input.baseLocation.lat}), 4326)::geography, 60000) AS ok
-            FROM cities WHERE id = ${city.id}::uuid`;
-        if (!inCity[0]?.ok) throw new AppError(422, 'LOCATION_OUTSIDE_CITY', 'Le point de départ doit se trouver dans la zone desservie.');
-        await tx.$executeRaw`UPDATE pro_profiles SET base_location = ST_SetSRID(ST_MakePoint(${input.baseLocation.lng}, ${input.baseLocation.lat}), 4326)::geography
-                              WHERE user_id = ${userId}::uuid`;
+        await this.geo.requireInServiceArea(input.baseLocation, tx).catch(() => {
+          throw new AppError(422, 'LOCATION_OUTSIDE_CITY', 'Le point de départ doit se trouver dans la zone desservie.');
+        });
+        await tx.$executeRaw`UPDATE pro_profiles SET base_location = ${pointSql(input.baseLocation)} WHERE user_id = ${userId}::uuid`;
       }
       await tx.proCategory.deleteMany({ where: { proId: userId } });
       await tx.proCategory.createMany({ data: input.categoryIds.map((categoryId) => ({ proId: userId, categoryId })) });
@@ -205,8 +209,49 @@ export class ProsService {
     if (pausedUntil && pausedUntil.getTime() <= Date.now()) throw new AppError(422, 'INVALID_PAUSE', 'La fin de la pause doit être dans le futur.');
     await this.prisma.proProfile.update({
       where: { userId },
-      data: { ...(isOnline === undefined ? {} : { isOnline }), ...(pausedUntil === undefined ? {} : { pausedUntil }), updatedAt: new Date() },
+      data: {
+        ...(isOnline === undefined ? {} : { isOnline }),
+        // Hors ligne : la position du moment n'a plus d'utilité, elle est effacée.
+        ...(isOnline === false ? { lastLocationAt: null } : {}),
+        ...(pausedUntil === undefined ? {} : { pausedUntil }),
+        updatedAt: new Date(),
+      },
+    });
+    if (isOnline === false) await this.prisma.$executeRaw`UPDATE pro_profiles SET last_location = NULL WHERE user_id = ${userId}::uuid`;
+    return this.view(userId);
+  }
+
+  /**
+   * Point de départ et distance maximale : réglages opérationnels, modifiables à tout moment (sans nouvelle vérification).
+   */
+  async setServiceArea(userId: string, input: { baseLocation?: LatLng; serviceRadiusM?: number }) {
+    const pro = await this.prisma.proProfile.findUnique({ where: { userId } });
+    if (!pro) throw new AppError(409, 'PROFILE_REQUIRED', 'Commencez par renseigner votre profil professionnel.');
+    if (pro.verificationStatus === 'REJECTED') throw new AppError(409, 'PROFILE_LOCKED', 'Votre dossier ne peut plus être modifié depuis l’application. Contactez l’assistance Ineed.');
+    await this.prisma.$transaction(async (tx) => {
+      if (input.baseLocation) {
+        await this.geo.requireInServiceArea(input.baseLocation, tx).catch(() => {
+          throw new AppError(422, 'LOCATION_OUTSIDE_CITY', 'Le point de départ doit se trouver dans la zone desservie.');
+        });
+        await tx.$executeRaw`UPDATE pro_profiles SET base_location = ${pointSql(input.baseLocation)}, updated_at = now() WHERE user_id = ${userId}::uuid`;
+      }
+      if (input.serviceRadiusM !== undefined) await tx.proProfile.update({ where: { userId }, data: { serviceRadiusM: input.serviceRadiusM, updatedAt: new Date() } });
     });
     return this.view(userId);
+  }
+
+  /**
+   * Position du moment, envoyée par l'application tant que le professionnel est disponible.
+   * Une seule position est conservée (écrasée à chaque envoi, effacée au passage hors ligne) : aucun historique.
+   */
+  async updateLocation(userId: string, p: LatLng): Promise<{ recordedAt: string }> {
+    const pro = await this.prisma.proProfile.findUnique({ where: { userId } });
+    if (!pro || pro.verificationStatus !== 'APPROVED' || !pro.isOnline) {
+      throw new AppError(409, 'NOT_AVAILABLE', 'Votre position n’est utilisée que lorsque vous êtes disponible.');
+    }
+    await this.geo.requireInServiceArea(p);
+    const now = new Date();
+    await this.prisma.$executeRaw`UPDATE pro_profiles SET last_location = ${pointSql(p)}, last_location_at = ${now} WHERE user_id = ${userId}::uuid`;
+    return { recordedAt: now.toISOString() };
   }
 }

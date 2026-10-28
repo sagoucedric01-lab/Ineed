@@ -25,6 +25,20 @@ const MATRIX: { method: 'get' | 'post' | 'put' | 'patch' | 'delete'; path: strin
   { method: 'post', path: `/v1/admin/pros/${UUID}/suspend`, body: { note: 'x' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
   { method: 'post', path: '/v1/admin/auth/password', body: {}, expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
   { method: 'get', path: '/v1/catalog/categories', expect: { anonyme: 'ok', client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'get', path: '/v1/catalog/search?q=fuite', expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/pros/search', expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/pros/${UUID}`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/me/addresses', expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: '/v1/requests', body: {}, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/requests/${UUID}`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'put', path: '/v1/pro/location', body: {}, expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/me/notifications', expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'get', path: '/v1/admin/catalog/categories', expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
+  { method: 'patch', path: `/v1/admin/catalog/categories/${UUID}`, body: {}, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
+  { method: 'post', path: '/v1/admin/geo/zones', body: {}, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
+  { method: 'get', path: '/v1/admin/dispatch-rules', expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 403, super: 'ok' } },
+  { method: 'put', path: '/v1/admin/settings/request.max_photos', body: { value: 5 }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 403, super: 'ok' } },
+  { method: 'get', path: '/v1/admin/requests', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 403, super: 'ok' } },
 ];
 
 describe('T24 — contrôle d’accès', () => {

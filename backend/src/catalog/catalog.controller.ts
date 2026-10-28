@@ -1,56 +1,59 @@
 import { Controller, Get, Query } from '@nestjs/common';
-import { ApiOperation, ApiProperty, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { Public } from '../auth/decorators.js';
+import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import type { AuthUser } from '../auth/auth-user.js';
+import { Access, CurrentUser, Public } from '../auth/decorators.js';
 import { PrismaService } from '../infra/prisma.service.js';
+import { type CatalogSearchResult, CatalogService } from './catalog.service.js';
+import { CatalogSearchQueryDto, CategoryDto } from './dto.js';
 
-export class SkillDto {
-  @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty() name!: string;
-}
+/** Recherches conservées par utilisateur (les plus anciennes sont effacées au fil de l'eau). */
+const SEARCH_HISTORY_KEEP = 20;
 
-export class CategoryDto {
-  @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty() slug!: string;
-  @ApiProperty() name!: string;
-  @ApiProperty({ description: 'Clé de l’icône (design/icons/categories)' }) iconKey!: string;
-  @ApiProperty({ type: [SkillDto] }) skills!: SkillDto[];
-}
-
-export class ZoneDto {
-  @ApiProperty({ format: 'uuid' }) id!: string;
-  @ApiProperty() name!: string;
-  @ApiProperty({ enum: ['COMMUNE', 'QUARTIER', 'SECTEUR'] }) kind!: string;
-}
-
-/** Lectures publiques du référentiel. La recherche et le détail des prestations arrivent en phase 5. */
 @ApiTags('Référentiel')
-@Public()
-@Controller('v1')
+@Controller('v1/catalog')
 export class CatalogController {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly catalog: CatalogService,
+    private readonly prisma: PrismaService,
+  ) {}
 
-  @Get('catalog/categories')
-  @ApiOperation({ summary: 'Métiers actifs, dans l’ordre défini par l’administration' })
+  @Get('categories')
+  @Public()
+  @ApiOperation({ summary: 'Métiers actifs avec leurs prestations et compétences, dans l’ordre défini par l’administration' })
   @ApiResponse({ status: 200, type: [CategoryDto] })
-  async categories(): Promise<CategoryDto[]> {
-    const rows = await this.prisma.category.findMany({
-      where: { isActive: true, parentId: null },
-      orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
-      include: { skills: { orderBy: { name: 'asc' } } },
-    });
-    return rows.map((c) => ({ id: c.id, slug: c.slug, name: c.name, iconKey: c.iconKey, skills: c.skills.map((s) => ({ id: s.id, name: s.name })) }));
+  categories() {
+    return this.catalog.activeCategories();
   }
 
-  @Get('geo/zones')
-  @ApiOperation({ summary: 'Communes actives d’une ville (Abidjan par défaut)' })
-  @ApiQuery({ name: 'cityId', required: false })
-  @ApiResponse({ status: 200, type: [ZoneDto] })
-  async zones(@Query('cityId') cityId?: string): Promise<ZoneDto[]> {
-    const city = cityId
-      ? await this.prisma.city.findFirst({ where: { id: cityId, isActive: true } })
-      : await this.prisma.city.findFirst({ where: { isActive: true }, orderBy: { name: 'asc' } });
-    if (!city) return [];
-    const rows = await this.prisma.zone.findMany({ where: { cityId: city.id, parentId: null, isActive: true }, orderBy: { name: 'asc' } });
-    return rows.map((z) => ({ id: z.id, name: z.name, kind: z.kind }));
+  @Get('search')
+  @ApiBearerAuth()
+  @Access({ app: 'CLIENT' })
+  @ApiOperation({ summary: 'Recherche d’un métier ou d’une prestation (mots du client, synonymes, compétences)' })
+  async search(@CurrentUser() user: AuthUser, @Query() q: CatalogSearchQueryDto): Promise<CatalogSearchResult> {
+    const result = await this.catalog.search(q.q);
+    await this.prisma.$transaction([
+      this.prisma.searchHistory.create({ data: { userId: user.userId, query: q.q.slice(0, 80), categoryId: result.categories[0]?.id ?? null } }),
+      this.prisma.$executeRaw`DELETE FROM search_history WHERE user_id = ${user.userId}::uuid AND id NOT IN (
+        SELECT id FROM search_history WHERE user_id = ${user.userId}::uuid ORDER BY created_at DESC, id DESC LIMIT ${SEARCH_HISTORY_KEEP})`,
+    ]);
+    return result;
+  }
+
+  @Get('recent-searches')
+  @ApiBearerAuth()
+  @Access({ app: 'CLIENT' })
+  @ApiOperation({ summary: 'Mes dernières recherches (sans doublon)' })
+  async recent(@CurrentUser() user: AuthUser): Promise<{ query: string; categoryId: string | null }[]> {
+    const rows = await this.prisma.searchHistory.findMany({ where: { userId: user.userId, query: { not: null } }, orderBy: { createdAt: 'desc' }, take: SEARCH_HISTORY_KEEP });
+    const seen = new Set<string>();
+    const out: { query: string; categoryId: string | null }[] = [];
+    for (const r of rows) {
+      const key = r.query!.toLowerCase();
+      if (seen.has(key)) continue;
+      seen.add(key);
+      out.push({ query: r.query!, categoryId: r.categoryId });
+      if (out.length === 5) break;
+    }
+    return out;
   }
 }

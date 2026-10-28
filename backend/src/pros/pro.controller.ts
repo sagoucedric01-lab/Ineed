@@ -5,7 +5,7 @@ import { Access, CurrentUser } from '../auth/decorators.js';
 import { AppError } from '../common/http/api-error.js';
 import { auditContext, type AppRequest } from '../common/http/request-context.js';
 import { PrismaService } from '../infra/prisma.service.js';
-import { AddDocumentDto, AvailabilityDto, SaveProProfileDto } from './dto.js';
+import { AddDocumentDto, AvailabilityDto, GeoPointDto, SaveProProfileDto, ServiceAreaDto } from './dto.js';
 import { ProsService } from './pros.service.js';
 
 /** Dossier du professionnel connecté (application Ineed Pro uniquement). */
@@ -58,5 +58,17 @@ export class ProController {
   availability(@CurrentUser() user: AuthUser, @Body() dto: AvailabilityDto) {
     const paused = dto.pausedUntil === undefined ? undefined : dto.pausedUntil === null ? null : new Date(dto.pausedUntil);
     return this.pros.setAvailability(user.userId, dto.isOnline, paused);
+  }
+
+  @Put('service-area')
+  @ApiOperation({ summary: 'Point de départ et distance maximale (modifiables à tout moment, sans nouvelle vérification)' })
+  serviceArea(@CurrentUser() user: AuthUser, @Body() dto: ServiceAreaDto) {
+    return this.pros.setServiceArea(user.userId, dto);
+  }
+
+  @Put('location')
+  @ApiOperation({ summary: 'Position du moment (uniquement quand le professionnel est disponible ; aucune conservation d’historique)' })
+  location(@CurrentUser() user: AuthUser, @Body() dto: GeoPointDto) {
+    return this.pros.updateLocation(user.userId, dto);
   }
 }
