@@ -1,0 +1,922 @@
+<title>Maquettes Ineed</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap">
+<style>
+/* Mise en page : galerie verticale de sections ; chaque écran est un cadre de téléphone 360 px,
+   les écrans d'administration sont des cadres larges dans un conteneur à défilement horizontal. */
+{{tokens}}
+:root {
+  /* Couleurs propres à la page de présentation (hors application) */
+  --page-ink: var(--in-text);
+  --map-water: #CFE0F5;
+  --map-road: var(--in-surface);
+  --map-ground: #E8EDF3;
+  --phone-bezel: #0A101C;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --map-water: #1B3358; --map-ground: #1C2537; --map-road: #2A3550; --phone-bezel: #000000; } }
+:root[data-theme="dark"] { --map-water: #1B3358; --map-ground: #1C2537; --map-road: #2A3550; --phone-bezel: #000000; }
+
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--in-background); color: var(--in-text);
+  font-family: var(--in-font-body); font-size: 14px; line-height: 20px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 32px 64px;
+}
+.wrap { max-width: 1240px; margin: 0 auto; display: grid; gap: 48px; }
+h1, h2, h3 { font-family: var(--in-font-display); text-wrap: balance; margin: 0; }
+.page-head { display: grid; gap: 16px; }
+.page-head .brand { display: flex; align-items: center; gap: 14px; }
+.page-head .brand svg { width: 48px; height: 48px; flex: none; }
+.page-head h1 { font-size: 32px; line-height: 38px; font-weight: 800; letter-spacing: -0.5px; }
+.page-head p { margin: 0; max-width: 68ch; color: var(--in-text-muted); font-size: 16px; line-height: 24px; }
+.sample-note { display: inline-flex; gap: 8px; align-items: center; padding: 8px 12px; border-radius: var(--in-radius-sm);
+  background: var(--in-warning-soft); color: var(--in-on-warning-soft); font-weight: 600; width: fit-content; max-width: 100%; }
+section.group { display: grid; gap: 20px; }
+section.group > header { display: grid; gap: 6px; border-top: 1px solid var(--in-border); padding-top: 20px; }
+section.group h2 { font-size: 22px; line-height: 28px; }
+section.group > header p { margin: 0; color: var(--in-text-muted); max-width: 72ch; }
+.screens { display: flex; flex-wrap: wrap; gap: 32px 28px; }
+figure { margin: 0; display: grid; gap: 10px; justify-items: start; min-width: 0; }
+figcaption { font-size: 13px; color: var(--in-text-muted); max-width: 360px; }
+figcaption b { color: var(--in-text); font-weight: 600; }
+
+/* ---------- Identité ---------- */
+.identity { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.panel { background: var(--in-surface); border: 1px solid var(--in-border); border-radius: var(--in-radius-lg); padding: 20px; display: grid; gap: 14px; align-content: start; min-width: 0; }
+.panel h3 { font-size: 16px; line-height: 22px; }
+.logo-row { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+.logo-row .app-icon { width: 76px; height: 76px; border-radius: 18px; overflow: hidden; flex: none; box-shadow: var(--in-shadow-card); }
+.logo-row .app-icon svg { width: 100%; height: 100%; display: block; }
+.logo-row .label { font-size: 12px; color: var(--in-text-muted); text-align: center; margin-top: 6px; }
+.wordmark svg { width: 220px; max-width: 100%; height: auto; }
+.wordmark.neg { background: var(--in-navy-900); border-radius: var(--in-radius-md); padding: 14px 16px; }
+.swatches { display: grid; grid-template-columns: repeat(auto-fill, minmax(118px, 1fr)); gap: 10px; }
+.swatch { border-radius: var(--in-radius-md); overflow: hidden; border: 1px solid var(--in-border); }
+.swatch .chip { height: 52px; display: flex; align-items: flex-end; padding: 6px 8px; font-weight: 600; font-size: 12px; }
+.swatch .meta { padding: 6px 8px; font-size: 11px; line-height: 15px; color: var(--in-text-muted); background: var(--in-surface); }
+.swatch .meta b { display: block; color: var(--in-text); font-size: 12px; }
+.type-specimen { display: grid; gap: 10px; }
+.type-specimen div { display: flex; gap: 12px; align-items: baseline; flex-wrap: wrap; }
+.type-specimen small { color: var(--in-text-subtle); font-size: 11px; width: 84px; flex: none; font-variant-numeric: tabular-nums; }
+.cat-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 10px; }
+.cat-grid div { display: grid; justify-items: center; gap: 6px; font-size: 11px; text-align: center; color: var(--in-text-muted); }
+.cat-grid .ico { width: 48px; height: 48px; border-radius: var(--in-radius-md); background: var(--in-action-soft); color: var(--in-on-action-soft); display: grid; place-items: center; }
+.cat-grid .ico svg { width: 26px; height: 26px; }
+
+/* ---------- Cadre de téléphone ---------- */
+.phone { width: 360px; max-width: 100%; height: 740px; border-radius: 36px; background: var(--phone-bezel); padding: 10px; box-shadow: var(--in-shadow-float); flex: none; }
+.screen { position: relative; height: 100%; border-radius: 27px; overflow: hidden; background: var(--in-background); display: flex; flex-direction: column; }
+.sbar { height: 30px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 22px; font-size: 12px; font-weight: 600; color: var(--in-text); }
+.sbar.on-dark { color: #FFFFFF; }
+.sbar .dots { display: flex; gap: 4px; align-items: center; }
+.sbar .dots i { width: 14px; height: 9px; border-radius: 2px; border: 1.5px solid currentColor; display: block; }
+.sbar .dots s { width: 4px; height: 4px; border-radius: 50%; background: currentColor; display: block; }
+.body { flex: 1; overflow: hidden; padding: 4px 16px 16px; display: flex; flex-direction: column; gap: 16px; min-height: 0; }
+.body.flush { padding: 0; gap: 0; }
+.footer { flex: none; padding: 12px 16px 18px; background: var(--in-surface); border-top: 1px solid var(--in-border); display: grid; gap: 10px; }
+.appbar { display: flex; align-items: center; gap: 10px; min-height: 44px; }
+.appbar h3 { font-size: 18px; line-height: 24px; flex: 1; }
+.iconbtn { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; color: var(--in-text); background: transparent; border: 0; flex: none; position: relative; }
+.iconbtn.filled { background: var(--in-surface); box-shadow: var(--in-shadow-card); }
+.iconbtn svg { width: 22px; height: 22px; }
+.iconbtn .dot { position: absolute; top: 8px; right: 9px; width: 8px; height: 8px; border-radius: 50%; background: var(--in-urgent); border: 2px solid var(--in-surface); }
+svg { flex: none; }
+.muted { color: var(--in-text-muted); }
+.subtle { color: var(--in-text-subtle); }
+.t-display { font-family: var(--in-font-display); font-size: 26px; line-height: 32px; font-weight: 800; letter-spacing: -0.4px; }
+.t-title { font-family: var(--in-font-display); font-size: 20px; line-height: 26px; font-weight: 700; }
+.t-titlem { font-family: var(--in-font-display); font-size: 17px; line-height: 23px; font-weight: 700; }
+.t-label { font-weight: 600; }
+.t-caption { font-size: 12px; line-height: 16px; font-weight: 500; }
+.t-amount { font-family: var(--in-font-display); font-size: 24px; line-height: 30px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.stack { display: grid; gap: 8px; }
+.stack-lg { display: grid; gap: 14px; }
+.row { display: flex; align-items: center; gap: 10px; }
+.spacer { flex: 1; }
+
+/* Boutons */
+.btn { height: 52px; border-radius: var(--in-radius-md); border: 0; display: flex; align-items: center; justify-content: center; gap: 8px;
+  font: 600 16px/20px var(--in-font-body); letter-spacing: 0.1px; width: 100%; }
+.btn svg { width: 20px; height: 20px; }
+.btn-primary { background: var(--in-action); color: var(--in-on-action); }
+.btn-urgent { background: var(--in-urgent); color: var(--in-on-urgent); }
+.btn-success { background: var(--in-success); color: var(--in-on-success); }
+.btn-secondary { background: var(--in-surface); color: var(--in-text); border: 1.5px solid var(--in-border-strong); }
+.btn-ghost { background: transparent; color: var(--in-action); height: 44px; }
+.btn-danger-ghost { background: transparent; color: var(--in-danger); height: 44px; }
+.btn[disabled] { background: var(--in-surface-muted); color: var(--in-text-subtle); }
+.btn-sm { height: 40px; font-size: 14px; border-radius: var(--in-radius-sm); }
+
+/* Champs */
+.field { display: grid; gap: 6px; }
+.field label { font-weight: 600; font-size: 14px; }
+.input { min-height: 52px; border-radius: var(--in-radius-md); background: var(--in-surface); border: 1.5px solid var(--in-border-strong);
+  display: flex; align-items: center; gap: 10px; padding: 0 14px; font-size: 16px; color: var(--in-text); }
+.input.focus { border-color: var(--in-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--in-focus) 22%, transparent); }
+.input.error { border-color: var(--in-danger); }
+.input .ph { color: var(--in-text-subtle); }
+.input.area { align-items: flex-start; padding: 12px 14px; min-height: 104px; line-height: 22px; }
+.help { font-size: 12px; line-height: 16px; color: var(--in-text-muted); }
+.help.err { color: var(--in-danger); font-weight: 500; }
+.prefix { font-weight: 600; padding-right: 10px; border-right: 1px solid var(--in-border); display: flex; gap: 6px; align-items: center; }
+.flag { width: 20px; height: 14px; border-radius: 2px; display: flex; overflow: hidden; }
+.flag i { flex: 1; } .flag i:nth-child(1){background:#F77F00} .flag i:nth-child(2){background:#FFFFFF} .flag i:nth-child(3){background:#009E60}
+.otp { display: flex; gap: 8px; }
+.otp span { flex: 1; height: 56px; border-radius: var(--in-radius-md); background: var(--in-surface); border: 1.5px solid var(--in-border-strong);
+  display: grid; place-items: center; font: 700 22px var(--in-font-display); }
+.otp span.cur { border-color: var(--in-focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--in-focus) 22%, transparent); }
+
+/* Cartes, puces, badges */
+.card { background: var(--in-surface); border-radius: var(--in-radius-lg); border: 1px solid var(--in-border); padding: 14px; display: grid; gap: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; height: 28px; padding: 0 10px; border-radius: var(--in-radius-pill); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.chip svg { width: 14px; height: 14px; }
+.chip-info { background: var(--in-action-soft); color: var(--in-on-action-soft); }
+.chip-success { background: var(--in-success-soft); color: var(--in-on-success-soft); }
+.chip-urgent { background: var(--in-urgent-soft); color: var(--in-on-urgent-soft); }
+.chip-warn { background: var(--in-warning-soft); color: var(--in-on-warning-soft); }
+.chip-danger { background: var(--in-danger-soft); color: var(--in-on-danger-soft); }
+.chip-neutral { background: var(--in-surface-muted); color: var(--in-text-muted); }
+.verified { display: inline-flex; align-items: center; gap: 4px; color: var(--in-on-success-soft); font-size: 12px; font-weight: 600; }
+.verified svg { width: 15px; height: 15px; }
+.avatar { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; font: 700 17px var(--in-font-display); flex: none;
+  background: var(--in-action-soft); color: var(--in-on-action-soft); }
+.avatar.lg { width: 64px; height: 64px; font-size: 22px; }
+.stars { display: inline-flex; gap: 2px; color: var(--in-rating); }
+.stars svg { width: 14px; height: 14px; fill: currentColor; }
+.stars.lg svg { width: 38px; height: 38px; }
+.stars .off { color: var(--in-border-strong); fill: none; }
+.kv { display: flex; justify-content: space-between; gap: 12px; font-variant-numeric: tabular-nums; }
+.kv span:first-child { color: var(--in-text-muted); }
+.kv.total { font-weight: 700; font-size: 16px; padding-top: 10px; border-top: 1px dashed var(--in-border-strong); }
+.kv.total span:first-child { color: var(--in-text); }
+.divider { height: 1px; background: var(--in-border); }
+.banner { display: flex; gap: 10px; align-items: flex-start; padding: 10px 12px; border-radius: var(--in-radius-md); font-size: 13px; line-height: 18px; }
+.banner svg { width: 18px; height: 18px; margin-top: 1px; }
+.banner-info { background: var(--in-action-soft); color: var(--in-on-action-soft); }
+.banner-warn { background: var(--in-warning-soft); color: var(--in-on-warning-soft); }
+.banner-test { background: var(--in-warning-soft); color: var(--in-on-warning-soft); font-weight: 700; letter-spacing: 0.2px; }
+.offline { background: var(--in-text); color: var(--in-background); font-size: 12px; font-weight: 600; padding: 6px 16px; display: flex; gap: 8px; align-items: center; }
+.offline svg { width: 15px; height: 15px; }
+.list-item { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--in-border); }
+.list-item:last-child { border-bottom: 0; }
+
+/* Accueil */
+.hero { background: var(--in-primary); color: var(--in-on-primary); padding: 4px 16px 20px; display: grid; gap: 14px; }
+.hero .loc { display: inline-flex; gap: 6px; align-items: center; font-size: 13px; font-weight: 600; opacity: 0.92; }
+.hero .loc svg { width: 16px; height: 16px; }
+.search { min-height: 50px; border-radius: var(--in-radius-md); background: var(--in-surface); color: var(--in-text-subtle); display: flex; align-items: center; gap: 10px; padding: 0 14px; font-size: 14px; }
+.search svg { width: 20px; height: 20px; color: var(--in-text-muted); }
+.cta-pair { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.cta { border-radius: var(--in-radius-lg); padding: 14px 12px; display: grid; gap: 4px; align-content: start; min-height: 96px; }
+.cta svg { width: 24px; height: 24px; }
+.cta b { font: 700 15px/19px var(--in-font-display); }
+.cta span { font-size: 12px; line-height: 15px; }
+.cta.urgent { background: var(--in-urgent); color: var(--in-on-urgent); }
+.cta.sched { background: var(--in-surface); color: var(--in-text); border: 1px solid var(--in-border); }
+.cta.sched span { color: var(--in-text-muted); }
+.cats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px 8px; }
+.cats div { display: grid; justify-items: center; gap: 6px; font-size: 11px; line-height: 14px; text-align: center; font-weight: 500; }
+.cats .ico { width: 56px; height: 56px; border-radius: var(--in-radius-lg); background: var(--in-surface); border: 1px solid var(--in-border); display: grid; place-items: center; color: var(--in-on-action-soft); }
+.cats .ico svg { width: 28px; height: 28px; }
+.section-title { display: flex; justify-content: space-between; align-items: baseline; }
+.section-title h4 { margin: 0; font: 700 16px/22px var(--in-font-display); }
+.section-title a { font-size: 13px; font-weight: 600; color: var(--in-action); text-decoration: none; }
+.tabbar { flex: none; display: grid; grid-template-columns: repeat(4, 1fr); background: var(--in-surface); border-top: 1px solid var(--in-border); padding: 8px 0 14px; }
+.tabbar div { display: grid; justify-items: center; gap: 2px; font-size: 11px; font-weight: 600; color: var(--in-text-subtle); }
+.tabbar div.on { color: var(--in-action); }
+.tabbar svg { width: 22px; height: 22px; }
+.mini-mission { display: flex; gap: 12px; align-items: center; }
+.mini-mission .ico { width: 44px; height: 44px; border-radius: var(--in-radius-md); background: var(--in-action-soft); color: var(--in-on-action-soft); display: grid; place-items: center; }
+.mini-mission .ico svg { width: 24px; height: 24px; }
+.recent { display: flex; gap: 8px; flex-wrap: wrap; }
+
+/* Choix de prestation */
+.svc { display: flex; gap: 12px; align-items: center; padding: 14px; background: var(--in-surface); border: 1px solid var(--in-border); border-radius: var(--in-radius-md); }
+.svc.sel { border: 2px solid var(--in-action); padding: 13px; }
+.svc .txt { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.radio { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--in-border-strong); flex: none; }
+.radio.on { border: 7px solid var(--in-action); }
+
+/* Carte */
+.map { position: relative; flex: 1; background: var(--map-ground); overflow: hidden; min-height: 0; }
+.map svg.streets { position: absolute; inset: 0; width: 100%; height: 100%; }
+.map .pin { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -100%); display: grid; justify-items: center; }
+.map .pin .bubble { background: var(--in-text); color: var(--in-background); font-size: 12px; font-weight: 600; padding: 6px 10px; border-radius: var(--in-radius-sm); margin-bottom: 6px; white-space: nowrap; }
+.map .pin svg { width: 40px; height: 40px; }
+.map .attrib { position: absolute; left: 8px; bottom: 26px; font-size: 10px; color: var(--in-text-muted); background: color-mix(in srgb, var(--in-surface) 80%, transparent); padding: 2px 6px; border-radius: 4px; }
+.map .float-top { position: absolute; top: 8px; left: 12px; right: 12px; display: flex; gap: 8px; }
+.map .gps { position: absolute; right: 12px; bottom: 14px; }
+.sheet { flex: none; background: var(--in-surface); border-radius: 22px 22px 0 0; box-shadow: var(--in-shadow-sheet); padding: 10px 16px 18px; display: grid; gap: 12px; position: relative; margin-top: -18px; }
+.sheet::before { content: ""; width: 40px; height: 4px; border-radius: 2px; background: var(--in-border-strong); justify-self: center; }
+
+/* Photos */
+.thumbs { display: flex; gap: 8px; }
+.thumb { width: 72px; height: 72px; border-radius: var(--in-radius-md); position: relative; overflow: hidden; flex: none; }
+.thumb.add { border: 1.5px dashed var(--in-border-strong); display: grid; place-items: center; color: var(--in-action); background: var(--in-surface); }
+.thumb.add svg { width: 24px; height: 24px; }
+.thumb.ph1 { background: linear-gradient(160deg, #8FA3B8 0%, #5D6F84 55%, #3F4C5C 100%); }
+.thumb.ph2 { background: linear-gradient(200deg, #C9B79C 0%, #8C7A5E 60%, #5E5040 100%); }
+.thumb .x { position: absolute; top: 4px; right: 4px; width: 20px; height: 20px; border-radius: 50%; background: rgba(10,16,28,0.7); color: #fff; display: grid; place-items: center; }
+.thumb .x svg { width: 12px; height: 12px; }
+.voice { display: flex; align-items: center; gap: 10px; padding: 10px 12px; background: var(--in-surface); border: 1px solid var(--in-border); border-radius: var(--in-radius-md); }
+.voice .play { width: 34px; height: 34px; border-radius: 50%; background: var(--in-action); color: var(--in-on-action); display: grid; place-items: center; }
+.voice .play::before { content: ""; border-left: 10px solid currentColor; border-top: 6px solid transparent; border-bottom: 6px solid transparent; margin-left: 3px; }
+.wave { flex: 1; display: flex; align-items: center; gap: 2px; height: 24px; }
+.wave i { flex: 1; background: var(--in-border-strong); border-radius: 1px; }
+
+/* Recherche en cours */
+.radar { position: relative; width: 220px; height: 220px; margin: 8px auto 0; display: grid; place-items: center; }
+.radar .ring { position: absolute; inset: 0; border-radius: 50%; border: 2px solid color-mix(in srgb, var(--in-urgent) 40%, transparent); }
+.radar .ring.r2 { inset: 30px; border-color: color-mix(in srgb, var(--in-urgent) 60%, transparent); }
+.radar .ring.r3 { inset: 62px; background: var(--in-urgent-soft); border-color: var(--in-urgent); }
+.radar .core { position: relative; width: 64px; height: 64px; border-radius: 50%; background: var(--in-urgent); color: var(--in-on-urgent); display: grid; place-items: center; }
+.radar .core svg { width: 30px; height: 30px; }
+.radar .blip { position: absolute; width: 12px; height: 12px; border-radius: 50%; background: var(--in-action); border: 2px solid var(--in-surface); }
+@media (prefers-reduced-motion: no-preference) {
+  .radar .ring.r1 { animation: pulse 2.4s var(--in-ease) infinite; }
+  @keyframes pulse { 0% { transform: scale(0.9); opacity: 1; } 100% { transform: scale(1.06); opacity: 0.35; } }
+}
+.progress { height: 6px; border-radius: 3px; background: var(--in-surface-muted); overflow: hidden; }
+.progress i { display: block; height: 100%; background: var(--in-urgent); border-radius: 3px; }
+.countdown { display: flex; align-items: center; gap: 10px; }
+.countdown .ring { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font: 800 13px var(--in-font-display);
+  background: conic-gradient(var(--in-urgent) 0 68%, var(--in-surface-muted) 68% 100%); }
+.countdown .ring span { width: 34px; height: 34px; border-radius: 50%; background: var(--in-surface); display: grid; place-items: center; }
+
+/* Vide / erreur */
+.empty { flex: 1; display: grid; align-content: center; justify-items: center; text-align: center; gap: 12px; padding: 0 8px; }
+.empty .illus { width: 120px; height: 120px; border-radius: 50%; background: var(--in-surface-muted); display: grid; place-items: center; color: var(--in-text-muted); position: relative; }
+.empty .illus svg { width: 52px; height: 52px; }
+.empty .illus .badge { position: absolute; right: 6px; bottom: 10px; width: 36px; height: 36px; border-radius: 50%; background: var(--in-surface); box-shadow: var(--in-shadow-card); display: grid; place-items: center; color: var(--in-on-warning-soft); }
+.empty .illus .badge svg { width: 20px; height: 20px; }
+.option { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: var(--in-radius-md); background: var(--in-surface); border: 1px solid var(--in-border); text-align: left; width: 100%; font-weight: 600; }
+.option .ico { width: 36px; height: 36px; border-radius: var(--in-radius-sm); background: var(--in-action-soft); color: var(--in-on-action-soft); display: grid; place-items: center; }
+.option .ico svg { width: 20px; height: 20px; }
+.option > svg { width: 18px; height: 18px; color: var(--in-text-subtle); margin-left: auto; }
+
+/* Chronologie */
+.timeline { display: grid; gap: 0; }
+.tl { display: grid; grid-template-columns: 24px 1fr; gap: 10px; }
+.tl .rail { display: grid; justify-items: center; grid-template-rows: 24px 1fr; }
+.tl .rail .b { width: 24px; height: 24px; border-radius: 50%; display: grid; place-items: center; background: var(--in-surface-muted); color: var(--in-text-subtle); }
+.tl .rail .b svg { width: 14px; height: 14px; }
+.tl .rail .ln { width: 2px; background: var(--in-border); min-height: 14px; }
+.tl.done .b { background: var(--in-success); color: var(--in-on-success); }
+.tl.done .ln { background: var(--in-success); }
+.tl.cur .b { background: var(--in-action); color: var(--in-on-action); box-shadow: 0 0 0 4px var(--in-action-soft); }
+.tl .txt { padding-bottom: 12px; display: grid; gap: 1px; }
+.tl .txt b { font-size: 14px; }
+.tl .txt span { font-size: 12px; color: var(--in-text-muted); font-variant-numeric: tabular-nums; }
+.tl:not(.done):not(.cur) .txt b { color: var(--in-text-subtle); font-weight: 500; }
+
+/* Stepper pro */
+.step-actions { display: grid; gap: 8px; }
+.locked { display: flex; gap: 8px; align-items: center; font-size: 13px; color: var(--in-text-muted); }
+.locked svg { width: 16px; height: 16px; }
+
+/* Devis (édition) */
+.qline { display: grid; grid-template-columns: 1fr auto; gap: 2px 10px; padding: 12px; border: 1px solid var(--in-border); border-radius: var(--in-radius-md); background: var(--in-surface); }
+.qline .lbl { font-weight: 600; }
+.qline .amt { font-weight: 700; font-variant-numeric: tabular-nums; text-align: right; }
+.qline .meta { font-size: 12px; color: var(--in-text-muted); grid-column: 1 / -1; }
+.seg { display: flex; background: var(--in-surface-muted); border-radius: var(--in-radius-sm); padding: 3px; gap: 3px; }
+.seg span { flex: 1; text-align: center; padding: 7px 0; border-radius: 6px; font-size: 13px; font-weight: 600; color: var(--in-text-muted); }
+.seg span.on { background: var(--in-surface); color: var(--in-text); box-shadow: var(--in-shadow-card); }
+
+/* Pro : interrupteur, revenus */
+.toggle-card { display: flex; gap: 12px; align-items: center; padding: 14px; border-radius: var(--in-radius-lg); background: var(--in-success-soft); color: var(--in-on-success-soft); }
+.switch { width: 52px; height: 32px; border-radius: 16px; background: var(--in-success); position: relative; flex: none; }
+.switch::after { content: ""; position: absolute; top: 3px; right: 3px; width: 26px; height: 26px; border-radius: 50%; background: #FFFFFF; }
+.stat-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat { background: var(--in-surface); border: 1px solid var(--in-border); border-radius: var(--in-radius-md); padding: 12px; display: grid; gap: 2px; }
+.stat b { font: 800 18px/24px var(--in-font-display); font-variant-numeric: tabular-nums; }
+.stat span { font-size: 12px; color: var(--in-text-muted); }
+.alert-screen { background: var(--in-navy-950); color: #FFFFFF; }
+.alert-screen .card { background: var(--in-surface); color: var(--in-text); }
+.big-balance { background: var(--in-primary); color: var(--in-on-primary); border-radius: var(--in-radius-lg); padding: 16px; display: grid; gap: 4px; }
+.big-balance .t-amount { font-size: 30px; line-height: 36px; }
+.big-balance small { opacity: 0.85; font-size: 12px; }
+
+/* Administration */
+.admin-scroll { overflow-x: auto; max-width: 100%; padding-bottom: 8px; }
+.admin { width: 1120px; height: 680px; border-radius: var(--in-radius-lg); overflow: hidden; border: 1px solid var(--in-border); display: grid; grid-template-columns: 232px 1fr; background: var(--in-background); box-shadow: var(--in-shadow-float); }
+.side { background: var(--in-navy-950); color: #C9D3E6; padding: 18px 12px; display: grid; align-content: start; gap: 2px; font-size: 13px; }
+.side .brand { display: flex; gap: 10px; align-items: center; color: #FFFFFF; font: 800 17px var(--in-font-display); padding: 0 8px 16px; }
+.side .brand svg { width: 30px; height: 30px; }
+.side .grp { font-size: 11px; letter-spacing: 0.6px; text-transform: uppercase; color: #7F8DA8; padding: 12px 8px 4px; }
+.side a { color: inherit; text-decoration: none; padding: 7px 8px; border-radius: 6px; display: flex; justify-content: space-between; }
+.side a.on { background: #123A7A; color: #FFFFFF; font-weight: 600; }
+.side a .n { background: var(--in-urgent); color: var(--in-navy-950); border-radius: 10px; padding: 0 7px; font-size: 11px; font-weight: 700; }
+.main { padding: 20px 24px; display: grid; gap: 16px; align-content: start; overflow: hidden; }
+.main .top { display: flex; justify-content: space-between; align-items: center; }
+.main .top h3 { font-size: 22px; }
+.env { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 6px; background: var(--in-warning-soft); color: var(--in-on-warning-soft); }
+.kpis { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+.kpi { background: var(--in-surface); border: 1px solid var(--in-border); border-radius: var(--in-radius-md); padding: 12px 14px; display: grid; gap: 4px; }
+.kpi span { font-size: 12px; color: var(--in-text-muted); }
+.kpi b { font: 800 22px/28px var(--in-font-display); font-variant-numeric: tabular-nums; }
+.kpi em { font-style: normal; font-size: 12px; font-weight: 600; }
+.kpi em.up { color: var(--in-on-success-soft); } .kpi em.down { color: var(--in-danger); }
+.panels { display: grid; grid-template-columns: 1.4fr 1fr; gap: 12px; }
+.tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tbl th { text-align: left; font-weight: 600; color: var(--in-text-muted); font-size: 12px; padding: 8px 10px; border-bottom: 1px solid var(--in-border); }
+.tbl td { white-space: nowrap; padding: 9px 10px; border-bottom: 1px solid var(--in-border); font-variant-numeric: tabular-nums; }
+.tbl tr:last-child td { border-bottom: 0; }
+.bars { display: flex; align-items: flex-end; gap: 8px; height: 150px; padding: 8px 4px 0; border-bottom: 1px solid var(--in-border); }
+.bars div { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; gap: 4px; height: 100%; }
+.bars i { flex: none; width: 100%; background: var(--in-action); border-radius: 4px 4px 0 0; display: block; }
+.bars small { font-size: 11px; color: var(--in-text-muted); }
+.doc-view { display: grid; grid-template-columns: 1fr 340px; gap: 14px; }
+.doc { background: var(--in-surface-muted); border-radius: var(--in-radius-md); height: 360px; display: grid; place-items: center; position: relative; border: 1px solid var(--in-border); }
+.doc .card-id { width: 380px; height: 236px; border-radius: 14px; background: linear-gradient(135deg, #F2E6D0, #DCE9DA); box-shadow: var(--in-shadow-float); display: grid; grid-template-columns: 110px 1fr; gap: 14px; padding: 18px; color: #2B3240; }
+.doc .card-id .ph { background: #A9B4C2; border-radius: 8px; }
+.doc .card-id .ln { height: 9px; border-radius: 4px; background: rgba(43,50,64,0.25); }
+.doc .watermark { position: absolute; bottom: 10px; right: 12px; font-size: 11px; color: var(--in-text-muted); }
+</style>
+
+<div class="wrap">
+  <header class="page-head">
+    <div class="brand">{{b:symbole}}<h1>Maquettes Ineed</h1></div>
+    <p>Phase 2 : direction visuelle, système de design et écrans clés des applications Ineed (client), Ineed Pro (professionnel) et de l’administration. Les couleurs, typographies, icônes et textes de cette page proviennent directement des fichiers du dépôt (<code>design/tokens.json</code>, <code>design/icons</code>, <code>design/copy</code>). La page suit le thème clair ou sombre de votre appareil, comme le feront les applications.</p>
+    <div class="sample-note">{{i:alerte}} Données d’exemple : noms, montants et adresses sont fictifs.</div>
+  </header>
+
+  <!-- ===================== IDENTITÉ ===================== -->
+  <section class="group" id="identite">
+    <header><h2>Identité visuelle</h2><p>Un « i » dont le point est un repère de localisation : la personne, et l’endroit où elle a besoin d’aide. Bleu nuit pour la confiance, orange signal réservé à l’urgence.</p></header>
+    <div class="identity">
+      <div class="panel">
+        <h3>Logo et icônes d’application</h3>
+        <div class="wordmark">{{b:logo-horizontal}}</div>
+        <div class="wordmark neg">{{b:logo-horizontal-negatif}}</div>
+        <div class="logo-row">
+          <div><div class="app-icon">{{b:icone-app-client}}</div><div class="label">Ineed</div></div>
+          <div><div class="app-icon">{{b:icone-app-pro}}</div><div class="label">Ineed Pro</div></div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Couleurs principales</h3>
+        <div class="swatches">
+          <div class="swatch"><div class="chip" style="background:var(--in-navy-900);color:#FFFFFF">Aa</div><div class="meta"><b>Bleu nuit</b>Marque, en-têtes</div></div>
+          <div class="swatch"><div class="chip" style="background:var(--in-blue-600);color:#FFFFFF">Aa</div><div class="meta"><b>Bleu action</b>Boutons, liens</div></div>
+          <div class="swatch"><div class="chip" style="background:var(--in-orange-500);color:var(--in-navy-950)">Aa</div><div class="meta"><b>Orange signal</b>Urgence uniquement</div></div>
+          <div class="swatch"><div class="chip" style="background:var(--in-green-700);color:#FFFFFF">Aa</div><div class="meta"><b>Vert</b>Validé, payé</div></div>
+          <div class="swatch"><div class="chip" style="background:var(--in-red-700);color:#FFFFFF">Aa</div><div class="meta"><b>Rouge</b>Erreur, annulation</div></div>
+          <div class="swatch"><div class="chip" style="background:var(--in-amber-100);color:var(--in-amber-700)">Aa</div><div class="meta"><b>Ambre</b>Avertissement, test</div></div>
+        </div>
+        <p class="help">Les 23 paires texte/fond de chaque thème sont vérifiées automatiquement (WCAG AA, 4,5:1 pour le texte).</p>
+      </div>
+      <div class="panel">
+        <h3>Typographie</h3>
+        <div class="type-specimen">
+          <div><small>Titre 28/34</small><span class="t-display">Le bon pro, tout près.</span></div>
+          <div><small>Titre 22/28</small><span class="t-title">Plomberie à Cocody</span></div>
+          <div><small>Texte 16/24</small><span style="font-size:16px;line-height:24px">Décrivez votre problème en quelques mots.</span></div>
+          <div><small>Montant 24/30</small><span class="t-amount">17 500 F CFA</span></div>
+          <div><small>Légende 12/16</small><span class="t-caption muted">Plus Jakarta Sans pour les titres, Inter pour le texte</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Icônes de métiers</h3>
+      <div class="cat-grid">
+        <div><span class="ico">{{c:plomberie}}</span>Plomberie</div>
+        <div><span class="ico">{{c:electricite}}</span>Électricité</div>
+        <div><span class="ico">{{c:menuiserie}}</span>Menuiserie</div>
+        <div><span class="ico">{{c:serrurerie}}</span>Serrurerie</div>
+        <div><span class="ico">{{c:mecanique-auto}}</span>Mécanique auto</div>
+        <div><span class="ico">{{c:climatisation}}</span>Climatisation</div>
+        <div><span class="ico">{{c:peinture}}</span>Peinture</div>
+        <div><span class="ico">{{c:maconnerie}}</span>Maçonnerie</div>
+        <div><span class="ico">{{c:maintenance}}</span>Maintenance</div>
+        <div><span class="ico">{{c:electromenager}}</span>Électroménager</div>
+        <div><span class="ico">{{c:carrelage}}</span>Carrelage</div>
+        <div><span class="ico">{{c:autres}}</span>Autres services</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== CLIENT ===================== -->
+  <section class="group" id="client">
+    <header><h2>Application client : parcours d’une intervention urgente</h2><p>De la connexion à l’évaluation, pour une fuite sous un évier à Cocody. Chaque écran indique son identifiant dans l’inventaire (<code>docs/phase-2/inventaire-ecrans.md</code>).</p></header>
+    <div class="screens">
+
+      <figure id="C-02"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:41</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span></div>
+          <div class="stack"><span class="t-display">Votre numéro de téléphone</span><span class="muted" style="font-size:15px;line-height:22px">Nous vous envoyons un code par SMS pour vérifier qu’il s’agit bien de vous.</span></div>
+          <div class="field"><label>Numéro de téléphone</label>
+            <div class="input focus"><span class="prefix"><span class="flag"><i></i><i></i><i></i></span>+225</span><span style="font-variant-numeric:tabular-nums">07 12 34 56 78</span></div></div>
+          <div class="spacer"></div>
+          <p class="help">En continuant, vous acceptez les conditions d’utilisation et la politique de confidentialité d’Ineed.</p>
+          <button class="btn btn-primary">Recevoir le code</button>
+        </div></div></div>
+        <figcaption><b>C-02 · Connexion.</b> Préfixe +225 prérempli, pas de mot de passe.</figcaption></figure>
+
+      <figure id="C-03"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:42</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span></div>
+          <div class="stack"><span class="t-display">Saisissez le code</span><span class="muted" style="font-size:15px;line-height:22px">Code à 6 chiffres envoyé au +225 07 12 34 56 78.</span></div>
+          <div class="otp"><span>4</span><span>8</span><span>1</span><span>9</span><span class="cur"></span><span></span></div>
+          <div class="help err">Code incorrect. Il vous reste 2 essais.</div>
+          <div class="row" style="justify-content:space-between"><span class="muted">Renvoyer le code dans 42 s</span><span class="t-label" style="color:var(--in-action)">Modifier le numéro</span></div>
+          <div class="spacer"></div>
+          <div class="banner banner-warn">{{i:alerte}}<span>Mode développement : aucun SMS n’est envoyé, le code est affiché dans les journaux du serveur.</span></div>
+        </div></div></div>
+        <figcaption><b>C-03 · Code SMS, état d’erreur.</b> Le bandeau n’apparaît qu’en environnement de développement.</figcaption></figure>
+
+      <figure id="C-05"><div class="phone"><div class="screen">
+        <div class="sbar on-dark" style="background:var(--in-primary)"><span>09:44</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body flush">
+          <div class="hero">
+            <div class="row"><div class="stack" style="gap:2px;flex:1"><span class="loc">{{i:position}} Cocody, Riviera 2 ▾</span><span class="t-title">Bonjour Awa</span></div>
+              <span class="iconbtn" style="color:#fff">{{i:notifications}}<span class="dot"></span></span></div>
+            <div class="search">{{i:rechercher}}Décrivez votre problème ou cherchez un métier</div>
+          </div>
+          <div style="padding:16px;display:grid;gap:18px">
+            <div class="cta-pair">
+              <div class="cta urgent">{{i:urgence}}<b>Intervention immédiate</b><span>Un pro disponible maintenant</span></div>
+              <div class="cta sched">{{i:calendrier}}<b>Programmer une intervention</b><span>Choisissez le jour et l’heure</span></div>
+            </div>
+            <div class="stack-lg"><div class="section-title"><h4>Métiers</h4><a href="#client">Tout voir</a></div>
+              <div class="cats">
+                <div><span class="ico">{{c:plomberie}}</span>Plomberie</div><div><span class="ico">{{c:electricite}}</span>Électricité</div>
+                <div><span class="ico">{{c:climatisation}}</span>Climatisation</div><div><span class="ico">{{c:serrurerie}}</span>Serrurerie</div>
+                <div><span class="ico">{{c:mecanique-auto}}</span>Mécanique</div><div><span class="ico">{{c:menuiserie}}</span>Menuiserie</div>
+                <div><span class="ico">{{c:peinture}}</span>Peinture</div><div><span class="ico">{{c:autres}}</span>Autres</div>
+              </div></div>
+            <div class="stack"><div class="section-title"><h4>Recherches récentes</h4></div>
+              <div class="recent"><span class="chip chip-neutral">Climatiseur qui ne refroidit plus</span><span class="chip chip-neutral">Prise grillée</span></div></div>
+          </div>
+        </div>
+        <div class="tabbar"><div class="on">{{i:accueil}}Accueil</div><div>{{i:horloge}}Missions</div><div>{{i:messages}}Messages</div><div>{{i:profil}}Profil</div></div>
+      </div></div>
+        <figcaption><b>C-05 · Accueil.</b> L’orange est réservé à l’intervention immédiate ; les métiers viennent du backend.</figcaption></figure>
+
+      <figure id="C-07"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:45</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Plomberie</h3></div>
+          <span class="t-title">Quel est le besoin ?</span>
+          <div class="stack">
+            <div class="svc sel"><div class="txt"><span class="t-label">Fuite d’eau</span><span class="t-caption muted">Déplacement : 3 000 F CFA, puis devis sur place</span></div><span class="radio on"></span></div>
+            <div class="svc"><div class="txt"><span class="t-label">Débouchage évier ou WC</span><span class="t-caption muted">Prix fixe : 12 000 F CFA</span></div><span class="radio"></span></div>
+            <div class="svc"><div class="txt"><span class="t-label">Installation de chauffe-eau</span><span class="t-caption muted">Sur devis · en général entre 25 000 et 60 000 F CFA</span></div><span class="radio"></span></div>
+            <div class="svc"><div class="txt"><span class="t-label">Autre besoin en plomberie</span><span class="t-caption muted">Sur devis</span></div><span class="radio"></span></div>
+          </div>
+          <div class="banner banner-info">{{i:verifie}}<span>Le professionnel vous envoie un devis détaillé. Rien n’est dû tant que vous ne l’avez pas accepté.</span></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Continuer</button>
+        </div></div></div>
+        <figcaption><b>C-07 · Choix de la prestation.</b> Les trois modèles de prix sont visibles avant de s’engager.</figcaption></figure>
+
+      <figure id="C-10"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:46</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body flush">
+          <div class="map">
+            <svg class="streets" viewBox="0 0 340 420" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect width="340" height="420" fill="var(--map-ground)"/>
+              <path d="M0 330 C80 300 140 360 220 340 S320 300 340 310 V420 H0z" fill="var(--map-water)"/>
+              <path d="M-10 120 L350 90" stroke="var(--map-road)" stroke-width="14" fill="none"/>
+              <path d="M170 -10 L190 330" stroke="var(--map-road)" stroke-width="16" fill="none"/>
+              <path d="M30 0 L90 300" stroke="var(--map-road)" stroke-width="8" fill="none"/>
+              <path d="M260 0 L300 300" stroke="var(--map-road)" stroke-width="8" fill="none"/>
+              <path d="M0 220 L340 200" stroke="var(--map-road)" stroke-width="8" fill="none"/>
+              <text x="200" y="150" font-size="10" fill="var(--in-text-muted)" font-family="Inter, sans-serif" transform="rotate(86 200 150)">Bd Latrille</text>
+              <text x="20" y="140" font-size="10" fill="var(--in-text-muted)" font-family="Inter, sans-serif">Rue des Jardins</text>
+              <text x="110" y="395" font-size="10" fill="var(--in-text-muted)" font-family="Inter, sans-serif" font-style="italic">Lagune Ébrié</text>
+            </svg>
+            <div class="float-top"><span class="iconbtn filled">{{i:retour}}</span><div class="search" style="flex:1;box-shadow:var(--in-shadow-card)">{{i:rechercher}}Rechercher un lieu</div></div>
+            <div class="pin"><span class="bubble">Déplacez la carte pour ajuster</span>
+              <svg viewBox="0 0 24 24"><path d="M12 22s-7-6.4-7-12a7 7 0 0 1 14 0c0 5.6-7 12-7 12z" fill="var(--in-urgent)" stroke="var(--in-navy-950)" stroke-width="1.2"/><circle cx="12" cy="10" r="2.6" fill="var(--in-navy-950)"/></svg></div>
+            <span class="iconbtn filled gps" style="color:var(--in-action)">{{i:position}}</span>
+            <span class="attrib">Carte : fournisseur cartographique (phase 5)</span>
+          </div>
+          <div class="sheet">
+            <div class="stack" style="gap:2px"><span class="t-titlem">Cocody, Riviera 2</span><span class="t-caption muted">Position précise à environ 15 m</span></div>
+            <div class="field"><label>Point de repère</label><div class="input" style="font-size:15px">Derrière la pharmacie Les Rosiers, portail bleu</div></div>
+            <div class="field"><label>Indications pour le professionnel (facultatif)</label><div class="input" style="font-size:15px"><span class="ph">Ex. : 2ᵉ étage, sonner chez M. Kouassi</span></div></div>
+            <button class="btn btn-primary">Confirmer cette adresse</button>
+          </div>
+        </div></div></div>
+        <figcaption><b>C-10 · Adresse.</b> Point sur la carte obligatoire, rue facultative, repère mis en avant.</figcaption></figure>
+
+      <figure id="C-11"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:48</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Décrivez le problème</h3></div>
+          <div class="field"><label>Description</label>
+            <div class="input area focus">L’eau coule sous l’évier de la cuisine depuis ce matin, le robinet d’arrêt ne ferme plus complètement.</div>
+            <span class="help">101 / 2 000 caractères</span></div>
+          <div class="field"><label>Photos (facultatif)</label>
+            <div class="thumbs"><span class="thumb ph1"><span class="x">{{i:fermer}}</span></span><span class="thumb ph2"><span class="x">{{i:fermer}}</span></span><span class="thumb add">{{i:photo}}</span></div>
+            <span class="help">Jusqu’à 5 photos. Elles aident le professionnel à prévoir le bon matériel.</span></div>
+          <div class="field"><label>Note vocale (facultatif)</label>
+            <div class="voice"><span class="play"></span><span class="wave">
+              <i style="height:30%"></i><i style="height:60%"></i><i style="height:90%"></i><i style="height:50%"></i><i style="height:75%"></i><i style="height:40%"></i><i style="height:85%"></i><i style="height:55%"></i><i style="height:30%"></i><i style="height:65%"></i><i style="height:45%"></i><i style="height:80%"></i><i style="height:35%"></i><i style="height:60%"></i><i style="height:25%"></i><i style="height:50%"></i></span>
+              <span class="t-caption muted">0:18</span><span class="iconbtn" style="width:32px;height:32px;color:var(--in-danger)">{{i:fermer}}</span></div></div>
+          <div class="field"><label>Budget indicatif (facultatif)</label><div class="input"><span class="ph">Montant en F CFA</span></div></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Continuer</button>
+        </div></div></div>
+        <figcaption><b>C-11 · Description.</b> Photos compressées et nettoyées de leurs données GPS avant envoi.</figcaption></figure>
+
+      <figure id="C-12"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:49</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Vérifiez votre demande</h3></div>
+          <div class="card">
+            <div class="row"><span class="mini-mission"><span class="ico">{{c:plomberie}}</span></span><div class="stack" style="gap:0"><span class="t-label">Plomberie · Fuite d’eau</span><span class="t-caption muted">Déplacement + devis sur place</span></div></div>
+            <div class="divider"></div>
+            <div class="kv"><span>Quand</span><span class="t-label">Dès que possible</span></div>
+            <div class="kv"><span>Où</span><span class="t-label" style="text-align:right">Cocody, Riviera 2<br><span class="t-caption muted">Derrière la pharmacie Les Rosiers</span></span></div>
+            <div class="kv"><span>Déplacement</span><span class="t-label">3 000 F CFA</span></div>
+            <div class="kv"><span>Pièces jointes</span><span class="t-label">2 photos, 1 note vocale</span></div>
+          </div>
+          <div class="card" style="gap:6px"><span class="t-label">Détails</span><span class="muted">L’eau coule sous l’évier de la cuisine depuis ce matin, le robinet d’arrêt ne ferme plus complètement.</span></div>
+          <div class="banner banner-info">{{i:verifie}}<span>Les professionnels voient votre quartier et une distance approximative. Votre adresse précise et votre prénom ne sont communiqués qu’au professionnel retenu.</span></div>
+          <div class="spacer"></div>
+          <button class="btn btn-urgent">{{i:urgence}}Publier la demande</button>
+        </div></div></div>
+        <figcaption><b>C-12 · Récapitulatif.</b> Confirmation explicite avant publication, avec la règle de confidentialité.</figcaption></figure>
+
+      <figure id="C-13"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:49</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span></div>
+          <div class="radar"><span class="ring r1"></span><span class="ring r2"></span><span class="ring r3"></span>
+            <span class="blip" style="top:24px;left:120px"></span><span class="blip" style="top:150px;left:30px"></span><span class="blip" style="top:180px;left:170px"></span><span class="blip" style="top:70px;left:192px"></span>
+            <span class="core">{{c:plomberie}}</span></div>
+          <div class="stack" style="text-align:center;justify-items:center"><span class="t-title">Recherche en cours</span><span class="muted">Nous prévenons les professionnels disponibles autour de vous.</span></div>
+          <div class="card">
+            <div class="row"><span class="t-label" style="flex:1">4 professionnels prévenus dans un rayon de 3 km</span></div>
+            <div class="progress"><i style="width:45%"></i></div>
+            <span class="t-caption muted">Vague 1 sur 3 · élargissement à 6 km dans 40 s si personne ne répond</span>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn btn-danger-ghost">Annuler la demande</button>
+        </div></div></div>
+        <figcaption><b>C-13 · Recherche.</b> La progression affichée reflète les vagues réelles du serveur, pas une animation décorative.</figcaption></figure>
+
+      <figure id="C-14"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:53</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span></div>
+          <div class="empty" style="flex:0;padding-top:12px">
+            <div class="illus">{{c:plomberie}}<span class="badge">{{i:horloge}}</span></div>
+            <span class="t-title">Aucun professionnel disponible pour le moment</span>
+            <span class="muted">Personne n’a pu accepter votre demande dans un rayon de 10 km. Vous pouvez :</span>
+          </div>
+          <div class="stack">
+            <button class="option"><span class="ico">{{i:position}}</span>Élargir la zone de recherche{{i:suivant}}</button>
+            <button class="option"><span class="ico">{{i:horloge}}</span>Choisir un autre horaire{{i:suivant}}</button>
+            <button class="option"><span class="ico">{{i:calendrier}}</span>Envoyer une demande programmée{{i:suivant}}</button>
+          </div>
+          <div class="spacer"></div>
+          <p class="help" style="text-align:center">Votre description et vos photos sont conservées.</p>
+        </div></div></div>
+        <figcaption><b>C-14 · État vide.</b> Trois sorties concrètes, jamais une impasse.</figcaption></figure>
+
+      <figure id="C-15"><div class="phone"><div class="screen">
+        <div class="sbar"><span>09:51</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span></div>
+          <div class="stack"><span class="chip chip-success" style="width:fit-content">{{i:valider}} Professionnel réservé</span><span class="t-display">Koffi a accepté votre demande</span></div>
+          <div class="card">
+            <div class="row"><span class="avatar lg">KK</span><div class="stack" style="gap:3px"><span class="t-titlem">Koffi Plomberie</span>
+              <span class="row" style="gap:6px"><span class="stars">{{i:etoile}}</span><span class="t-label">4,8</span><span class="t-caption muted">63 avis</span></span><span class="t-caption muted">112 missions terminées</span>
+              <span class="verified">{{i:verifie}}Identité vérifiée par Ineed</span></div></div>
+            <div class="divider"></div>
+            <div class="kv"><span>Distance</span><span class="t-label">environ 2,4 km</span></div>
+            <div class="kv"><span>Arrivée</span><span class="t-label">estimée dans 18 min</span></div>
+            <div class="kv"><span>Déplacement</span><span class="t-label">3 000 F CFA</span></div>
+            <div class="kv"><span>Travaux</span><span class="t-label">devis sur place, à valider</span></div>
+          </div>
+          <div class="countdown"><span class="ring"><span>1:42</span></span><span class="muted">Confirmez dans les 2 minutes pour réserver ce professionnel.</span></div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Confirmer ce professionnel</button>
+          <button class="btn btn-ghost">Chercher quelqu’un d’autre</button>
+        </div></div></div>
+        <figcaption><b>C-15 · Réservation temporaire.</b> Le badge « vérifié » n’apparaît que si la vérification a eu lieu.</figcaption></figure>
+
+      <figure id="C-21"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:02</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body flush">
+          <div class="map" style="flex:0 0 250px">
+            <svg class="streets" viewBox="0 0 340 250" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
+              <rect width="340" height="250" fill="var(--map-ground)"/>
+              <path d="M-10 70 L350 50" stroke="var(--map-road)" stroke-width="12"/>
+              <path d="M150 -10 L170 260" stroke="var(--map-road)" stroke-width="14"/>
+              <path d="M0 180 L340 165" stroke="var(--map-road)" stroke-width="8"/>
+              <path d="M40 210 C90 170 120 120 160 110 S240 70 270 60" stroke="var(--in-action)" stroke-width="5" fill="none" stroke-linecap="round" stroke-dasharray="1 9"/>
+              <circle cx="270" cy="60" r="9" fill="var(--in-urgent)" stroke="var(--in-surface)" stroke-width="3"/>
+              <circle cx="110" cy="140" r="11" fill="var(--in-action)" stroke="var(--in-surface)" stroke-width="3"/>
+            </svg>
+            <div class="float-top"><span class="iconbtn filled">{{i:retour}}</span></div>
+            <span class="attrib">Position mise à jour il y a 1 min</span>
+          </div>
+          <div class="sheet" style="flex:1;align-content:start">
+            <div class="row"><span class="avatar">KK</span><div class="stack" style="gap:0;flex:1"><span class="t-titlem">Koffi est en route</span><span class="t-caption muted">Arrivée estimée dans 9 min · Mission IN-2026-000123</span></div><span class="iconbtn filled" style="color:var(--in-action)">{{i:messages}}</span></div>
+            <div class="timeline">
+              <div class="tl done"><div class="rail"><span class="b">{{i:valider}}</span><span class="ln"></span></div><div class="txt"><b>Intervention confirmée</b><span>09:52</span></div></div>
+              <div class="tl done"><div class="rail"><span class="b">{{i:valider}}</span><span class="ln"></span></div><div class="txt"><b>Paiement confirmé · 3 000 F CFA</b><span>09:54 · Orange Money</span></div></div>
+              <div class="tl cur"><div class="rail"><span class="b">{{i:position}}</span><span class="ln"></span></div><div class="txt"><b>Professionnel en route</b><span>parti à 09:56</span></div></div>
+              <div class="tl"><div class="rail"><span class="b"></span><span class="ln"></span></div><div class="txt"><b>Arrivée et devis des travaux</b></div></div>
+              <div class="tl"><div class="rail"><span class="b"></span></div><div class="txt"><b>Intervention</b></div></div>
+            </div>
+            <p class="help">L’annulation entraîne la retenue des frais de déplacement (3 000 F CFA) : le professionnel est déjà parti.</p>
+          </div>
+        </div></div></div>
+        <figcaption><b>C-21 · Suivi.</b> La position n’est partagée que pendant le trajet ; la chronologie combine demande et mission.</figcaption></figure>
+
+      <figure id="C-18"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:21</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Devis n° 2</h3><span class="chip chip-warn">À valider</span></div>
+          <div class="row"><span class="avatar">KK</span><div class="stack" style="gap:0"><span class="t-label">Proposé par Koffi Plomberie</span><span class="t-caption muted">Valable jusqu’au 28/10/2026 à 18:00</span></div></div>
+          <div class="card">
+            <div class="kv"><span>Déplacement (déjà payé)</span><span>3 000 F CFA</span></div>
+            <div class="kv"><span>Robinet d’arrêt 1/2″ × 1</span><span>4 500 F CFA</span></div>
+            <div class="kv"><span>Flexible inox × 2</span><span>3 000 F CFA</span></div>
+            <div class="kv"><span>Main-d’œuvre</span><span>10 000 F CFA</span></div>
+            <div class="kv total"><span>Reste à payer</span><span class="t-amount" style="font-size:20px">17 500 F CFA</span></div>
+          </div>
+          <div class="card" style="gap:4px"><span class="t-label">Conditions de réalisation</span><span class="muted">Pièces garanties 6 mois. L’eau sera coupée environ 45 minutes. Durée estimée : 1 h.</span></div>
+          <span class="t-caption muted">Version 1 (22 000 F CFA) refusée à 10:12 · remplacée par cette version</span>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Accepter le devis</button>
+          <button class="btn btn-ghost">Refuser</button>
+        </div></div></div>
+        <figcaption><b>C-18 · Devis.</b> Chaque modification de prix crée une nouvelle version, à accepter explicitement.</figcaption></figure>
+
+      <figure id="C-19"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:23</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Paiement</h3></div>
+          <div class="banner banner-test">{{i:alerte}}<span>PAIEMENT DE TEST : aucun argent réel n’est débité</span></div>
+          <div class="card" style="gap:4px"><span class="muted">Montant à payer · Travaux</span><span class="t-amount">17 500 F CFA</span><span class="t-caption muted">Mission IN-2026-000123 · Koffi Plomberie</span></div>
+          <span class="t-label">Moyen de paiement</span>
+          <div class="stack">
+            <div class="svc sel"><span class="avatar" style="width:36px;height:36px;font-size:12px;background:#FF7900;color:#000">OM</span><div class="txt"><span class="t-label">Orange Money</span><span class="t-caption muted">07 12 •• •• 78</span></div><span class="radio on"></span></div>
+            <div class="svc"><span class="avatar" style="width:36px;height:36px;font-size:12px;background:#FFCB05;color:#000">MTN</span><div class="txt"><span class="t-label">MTN Mobile Money</span></div><span class="radio"></span></div>
+            <div class="svc"><span class="avatar" style="width:36px;height:36px;font-size:12px;background:#1DC8F2;color:#000">W</span><div class="txt"><span class="t-label">Wave</span></div><span class="radio"></span></div>
+            <div class="svc"><span class="avatar" style="width:36px;height:36px;font-size:12px">CB</span><div class="txt"><span class="t-label">Carte bancaire</span></div><span class="radio"></span></div>
+          </div>
+          <div class="spacer"></div>
+          <p class="help">Votre argent est versé au professionnel seulement après la fin de l’intervention. Ineed ne conserve aucune donnée de carte.</p>
+          <button class="btn btn-primary">Payer 17 500 F CFA</button>
+        </div></div></div>
+        <figcaption><b>C-19 · Paiement.</b> Bandeau TEST obligatoire tant que le prestataire réel n’est pas branché.</figcaption></figure>
+
+      <figure id="C-20"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:24</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="empty">
+            <div class="illus" style="background:var(--in-action-soft);color:var(--in-on-action-soft)">{{i:horloge}}</div>
+            <span class="t-title">Vérification du paiement…</span>
+            <span class="muted">Validez le paiement sur votre téléphone si ce n’est pas déjà fait. Nous attendons la confirmation de l’opérateur ; cela peut prendre quelques minutes.</span>
+            <div class="card" style="width:100%;text-align:left">
+              <div class="kv"><span>Montant</span><span class="t-label">17 500 F CFA</span></div>
+              <div class="kv"><span>Opérateur</span><span class="t-label">Orange Money</span></div>
+              <div class="kv"><span>Référence</span><span class="t-label">PAY-7Q2M-4K9D</span></div>
+            </div>
+            <span class="help">Vous pouvez quitter cet écran : vous serez prévenu dès que le paiement est confirmé.</span>
+          </div>
+          <button class="btn btn-secondary">Retour à la mission</button>
+        </div></div></div>
+        <figcaption><b>C-20 · Attente de confirmation.</b> Le succès ne s’affiche qu’après validation par le serveur auprès de l’opérateur.</figcaption></figure>
+
+      <figure id="C-24"><div class="phone"><div class="screen">
+        <div class="sbar"><span>11:38</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span></div>
+          <div class="empty" style="flex:0">
+            <div class="illus" style="background:var(--in-success-soft);color:var(--in-on-success-soft)">{{i:valider}}</div>
+            <span class="t-title">L’intervention est-elle terminée ?</span>
+            <span class="muted">Koffi a indiqué avoir terminé. Confirmez pour clôturer la mission et libérer le paiement.</span>
+          </div>
+          <div class="card" style="gap:6px"><span class="t-label">Compte rendu du professionnel</span><span class="muted">Robinet d’arrêt et deux flexibles remplacés. Aucune fuite après 15 minutes de mise en eau.</span>
+            <div class="thumbs"><span class="thumb ph1" style="width:56px;height:56px"></span><span class="thumb ph2" style="width:56px;height:56px"></span></div></div>
+          <span class="help">Sans réponse de votre part, la mission sera clôturée automatiquement le 30/10/2026 à 11:38.</span>
+          <div class="spacer"></div>
+          <button class="btn btn-success">Oui, tout est en ordre</button>
+          <button class="btn btn-danger-ghost">Non, il y a un problème</button>
+        </div></div></div>
+        <figcaption><b>C-24 · Fin de prestation.</b> Le signalement d’un problème ouvre un litige et suspend le reversement.</figcaption></figure>
+
+      <figure id="C-26"><div class="phone"><div class="screen">
+        <div class="sbar"><span>11:40</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span><span class="spacer"></span><span class="btn-ghost t-label" style="display:flex;align-items:center">Plus tard</span></div>
+          <div class="stack" style="justify-items:center;text-align:center"><span class="avatar lg">KK</span><span class="t-title">Comment s’est passée l’intervention ?</span><span class="muted">Votre avis aide les autres clients et le professionnel.</span></div>
+          <div class="stack" style="justify-items:center"><span class="stars lg">{{i:etoile}}{{i:etoile}}{{i:etoile}}{{i:etoile}}<span class="off">{{i:etoile}}</span></span><span class="t-label">Bien</span></div>
+          <div class="input area">Ponctuel et soigneux, il a expliqué ce qu’il changeait. Un peu cher pour les flexibles.</div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Publier mon avis</button>
+        </div></div></div>
+        <figcaption><b>C-26 · Évaluation.</b> Possible uniquement après la clôture réelle d’une mission (contrôlé en base).</figcaption></figure>
+
+    </div>
+  </section>
+
+  <!-- ===================== PRO ===================== -->
+  <section class="group" id="pro">
+    <header><h2>Application professionnel : recevoir et réaliser une mission</h2><p>Les mêmes composants, un usage différent : décider vite, avancer étape par étape, suivre ses revenus.</p></header>
+    <div class="screens">
+
+      <figure id="P-10"><div class="phone"><div class="screen">
+        <div class="sbar"><span>08:15</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="empty" style="flex:0;padding-top:24px">
+            <div class="illus" style="background:var(--in-warning-soft);color:var(--in-on-warning-soft)">{{i:verifie}}</div>
+            <span class="t-title">Informations complémentaires demandées</span>
+          </div>
+          <div class="card" style="gap:6px"><span class="t-caption muted">Message de l’équipe Ineed · hier à 16:20</span><span>La photo de votre pièce d’identité est floue sur le verso. Merci de la reprendre à la lumière du jour, sans reflet.</span></div>
+          <div class="stack">
+            <div class="list-item"><span class="chip chip-success">{{i:valider}} Validé</span><span>Photo de profil</span></div>
+            <div class="list-item"><span class="chip chip-danger">À reprendre</span><span>Carte nationale d’identité</span></div>
+            <div class="list-item"><span class="chip chip-success">{{i:valider}} Validé</span><span>Compte Mobile Money</span></div>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn btn-primary">Compléter mon dossier</button>
+        </div></div></div>
+        <figcaption><b>P-10 · Vérification.</b> Statut et motif exacts, document par document.</figcaption></figure>
+
+      <figure id="P-11"><div class="phone"><div class="screen">
+        <div class="sbar"><span>08:30</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="avatar" style="width:40px;height:40px;font-size:14px">KK</span><div class="stack" style="gap:0;flex:1"><span class="t-label">Koffi Plomberie</span><span class="verified">{{i:verifie}}Identité vérifiée</span></div><span class="iconbtn">{{i:notifications}}</span></div>
+          <div class="toggle-card"><div class="stack" style="gap:2px;flex:1"><span class="t-titlem">Disponible maintenant</span><span class="t-caption">Vous recevez les demandes urgentes autour de vous.</span></div><span class="switch"></span></div>
+          <div class="stat-row"><div class="stat"><span>Gains de la semaine</span><b>86 400 F CFA</b></div><div class="stat"><span>Missions du jour</span><b>2</b></div></div>
+          <div class="section-title"><h4>Missions du jour</h4></div>
+          <div class="card">
+            <div class="mini-mission"><span class="ico">{{c:plomberie}}</span><div class="stack" style="gap:0;flex:1"><span class="t-label">Fuite d’eau · Cocody</span><span class="t-caption muted">En route · arrivée prévue 10:11</span></div><span class="chip chip-info">En cours</span></div>
+            <div class="divider"></div>
+            <div class="mini-mission"><span class="ico">{{c:plomberie}}</span><div class="stack" style="gap:0;flex:1"><span class="t-label">Chauffe-eau · Angré</span><span class="t-caption muted">Rendez-vous 15:00 – 17:00</span></div><span class="chip chip-neutral">Programmée</span></div>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn btn-secondary">Suspendre les demandes</button>
+        </div>
+        <div class="tabbar"><div class="on">{{i:accueil}}Accueil</div><div>{{i:horloge}}Missions</div><div>{{i:revenus}}Revenus</div><div>{{i:profil}}Profil</div></div>
+      </div></div>
+        <figcaption><b>P-11 · Tableau de bord.</b> Un interrupteur clair pour la réception des demandes urgentes.</figcaption></figure>
+
+      <figure id="P-12"><div class="phone"><div class="screen alert-screen">
+        <div class="sbar on-dark"><span>09:49</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="row"><span class="chip chip-urgent">{{i:urgence}} Demande urgente</span><span class="spacer"></span>
+            <div class="countdown"><span class="ring"><span style="color:var(--in-text)">38 s</span></span></div></div>
+          <div class="stack" style="gap:4px"><span class="t-display" style="color:#fff">Fuite d’eau</span><span style="color:#C9D3E6">À environ 2,4 km · Cocody, Riviera 2</span></div>
+          <div class="card">
+            <span>L’eau coule sous l’évier de la cuisine depuis ce matin, le robinet d’arrêt ne ferme plus complètement.</span>
+            <div class="thumbs"><span class="thumb ph1" style="width:64px;height:64px"></span><span class="thumb ph2" style="width:64px;height:64px"></span><span class="voice" style="flex:1;padding:6px 8px"><span class="play" style="width:28px;height:28px"></span><span class="t-caption muted">0:18</span></span></div>
+            <div class="divider"></div>
+            <div class="kv"><span>Tarif</span><span class="t-label">Déplacement 3 000 F CFA + devis</span></div>
+            <div class="kv"><span>Créneau</span><span class="t-label">Dès que possible</span></div>
+            <div class="kv"><span>Vous recevrez</span><span class="t-label">2 700 F CFA pour le déplacement</span></div>
+          </div>
+          <div class="banner" style="background:rgba(255,255,255,0.08);color:#C9D3E6">{{i:verifie}}<span>L’adresse exacte vous sera communiquée après confirmation du client.</span></div>
+          <div class="spacer"></div>
+          <div class="cta-pair"><button class="btn btn-secondary">Refuser</button><button class="btn btn-urgent">Accepter</button></div>
+        </div></div></div>
+        <figcaption><b>P-12 · Alerte.</b> Toutes les informations utiles à la décision, sans l’adresse exacte ni l’identité du client.</figcaption></figure>
+
+      <figure id="P-15"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:12</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:retour}}</span><h3>Mission IN-2026-000123</h3></div>
+          <div class="card">
+            <div class="row"><span class="avatar">A</span><div class="stack" style="gap:0;flex:1"><span class="t-label">Awa · Fuite d’eau</span><span class="t-caption muted">Cocody, Riviera 2</span></div><span class="iconbtn filled" style="color:var(--in-action)">{{i:messages}}</span></div>
+            <div class="divider"></div>
+            <div class="stack" style="gap:2px"><span class="t-caption muted">Adresse d’intervention</span><span class="t-label">Derrière la pharmacie Les Rosiers, portail bleu</span><span class="t-caption muted">2ᵉ étage, sonner chez M. Kouassi</span></div>
+            <button class="btn btn-secondary btn-sm">{{i:position}}Ouvrir l’itinéraire</button>
+          </div>
+          <div class="timeline">
+            <div class="tl done"><div class="rail"><span class="b">{{i:valider}}</span><span class="ln"></span></div><div class="txt"><b>Départ</b><span>09:56</span></div></div>
+            <div class="tl done"><div class="rail"><span class="b">{{i:valider}}</span><span class="ln"></span></div><div class="txt"><b>Arrivé</b><span>10:11</span></div></div>
+            <div class="tl cur"><div class="rail"><span class="b">{{i:horloge}}</span><span class="ln"></span></div><div class="txt"><b>Devis des travaux</b><span>Devis n° 2 envoyé · en attente du client</span></div></div>
+            <div class="tl"><div class="rail"><span class="b"></span></div><div class="txt"><b>Travaux et fin d’intervention</b></div></div>
+          </div>
+          <div class="spacer"></div>
+          <div class="locked">{{i:horloge}}Le client doit d’abord accepter votre devis.</div>
+          <button class="btn" disabled>Commencer les travaux</button>
+          <button class="btn btn-ghost">Ajouter des frais justifiés</button>
+        </div></div></div>
+        <figcaption><b>P-15 · Étapes.</b> Le bouton suivant reste bloqué tant que le serveur n’autorise pas la transition.</figcaption></figure>
+
+      <figure id="P-16"><div class="phone"><div class="screen">
+        <div class="sbar"><span>10:15</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="body">
+          <div class="appbar"><span class="iconbtn">{{i:fermer}}</span><h3>Nouvelle version (v2)</h3></div>
+          <div class="qline"><span class="lbl">Robinet d’arrêt 1/2″</span><span class="amt">4 500 F CFA</span><span class="meta">Pièces et matériaux · 1 × 4 500</span></div>
+          <div class="qline"><span class="lbl">Flexible inox</span><span class="amt">3 000 F CFA</span><span class="meta">Pièces et matériaux · 2 × 1 500</span></div>
+          <div class="qline"><span class="lbl">Main-d’œuvre</span><span class="amt">10 000 F CFA</span><span class="meta">Main-d’œuvre · 1 × 10 000</span></div>
+          <button class="btn btn-ghost btn-sm">+ Ajouter une ligne</button>
+          <div class="field"><label>Validité du devis</label><div class="seg"><span class="on">24 heures</span><span>3 jours</span><span>7 jours</span></div></div>
+          <div class="card" style="gap:6px">
+            <div class="kv total" style="border:0;padding:0"><span>Total</span><span>17 500 F CFA</span></div>
+            <div class="kv"><span>Commission Ineed (10 %)</span><span>1 750 F CFA</span></div>
+            <div class="kv"><span>Vous recevrez</span><span class="t-label">15 750 F CFA</span></div>
+          </div>
+          <p class="help">Un devis envoyé ne peut plus être modifié. Pour changer le prix, envoyez une nouvelle version : le client devra l’accepter.</p>
+          <button class="btn btn-primary">Envoyer le devis au client</button>
+        </div></div></div>
+        <figcaption><b>P-16 · Devis.</b> Le total, la commission et le net sont recalculés par le serveur. Le taux affiché est un exemple : il reste à fixer.</figcaption></figure>
+
+      <figure id="P-19"><div class="phone"><div class="screen">
+        <div class="sbar"><span>18:02</span><span class="dots"><s></s><s></s><i></i></span></div>
+        <div class="offline">{{i:hors-connexion}}Hors connexion. Reconnexion en cours…</div>
+        <div class="body">
+          <div class="appbar"><h3>Mes revenus</h3><div class="seg" style="width:180px"><span class="on">Semaine</span><span>Mois</span></div></div>
+          <div class="big-balance"><small>Montant dû</small><span class="t-amount">54 900 F CFA</span><small>Missions clôturées, après commission, pas encore reversées.</small></div>
+          <div class="stat-row"><div class="stat"><span>En attente de clôture</span><b>15 750 F CFA</b></div><div class="stat"><span>Déjà reversé</span><b>31 500 F CFA</b></div></div>
+          <div class="banner banner-warn">{{i:alerte}}<span>Les reversements automatiques ne sont pas encore activés. Les montants dus sont conservés et vous seront versés dès leur activation.</span></div>
+          <div class="section-title"><h4>Historique</h4></div>
+          <div>
+            <div class="list-item"><div class="stack" style="gap:0;flex:1"><span class="t-label">Débouchage WC · Marcory</span><span class="t-caption muted">27/10 · commission 1 200 F CFA</span></div><span class="t-label">+10 800 F CFA</span></div>
+            <div class="list-item"><div class="stack" style="gap:0;flex:1"><span class="t-label">Reversement Orange Money</span><span class="t-caption muted">25/10 · •• 78</span></div><span class="chip chip-success">Versé</span></div>
+            <div class="list-item"><div class="stack" style="gap:0;flex:1"><span class="t-label">Remboursement partiel · Plateau</span><span class="t-caption muted">24/10 · litige résolu</span></div><span class="t-label" style="color:var(--in-danger)">−2 000 F CFA</span></div>
+          </div>
+        </div></div></div>
+        <figcaption><b>P-19 · Revenus, hors connexion.</b> Aucune promesse de reversement tant que le fournisseur n’est pas configuré.</figcaption></figure>
+
+    </div>
+  </section>
+
+  <!-- ===================== ADMIN ===================== -->
+  <section class="group" id="admin">
+    <header><h2>Administration web</h2><p>Une interface dense pour l’équipe d’exploitation : les files d’attente d’abord, puis le détail. Chaque action sensible demande un motif et est journalisée.</p></header>
+    <figure id="A-02"><div class="admin-scroll"><div class="admin">
+      <nav class="side">
+        <div class="brand">{{b:symbole}}Ineed Admin</div>
+        <a class="on" href="#A-02">Tableau de bord</a>
+        <div class="grp">Opérations</div>
+        <a href="#A-02">Demandes</a><a href="#A-02">Missions</a><a href="#A-05">Validation des documents <span class="n">7</span></a><a href="#A-02">Réclamations <span class="n">3</span></a><a href="#A-02">Signalements</a>
+        <div class="grp">Finances</div>
+        <a href="#A-02">Paiements</a><a href="#A-02">Remboursements</a><a href="#A-02">Reversements</a><a href="#A-02">Commissions</a>
+        <div class="grp">Catalogue</div>
+        <a href="#A-02">Catégories</a><a href="#A-02">Zones géographiques</a><a href="#A-02">Règles d’attribution</a>
+      </nav>
+      <div class="main">
+        <div class="top"><h3>Tableau de bord</h3><span class="env">Environnement de test</span></div>
+        <div class="kpis">
+          <div class="kpi"><span>Demandes en recherche</span><b>12</b><em class="up">délai médian d’acceptation 2 min 40</em></div>
+          <div class="kpi"><span>Missions en cours</span><b>38</b><em class="up">+6 vs hier</em></div>
+          <div class="kpi"><span>Paiements en attente</span><b>5</b><em class="down">1 depuis plus de 30 min</em></div>
+          <div class="kpi"><span>Dossiers à valider</span><b>7</b><em>le plus ancien : 2 j</em></div>
+          <div class="kpi"><span>Sans professionnel (7 j)</span><b>8,5 %</b><em class="down">+1,2 pt · Yopougon</em></div>
+        </div>
+        <div class="panels">
+          <div class="panel"><h3>Litiges et réclamations ouverts</h3>
+            <table class="tbl"><thead><tr><th>Réf.</th><th>Mission</th><th>Motif</th><th>Ouvert</th><th>Statut</th></tr></thead><tbody>
+              <tr><td>RC-0042</td><td>IN-2026-000097</td><td>Prix différent</td><td>il y a 3 h</td><td><span class="chip chip-warn">Réponse attendue</span></td></tr>
+              <tr><td>RC-0041</td><td>IN-2026-000088</td><td>Travail mal réalisé</td><td>hier</td><td><span class="chip chip-info">En examen</span></td></tr>
+              <tr><td>RC-0039</td><td>IN-2026-000071</td><td>Pro non venu</td><td>il y a 2 j</td><td><span class="chip chip-info">En examen</span></td></tr>
+            </tbody></table></div>
+          <div class="panel"><h3>Demandes par jour (7 derniers jours)</h3>
+            <div class="bars">
+              <div><i style="height:52%"></i><small>22/10</small></div><div><i style="height:61%"></i><small>23/10</small></div><div><i style="height:48%"></i><small>24/10</small></div>
+              <div><i style="height:70%"></i><small>25/10</small></div><div><i style="height:83%"></i><small>26/10</small></div><div><i style="height:66%"></i><small>27/10</small></div><div><i style="height:92%"></i><small>28/10</small></div>
+            </div>
+            <span class="help">Maximum : 64 demandes le 28/10.</span></div>
+        </div>
+      </div>
+    </div></div>
+    <figcaption><b>A-02 · Tableau de bord.</b> Les indicateurs pointent vers une file d’attente à traiter.</figcaption></figure>
+
+    <figure id="A-05"><div class="admin-scroll"><div class="admin">
+      <nav class="side">
+        <div class="brand">{{b:symbole}}Ineed Admin</div>
+        <a href="#A-02">Tableau de bord</a>
+        <div class="grp">Opérations</div>
+        <a href="#A-02">Demandes</a><a href="#A-02">Missions</a><a class="on" href="#A-05">Validation des documents <span class="n">7</span></a><a href="#A-02">Réclamations <span class="n">3</span></a><a href="#A-02">Signalements</a>
+        <div class="grp">Finances</div>
+        <a href="#A-02">Paiements</a><a href="#A-02">Remboursements</a><a href="#A-02">Reversements</a><a href="#A-02">Commissions</a>
+      </nav>
+      <div class="main">
+        <div class="top"><h3>Dossier : Koffi Plomberie</h3><span class="chip chip-warn">Soumis il y a 2 jours</span></div>
+        <div class="doc-view">
+          <div class="doc"><div class="card-id"><span class="ph"></span><div class="stack" style="align-content:start;gap:10px"><span class="ln" style="width:70%"></span><span class="ln" style="width:90%"></span><span class="ln" style="width:55%"></span><span class="ln" style="width:80%"></span><span class="ln" style="width:40%"></span></div></div>
+            <span class="watermark">Carte nationale d’identité · recto · consultation journalisée</span></div>
+          <div class="panel">
+            <div class="kv"><span>Type de compte</span><span class="t-label">Indépendant</span></div>
+            <div class="kv"><span>Métiers</span><span class="t-label">Plomberie</span></div>
+            <div class="kv"><span>Zones</span><span class="t-label">Cocody, Bingerville</span></div>
+            <div class="kv"><span>Téléphone vérifié</span><span class="t-label">Oui, le 26/10/2026</span></div>
+            <div class="divider"></div>
+            <div class="list-item"><span class="chip chip-success">{{i:valider}} Conforme</span><span>Photo de profil</span></div>
+            <div class="list-item"><span class="chip chip-warn">À examiner</span><span>CNI recto / verso</span></div>
+            <div class="field"><label>Motif (enregistré dans le journal d’audit)</label><div class="input" style="min-height:44px;font-size:14px"><span class="ph">Obligatoire pour refuser ou demander des compléments</span></div></div>
+            <div class="cta-pair"><button class="btn btn-secondary btn-sm">Demander des compléments</button><button class="btn btn-success btn-sm">Valider le professionnel</button></div>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <figcaption><b>A-05 · Validation des documents.</b> Documents servis par URL temporaire ; chaque consultation est tracée.</figcaption></figure>
+  </section>
+</div>

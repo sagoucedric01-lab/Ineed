@@ -1,0 +1,156 @@
+{
+  "$description": "Gabarits des notifications push et SMS envoyées par le backend (valeurs initiales, modifiables dans l'administration). Variables : {{nom}}.",
+  "client": {
+    "OFFER_RECEIVED": {
+      "title": "Nouvelle proposition",
+      "body": "{{proName}} propose d’intervenir pour {{serviceName}}. Comparez et choisissez."
+    },
+    "REQUEST_RESERVED": {
+      "title": "Un professionnel a accepté",
+      "body": "{{proName}} peut intervenir. Confirmez dans les {{minutes}} minutes pour le réserver."
+    },
+    "REQUEST_NO_PROVIDER": {
+      "title": "Aucun professionnel disponible",
+      "body": "Personne n’a pu accepter votre demande pour le moment. Élargissez la zone ou choisissez un autre horaire."
+    },
+    "APPOINTMENT_CONFIRMED": {
+      "title": "Rendez-vous confirmé",
+      "body": "{{proName}} interviendra {{slot}}. Mission {{reference}}."
+    },
+    "QUOTE_RECEIVED": {
+      "title": "Nouveau devis à valider",
+      "body": "{{proName}} vous a envoyé un devis de {{amount}}. Il est valable jusqu’au {{validUntil}}."
+    },
+    "QUOTE_SUPPLEMENT_RECEIVED": {
+      "title": "Frais supplémentaires proposés",
+      "body": "{{proName}} propose {{amount}} de frais supplémentaires. Ils ne s’appliquent que si vous les acceptez."
+    },
+    "PAYMENT_CONFIRMED": {
+      "title": "Paiement confirmé",
+      "body": "Votre paiement de {{amount}} est confirmé. Mission {{reference}}."
+    },
+    "PAYMENT_FAILED": {
+      "title": "Paiement non abouti",
+      "body": "Le paiement de {{amount}} n’a pas abouti. Vous pouvez réessayer depuis l’application."
+    },
+    "PRO_EN_ROUTE": {
+      "title": "Le professionnel est en route",
+      "body": "{{proName}} est parti. Suivez son arrivée dans l’application."
+    },
+    "PRO_ARRIVED": {
+      "title": "Le professionnel est arrivé",
+      "body": "{{proName}} est arrivé à l’adresse indiquée."
+    },
+    "WORK_STARTED": {
+      "title": "Intervention commencée",
+      "body": "{{proName}} a commencé les travaux."
+    },
+    "WORK_COMPLETED": {
+      "title": "Intervention terminée ?",
+      "body": "{{proName}} indique avoir terminé. Confirmez pour clôturer la mission, ou signalez un problème."
+    },
+    "COMPLETION_REMINDER": {
+      "title": "Confirmez la fin de l’intervention",
+      "body": "Sans réponse, la mission {{reference}} sera clôturée automatiquement le {{date}}."
+    },
+    "MISSION_CANCELLED": {
+      "title": "Intervention annulée",
+      "body": "La mission {{reference}} a été annulée. {{refundInfo}}"
+    },
+    "REFUND_COMPLETED": {
+      "title": "Remboursement effectué",
+      "body": "{{amount}} vous ont été remboursés sur votre moyen de paiement."
+    },
+    "NEW_MESSAGE": {
+      "title": "{{senderName}}",
+      "body": "{{preview}}"
+    },
+    "REVIEW_REQUEST": {
+      "title": "Votre avis compte",
+      "body": "Comment s’est passée l’intervention de {{proName}} ? Donnez votre note en quelques secondes."
+    },
+    "COMPLAINT_UPDATED": {
+      "title": "Réponse à votre réclamation",
+      "body": "L’équipe Ineed a répondu à votre réclamation {{reference}}."
+    }
+  },
+  "pro": {
+    "NEW_REQUEST_URGENT": {
+      "title": "Demande urgente à {{distance}}",
+      "body": "{{serviceName}} à {{zone}}. Répondez vite : la demande expire dans {{seconds}} s."
+    },
+    "NEW_REQUEST_SCHEDULED": {
+      "title": "Nouvelle demande",
+      "body": "{{serviceName}} à {{zone}}, {{slot}}. Envoyez votre proposition."
+    },
+    "REQUEST_CONFIRMED_BY_CLIENT": {
+      "title": "Mission confirmée",
+      "body": "Le client a confirmé. Adresse et détails disponibles dans la mission {{reference}}."
+    },
+    "REQUEST_ASSIGNED_TO_OTHER": {
+      "title": "Demande attribuée",
+      "body": "La demande {{serviceName}} à {{zone}} a été confiée à un autre professionnel."
+    },
+    "RESERVATION_EXPIRED": {
+      "title": "Réservation expirée",
+      "body": "Le client n’a pas confirmé à temps. La demande est retirée."
+    },
+    "QUOTE_ACCEPTED": {
+      "title": "Devis accepté",
+      "body": "Le client a accepté votre devis de {{amount}} pour la mission {{reference}}."
+    },
+    "QUOTE_REJECTED": {
+      "title": "Devis refusé",
+      "body": "Le client a refusé votre devis pour la mission {{reference}}. Vous pouvez proposer une nouvelle version."
+    },
+    "PAYMENT_CONFIRMED": {
+      "title": "Paiement reçu",
+      "body": "Le client a payé {{amount}}. Vous pouvez intervenir : mission {{reference}}."
+    },
+    "MISSION_CANCELLED": {
+      "title": "Mission annulée",
+      "body": "La mission {{reference}} a été annulée par {{actor}}."
+    },
+    "MISSION_CLOSED": {
+      "title": "Mission clôturée",
+      "body": "Le client a validé la mission {{reference}}. {{net}} sont ajoutés à votre montant dû."
+    },
+    "MISSION_DISPUTED": {
+      "title": "Problème signalé",
+      "body": "Le client a signalé un problème sur la mission {{reference}}. L’équipe Ineed va vous contacter."
+    },
+    "PAYOUT_SENT": {
+      "title": "Reversement envoyé",
+      "body": "{{amount}} ont été envoyés sur votre compte {{account}}."
+    },
+    "PAYOUT_FAILED": {
+      "title": "Reversement non abouti",
+      "body": "Le reversement de {{amount}} a échoué. Vérifiez votre compte de reversement."
+    },
+    "VERIFICATION_APPROVED": {
+      "title": "Compte validé",
+      "body": "Bienvenue sur Ineed Pro. Activez votre disponibilité pour recevoir des demandes."
+    },
+    "VERIFICATION_INFO_REQUESTED": {
+      "title": "Dossier à compléter",
+      "body": "L’équipe Ineed a besoin d’informations complémentaires pour valider votre compte."
+    },
+    "VERIFICATION_REJECTED": {
+      "title": "Dossier refusé",
+      "body": "Votre dossier n’a pas été validé. Consultez le motif dans l’application."
+    },
+    "NEW_MESSAGE": {
+      "title": "{{senderName}}",
+      "body": "{{preview}}"
+    },
+    "NEW_REVIEW": {
+      "title": "Nouvel avis",
+      "body": "Un client vous a donné {{rating}} sur 5."
+    }
+  },
+  "sms": {
+    "OTP": {
+      "body": "Ineed : votre code est {{code}}. Il expire dans 10 minutes. Ne le communiquez à personne."
+    }
+  }
+}

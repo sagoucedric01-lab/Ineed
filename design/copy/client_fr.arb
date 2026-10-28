@@ -1,0 +1,480 @@
+{
+  "@@locale": "fr",
+  "@@context": "Textes propres à l’application client Ineed.",
+  "onboarding1Title": "Décrivez votre problème",
+  "onboarding1Body": "Fuite, panne de courant, serrure bloquée… Expliquez en quelques mots, ajoutez une photo ou une note vocale.",
+  "onboarding2Title": "Un professionnel proche vous répond",
+  "onboarding2Body": "Ineed prévient les professionnels disponibles autour de vous. Vous voyez leur profil, leurs avis et leur prix avant de confirmer.",
+  "onboarding3Title": "Payez en toute sécurité",
+  "onboarding3Body": "Mobile Money ou carte, directement dans l’application. Le professionnel est payé une fois le travail confirmé.",
+  "onboardingStart": "Commencer",
+  "onboardingSkip": "Passer",
+  "homeGreeting": "Bonjour {firstName}",
+  "@homeGreeting": {
+    "placeholders": {
+      "firstName": {
+        "type": "String"
+      }
+    }
+  },
+  "homeGreetingAnonymous": "Bonjour",
+  "homeQuestion": "De quoi avez-vous besoin ?",
+  "homeSearchHint": "Décrivez votre problème ou cherchez un métier",
+  "homeUrgentCta": "Intervention immédiate",
+  "homeUrgentCaption": "Un pro disponible maintenant",
+  "homeScheduleCta": "Programmer une intervention",
+  "homeScheduleCaption": "Choisissez le jour et l’heure",
+  "homeCategories": "Métiers",
+  "homeRecentSearches": "Recherches récentes",
+  "homeOngoingMissions": "En cours",
+  "homeNoAddress": "Choisir une adresse",
+  "homeCategoriesError": "Impossible de charger les métiers. Vérifiez votre connexion.",
+  "searchTitle": "Rechercher",
+  "searchNoResult": "Aucun métier ne correspond à « {query} ».",
+  "@searchNoResult": {
+    "placeholders": {
+      "query": {
+        "type": "String"
+      }
+    }
+  },
+  "searchNoResultHelp": "Essayez un autre mot, par exemple « fuite », « prise » ou « climatiseur », ou parcourez les métiers.",
+  "searchClearHistory": "Effacer l’historique",
+  "serviceChooseTitle": "Quel est le besoin ?",
+  "serviceOther": "Autre besoin en {category}",
+  "@serviceOther": {
+    "placeholders": {
+      "category": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceFixedPrice": "Prix fixe : {amount}",
+  "@serviceFixedPrice": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceReferencePrice": "En général entre {min} et {max}",
+  "@serviceReferencePrice": {
+    "placeholders": {
+      "min": {
+        "type": "String"
+      },
+      "max": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceTravelFee": "Déplacement : {amount}, puis devis sur place",
+  "@serviceTravelFee": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "serviceQuoteInfo": "Le professionnel vous envoie un devis détaillé. Rien n’est dû tant que vous ne l’avez pas accepté.",
+  "requestModeTitle": "Quand faut-il intervenir ?",
+  "requestModeUrgent": "Dès que possible",
+  "requestModeUrgentHelp": "Les professionnels disponibles maintenant sont prévenus.",
+  "requestModeScheduled": "À une date précise",
+  "requestModeScheduledHelp": "Vous recevez des propositions et vous choisissez.",
+  "requestSlotTitle": "Vos disponibilités",
+  "requestSlotDay": "Jour",
+  "requestSlotStart": "À partir de",
+  "requestSlotEnd": "Jusqu’à",
+  "requestSlotInvalid": "Le créneau doit commencer dans le futur et durer au moins 1 heure.",
+  "requestDescribeTitle": "Décrivez le problème",
+  "requestDescriptionLabel": "Description",
+  "requestDescriptionHint": "Ex. : l’eau coule sous l’évier de la cuisine depuis ce matin, le robinet d’arrêt ne ferme plus.",
+  "requestDescriptionTooShort": "Ajoutez quelques détails (10 caractères minimum) pour aider le professionnel.",
+  "requestPhotos": "Photos (facultatif)",
+  "requestPhotosHelp": "Jusqu’à 5 photos. Elles aident le professionnel à prévoir le bon matériel.",
+  "requestPhotoAdd": "Ajouter une photo",
+  "requestPhotoTake": "Prendre une photo",
+  "requestPhotoGallery": "Choisir dans la galerie",
+  "requestVoiceNote": "Note vocale (facultatif)",
+  "requestVoiceRecord": "Maintenir pour enregistrer",
+  "requestVoiceRecording": "Enregistrement… {seconds} s",
+  "@requestVoiceRecording": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "requestVoiceMax": "2 minutes maximum",
+  "requestMicDenied": "L’accès au micro est refusé. Vous pouvez l’autoriser dans les réglages ou décrire le problème par écrit.",
+  "requestBudget": "Budget indicatif (facultatif)",
+  "requestBudgetHelp": "Indication pour le professionnel. Le prix final est celui du devis que vous acceptez.",
+  "requestUploading": "Envoi des fichiers… {done}/{total}",
+  "@requestUploading": {
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "requestReviewTitle": "Vérifiez votre demande",
+  "requestReviewService": "Service",
+  "requestReviewWhen": "Quand",
+  "requestReviewWhere": "Où",
+  "requestReviewDetails": "Détails",
+  "requestReviewPrivacy": "Les professionnels voient votre quartier et une distance approximative. Votre adresse précise et votre prénom ne sont communiqués qu’au professionnel retenu.",
+  "requestPublish": "Publier la demande",
+  "requestPublished": "Demande publiée.",
+  "matchingTitle": "Recherche en cours",
+  "matchingSubtitle": "Nous prévenons les professionnels disponibles autour de vous.",
+  "matchingProgress": "{count, plural, =0{Recherche dans un rayon de {km} km} =1{1 professionnel prévenu dans un rayon de {km} km} other{{count} professionnels prévenus dans un rayon de {km} km}}",
+  "@matchingProgress": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "matchingWidening": "Peu de professionnels libres à proximité. Nous élargissons la recherche.",
+  "matchingCancel": "Annuler la demande",
+  "matchingCancelConfirm": "Annuler cette demande ? Les professionnels prévenus en seront informés.",
+  "noProviderTitle": "Aucun professionnel disponible pour le moment",
+  "noProviderBody": "Personne n’a pu accepter votre demande dans la zone recherchée. Vous pouvez :",
+  "noProviderWiden": "Élargir la zone de recherche",
+  "noProviderChangeTime": "Choisir un autre horaire",
+  "noProviderSchedule": "Envoyer une demande programmée",
+  "reservedTitle": "{proName} a accepté votre demande",
+  "@reservedTitle": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "reservedBody": "Confirmez dans les {minutes} minutes pour réserver ce professionnel.",
+  "@reservedBody": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "reservedConfirm": "Confirmer ce professionnel",
+  "reservedDecline": "Chercher quelqu’un d’autre",
+  "reservedExpired": "Le délai de confirmation est dépassé. Nous recherchons un autre professionnel.",
+  "reservedConditions": "Conditions",
+  "offersTitle": "Propositions reçues",
+  "offersSubtitle": "{count, plural, =1{1 professionnel a répondu} other{{count} professionnels ont répondu}}",
+  "@offersSubtitle": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "offersWaiting": "D’autres propositions peuvent arriver. Vous serez prévenu.",
+  "offerProposedPrice": "Prix proposé",
+  "offerProposedSlot": "Disponible",
+  "offerChoose": "Choisir ce professionnel",
+  "offerExpired": "Cette proposition a expiré.",
+  "offersSort": "Trier par",
+  "offersSortDistance": "Distance",
+  "offersSortPrice": "Prix",
+  "offersSortRating": "Note",
+  "proProfileAbout": "À propos",
+  "proProfileSkills": "Compétences",
+  "proProfileZones": "Zones d’intervention",
+  "proProfileHours": "Horaires",
+  "proProfileReviews": "Avis vérifiés",
+  "proProfileReviewsHelp": "Seuls les clients ayant réellement fait appel à ce professionnel via Ineed peuvent laisser un avis.",
+  "proProfileIndicativePrice": "À partir de {amount}",
+  "@proProfileIndicativePrice": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "proProfileExperience": "{years, plural, =0{Moins d’un an d’expérience} =1{1 an d’expérience} other{{years} ans d’expérience}}",
+  "@proProfileExperience": {
+    "placeholders": {
+      "years": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteTitle": "Devis n° {version}",
+  "@quoteTitle": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteFrom": "Proposé par {proName}",
+  "@quoteFrom": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteLineTravel": "Déplacement",
+  "quoteLineLabor": "Main-d’œuvre",
+  "quoteLineMaterial": "Pièces et matériaux",
+  "quoteLineOther": "Autres frais",
+  "quoteTotal": "Total",
+  "quoteValidUntil": "Valable jusqu’au {date}",
+  "@quoteValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteConditions": "Conditions de réalisation",
+  "quoteDuration": "Durée estimée : {duration}",
+  "@quoteDuration": {
+    "placeholders": {
+      "duration": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteAccept": "Accepter le devis",
+  "quoteAcceptConfirm": "En acceptant, vous vous engagez à payer {amount} pour ces travaux.",
+  "@quoteAcceptConfirm": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteReject": "Refuser",
+  "quoteRejectReasonHint": "Expliquez pourquoi (facultatif) : le professionnel peut proposer une nouvelle version.",
+  "quoteRejected": "Devis refusé. Le professionnel en est informé.",
+  "quoteAccepted": "Devis accepté.",
+  "quoteExpired": "Ce devis a expiré. Demandez une nouvelle version au professionnel.",
+  "quoteSupplementTitle": "Frais supplémentaires proposés",
+  "quoteSupplementBody": "{proName} propose des frais supplémentaires pendant l’intervention. Ils ne seront appliqués que si vous les acceptez.",
+  "@quoteSupplementBody": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteHistory": "Versions précédentes",
+  "quoteVersionSuperseded": "Remplacé par une nouvelle version",
+  "paymentTitle": "Paiement",
+  "paymentAmountDue": "Montant à payer",
+  "paymentPurposeFull": "Intervention",
+  "paymentPurposeTravel": "Frais de déplacement",
+  "paymentPurposeWork": "Travaux",
+  "paymentPurposeSupplement": "Frais supplémentaires",
+  "paymentPromoCode": "Code promo",
+  "paymentPromoApply": "Appliquer",
+  "paymentPromoInvalid": "Ce code promo n’est pas valable pour cette intervention.",
+  "paymentPromoApplied": "Réduction de {amount} appliquée.",
+  "@paymentPromoApplied": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentChooseMethod": "Moyen de paiement",
+  "paymentOrangeMoney": "Orange Money",
+  "paymentMtnMomo": "MTN Mobile Money",
+  "paymentMoovMoney": "Moov Money",
+  "paymentWave": "Wave",
+  "paymentCard": "Carte bancaire",
+  "paymentPay": "Payer {amount}",
+  "@paymentPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentSecurityNote": "Votre argent est versé au professionnel seulement après la fin de l’intervention. Ineed ne conserve aucune donnée de carte.",
+  "paymentVerifying": "Vérification du paiement…",
+  "paymentVerifyingBody": "Validez le paiement sur votre téléphone si ce n’est pas déjà fait. Nous attendons la confirmation de l’opérateur ; cela peut prendre quelques minutes.",
+  "paymentVerifyingLeave": "Vous pouvez quitter cet écran : vous serez prévenu dès que le paiement est confirmé.",
+  "paymentSuccess": "Paiement confirmé",
+  "paymentSuccessBody": "{amount} payés. Le professionnel est prévenu.",
+  "@paymentSuccessBody": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentFailed": "Le paiement n’a pas abouti",
+  "paymentFailedBody": "Aucun montant n’a été débité par Ineed. Motif indiqué par l’opérateur : {reason}",
+  "@paymentFailedBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentFailedRetry": "Réessayer le paiement",
+  "paymentExpired": "Le délai de paiement est dépassé. Relancez le paiement pour garder ce professionnel.",
+  "trackingTitle": "Suivi de la mission",
+  "trackingReference": "Mission {reference}",
+  "@trackingReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingEnRoute": "{proName} est en route",
+  "@trackingEnRoute": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingArrived": "{proName} est arrivé",
+  "@trackingArrived": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingLastUpdate": "Position mise à jour il y a {minutes} min",
+  "@trackingLastUpdate": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "trackingLocationStale": "La position du professionnel n’est plus mise à jour. Écrivez-lui via la messagerie.",
+  "trackingTimeline": "Étapes",
+  "trackingMessage": "Écrire au professionnel",
+  "trackingCancel": "Annuler l’intervention",
+  "trackingCancelFree": "L’annulation est gratuite tant que le professionnel n’est pas parti.",
+  "trackingCancelFee": "Le professionnel est déjà en route : les frais de déplacement ({amount}) restent dus. Le reste vous est remboursé.",
+  "@trackingCancelFee": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingCancelNotAllowed": "Les travaux ont commencé : l’intervention ne peut plus être annulée. En cas de problème, signalez-le.",
+  "trackingCancelled": "Intervention annulée. {refund}",
+  "@trackingCancelled": {
+    "placeholders": {
+      "refund": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingRefundPending": "Remboursement de {amount} en cours.",
+  "@trackingRefundPending": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "completionTitle": "L’intervention est-elle terminée ?",
+  "completionBody": "{proName} a indiqué avoir terminé. Confirmez pour clôturer la mission et libérer le paiement.",
+  "@completionBody": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "completionAutoClose": "Sans réponse de votre part, la mission sera clôturée automatiquement le {date}.",
+  "@completionAutoClose": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "completionConfirm": "Oui, tout est en ordre",
+  "completionProblem": "Non, il y a un problème",
+  "completionProblemTitle": "Que s’est-il passé ?",
+  "completionProblemBody": "Le paiement au professionnel est suspendu le temps que l’équipe Ineed examine la situation.",
+  "completionClosed": "Mission clôturée. Merci d’avoir utilisé Ineed.",
+  "receiptTitle": "Reçu",
+  "receiptNumber": "Reçu n° {number}",
+  "@receiptNumber": {
+    "placeholders": {
+      "number": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptPaidOn": "Payé le {date}",
+  "@receiptPaidOn": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptMethod": "Moyen de paiement",
+  "receiptRefunded": "Remboursé",
+  "receiptShare": "Partager le reçu",
+  "reviewTitle": "Comment s’est passée l’intervention ?",
+  "reviewSubtitle": "Votre avis aide les autres clients et le professionnel.",
+  "reviewStarsLabel": "Note sur 5",
+  "reviewStar1": "Très décevant",
+  "reviewStar2": "Décevant",
+  "reviewStar3": "Correct",
+  "reviewStar4": "Bien",
+  "reviewStar5": "Excellent",
+  "reviewCommentHint": "Qu’avez-vous apprécié ? Qu’est-ce qui pourrait être amélioré ?",
+  "reviewSubmit": "Publier mon avis",
+  "reviewThanks": "Merci, votre avis est publié.",
+  "reviewLater": "Plus tard",
+  "historyTitle": "Mes missions",
+  "historyTabOngoing": "En cours",
+  "historyTabPast": "Terminées",
+  "historyEmptyOngoing": "Aucune mission en cours. Décrivez un besoin depuis l’accueil pour trouver un professionnel.",
+  "historyEmptyPast": "Vos missions terminées apparaîtront ici, avec leurs reçus.",
+  "historyNewRequest": "Nouvelle demande",
+  "complaintTitle": "Nouvelle réclamation",
+  "complaintMission": "Mission concernée",
+  "complaintCategory": "Motif",
+  "complaintCategoryQuality": "Travail mal réalisé",
+  "complaintCategoryPrice": "Prix différent de celui convenu",
+  "complaintCategoryNoShow": "Le professionnel n’est pas venu",
+  "complaintCategoryDamage": "Dégât causé",
+  "complaintCategoryPayment": "Problème de paiement",
+  "complaintCategoryBehaviour": "Comportement",
+  "complaintCategoryOther": "Autre",
+  "complaintDescription": "Décrivez la situation",
+  "complaintAddPhoto": "Ajouter une photo",
+  "complaintSubmit": "Envoyer la réclamation",
+  "complaintSent": "Réclamation {reference} envoyée. L’équipe Ineed vous répond ici.",
+  "@complaintSent": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintStatusOpen": "Ouverte",
+  "complaintStatusInReview": "En cours d’examen",
+  "complaintStatusWaitingUser": "Réponse attendue de votre part",
+  "complaintStatusResolved": "Résolue",
+  "complaintStatusRejected": "Close sans suite"
+}

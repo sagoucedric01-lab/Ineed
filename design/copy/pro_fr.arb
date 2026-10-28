@@ -1,0 +1,247 @@
+{
+  "@@locale": "fr",
+  "@@context": "Textes propres à l’application professionnel Ineed Pro.",
+  "signupTypeTitle": "Vous travaillez…",
+  "signupTypeIndividual": "À mon compte",
+  "signupTypeIndividualHelp": "Artisan ou technicien indépendant",
+  "signupTypeCompany": "Pour une entreprise",
+  "signupTypeCompanyHelp": "Société immatriculée au RCCM",
+  "signupStepCount": "Étape {current} sur {total}",
+  "@signupStepCount": {
+    "placeholders": {
+      "current": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "signupIdentityTitle": "Votre identité",
+  "signupBusinessName": "Nom affiché aux clients",
+  "signupBusinessNameHint": "Ex. : Koffi Plomberie",
+  "signupCompanyReg": "Numéro RCCM",
+  "signupPhotoTitle": "Votre photo",
+  "signupPhotoHelp": "Une photo nette de votre visage, sans lunettes de soleil. Les clients sont plus enclins à ouvrir leur porte à quelqu’un qu’ils reconnaissent.",
+  "signupTradesTitle": "Vos métiers",
+  "signupTradesHelp": "Choisissez jusqu’à 3 métiers. Vous ne recevrez que les demandes correspondantes.",
+  "signupSkillsTitle": "Vos spécialités",
+  "signupExperience": "Années d’expérience",
+  "signupBio": "Présentez-vous en quelques lignes",
+  "signupBioHint": "Ex. : Plombier depuis 12 ans, spécialisé dans les fuites et l’installation de chauffe-eau. J’interviens surtout à Cocody et Bingerville.",
+  "signupZonesTitle": "Où intervenez-vous ?",
+  "signupZonesHelp": "Choisissez les communes où vous acceptez de vous déplacer.",
+  "signupRadius": "Distance maximale depuis votre point de départ",
+  "signupHoursTitle": "Vos horaires habituels",
+  "signupHoursClosed": "Fermé",
+  "signupDocumentsTitle": "Justificatifs",
+  "signupDocumentsHelp": "Ces documents restent privés. Seule l’équipe de vérification d’Ineed y a accès.",
+  "signupDocumentRequired": "Obligatoire",
+  "signupDocumentOptional": "Facultatif",
+  "signupDocumentUpload": "Ajouter le document",
+  "signupDocumentReplace": "Remplacer",
+  "signupPayoutTitle": "Où recevoir vos paiements ?",
+  "signupPayoutHelp": "Le numéro doit être à votre nom. Vous pourrez le modifier plus tard.",
+  "signupPayoutNumber": "Numéro Mobile Money",
+  "signupPayoutHolder": "Nom du titulaire",
+  "signupSubmit": "Envoyer mon dossier",
+  "signupSubmitted": "Dossier envoyé. Nous vous prévenons dès qu’il est examiné.",
+  "verificationSubmittedTitle": "Dossier en cours de vérification",
+  "verificationSubmittedBody": "L’équipe Ineed contrôle vos informations et vos justificatifs. Vous recevrez une notification dès la décision.",
+  "verificationInfoRequestedTitle": "Informations complémentaires demandées",
+  "verificationInfoRequestedBody": "Message de l’équipe Ineed : {message}",
+  "@verificationInfoRequestedBody": {
+    "placeholders": {
+      "message": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationInfoRequestedAction": "Compléter mon dossier",
+  "verificationRejectedTitle": "Dossier refusé",
+  "verificationRejectedBody": "Motif : {reason}. Contactez l’assistance si vous pensez qu’il s’agit d’une erreur.",
+  "@verificationRejectedBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "verificationApprovedTitle": "Votre compte est validé",
+  "verificationApprovedBody": "Activez votre disponibilité pour commencer à recevoir des demandes.",
+  "verificationSuspendedTitle": "Compte suspendu",
+  "verificationSuspendedBody": "Vous ne recevez plus de demandes pour le moment. Motif : {reason}",
+  "@verificationSuspendedBody": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardAvailable": "Disponible maintenant",
+  "dashboardAvailableOn": "Vous recevez les demandes urgentes autour de vous.",
+  "dashboardAvailableOff": "Vous ne recevez que les demandes programmées sur vos horaires.",
+  "dashboardPause": "Suspendre les demandes",
+  "dashboardPauseUntil": "Demandes suspendues jusqu’à {time}",
+  "@dashboardPauseUntil": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "dashboardResume": "Reprendre",
+  "dashboardPauseOptions1h": "1 heure",
+  "dashboardPauseOptionsToday": "Jusqu’à demain matin",
+  "dashboardPauseOptionsCustom": "Choisir une date",
+  "dashboardToday": "Aujourd’hui",
+  "dashboardIncoming": "Demandes reçues",
+  "dashboardIncomingEmpty": "Aucune demande pour l’instant. Restez disponible : vous serez alerté dès qu’un client a besoin de vous.",
+  "dashboardMissionsToday": "Missions du jour",
+  "dashboardWeekEarnings": "Gains de la semaine",
+  "dashboardLocationNeeded": "Autorisez la localisation pour recevoir les demandes urgentes proches de vous.",
+  "alertTitleUrgent": "Demande urgente",
+  "alertTitleScheduled": "Nouvelle demande",
+  "alertDistance": "À environ {km} km · {zone}",
+  "@alertDistance": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      },
+      "zone": {
+        "type": "String"
+      }
+    }
+  },
+  "alertExpiresIn": "Répondez dans {seconds} s",
+  "@alertExpiresIn": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "alertSlot": "Créneau souhaité",
+  "alertBudget": "Budget indiqué par le client",
+  "alertPrivacyNote": "L’adresse exacte vous sera communiquée après confirmation du client.",
+  "alertAccept": "Accepter",
+  "alertDecline": "Refuser",
+  "alertDeclineReasonBusy": "Je suis occupé",
+  "alertDeclineReasonTooFar": "Trop loin",
+  "alertDeclineReasonSkill": "Hors de mes compétences",
+  "alertDeclineReasonOther": "Autre raison",
+  "alertAccepted": "Vous êtes réservé. Le client doit confirmer dans les {minutes} minutes.",
+  "@alertAccepted": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "alertTaken": "Un autre professionnel a été plus rapide. Restez disponible pour la prochaine demande.",
+  "alertExpired": "Cette demande n’est plus disponible.",
+  "alertClientDeclined": "Le client a choisi un autre professionnel.",
+  "proposalPrice": "Votre prix",
+  "proposalTravelFee": "Frais de déplacement",
+  "proposalStart": "Heure d’arrivée proposée",
+  "proposalMessage": "Message au client (facultatif)",
+  "proposalSend": "Envoyer ma proposition",
+  "proposalSent": "Proposition envoyée. Vous serez prévenu si le client vous choisit.",
+  "missionClientAddress": "Adresse d’intervention",
+  "missionOpenMaps": "Ouvrir l’itinéraire",
+  "missionStepDepart": "Je pars",
+  "missionStepDepartHelp": "Le client est prévenu et voit votre progression pendant le trajet.",
+  "missionStepArrived": "Je suis arrivé",
+  "missionStepStart": "Commencer les travaux",
+  "missionStepStartBlockedQuote": "Le client doit d’abord accepter votre devis.",
+  "missionStepStartBlockedPayment": "En attente du paiement du client.",
+  "missionStepFinish": "Terminer l’intervention",
+  "missionFinishConfirm": "Confirmez-vous que le travail est terminé ? Le client sera invité à valider.",
+  "missionReport": "Compte rendu (facultatif)",
+  "missionReportHint": "Travaux réalisés, pièces changées, conseils au client…",
+  "missionReportPhotos": "Photos après intervention",
+  "missionSharingLocation": "Votre position est partagée avec le client jusqu’à votre arrivée.",
+  "missionLocationOff": "Position non partagée. Activez la localisation pour que le client suive votre arrivée.",
+  "missionCancel": "Je ne peux plus intervenir",
+  "missionCancelWarning": "Le client sera remboursé et votre taux de fiabilité baissera. Utilisez cette option seulement en cas d’empêchement réel.",
+  "missionCancelReason": "Motif",
+  "missionWaitingClientConfirmation": "En attente de la validation du client.",
+  "quoteCreateTitle": "Nouveau devis",
+  "quoteCreateVersion": "Nouvelle version (v{version})",
+  "@quoteCreateVersion": {
+    "placeholders": {
+      "version": {
+        "type": "int"
+      }
+    }
+  },
+  "quoteAddLine": "Ajouter une ligne",
+  "quoteLineType": "Type",
+  "quoteLineLabel": "Désignation",
+  "quoteLineLabelHint": "Ex. : Remplacement du siphon",
+  "quoteLineQuantity": "Quantité",
+  "quoteLineUnitPrice": "Prix unitaire (F CFA)",
+  "quoteLineJustification": "Justification (facultatif)",
+  "quoteValidity": "Validité du devis",
+  "quoteValidity24h": "24 heures",
+  "quoteValidity3d": "3 jours",
+  "quoteValidity7d": "7 jours",
+  "quoteConditionsLabel": "Conditions de réalisation",
+  "quoteConditionsHint": "Ex. : pièces garanties 6 mois, l’eau sera coupée environ 1 heure.",
+  "quoteEstimatedDuration": "Durée estimée",
+  "quoteCommissionInfo": "Commission Ineed : {amount}. Vous recevrez {net}.",
+  "@quoteCommissionInfo": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteSubmit": "Envoyer le devis au client",
+  "quoteSubmitted": "Devis envoyé. Vous serez prévenu de la réponse du client.",
+  "quoteImmutableNote": "Un devis envoyé ne peut plus être modifié. Pour changer le prix, envoyez une nouvelle version : le client devra l’accepter.",
+  "quoteSupplementCreate": "Ajouter des frais justifiés",
+  "quoteSupplementHelp": "Pièce imprévue, travaux supplémentaires… Le client doit accepter avant que ces frais soient appliqués.",
+  "quoteClientRejected": "Le client a refusé le devis. Motif : {reason}",
+  "@quoteClientRejected": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteClientAccepted": "Le client a accepté le devis.",
+  "earningsTitle": "Mes revenus",
+  "earningsBalanceDue": "Montant dû",
+  "earningsBalanceDueHelp": "Missions clôturées, après commission, pas encore reversées.",
+  "earningsPending": "En attente de clôture",
+  "earningsPendingHelp": "Missions payées par le client mais pas encore validées. Ce montant est versé après la clôture.",
+  "earningsPaidOut": "Déjà reversé",
+  "earningsGross": "Montant des prestations",
+  "earningsCommission": "Commission Ineed",
+  "earningsRefunds": "Remboursements",
+  "earningsNet": "Net",
+  "earningsPayouts": "Reversements",
+  "earningsPayoutStatusPending": "En préparation",
+  "earningsPayoutStatusApproved": "Validé",
+  "earningsPayoutStatusProcessing": "En cours d’envoi",
+  "earningsPayoutStatusPaid": "Versé",
+  "earningsPayoutStatusFailed": "Échec, nouvel essai prévu",
+  "earningsHistory": "Historique",
+  "earningsEmpty": "Vos revenus apparaîtront ici après votre première mission.",
+  "earningsPayoutAccount": "Compte de reversement",
+  "earningsPayoutsUnavailable": "Les reversements automatiques ne sont pas encore activés. Les montants dus sont conservés et vous seront versés dès leur activation.",
+  "earningsPeriodWeek": "Cette semaine",
+  "earningsPeriodMonth": "Ce mois-ci",
+  "settingsTrades": "Métiers et spécialités",
+  "settingsZones": "Zones d’intervention",
+  "settingsHours": "Horaires",
+  "settingsRequestTypes": "Types de demandes acceptées",
+  "settingsAcceptUrgent": "Demandes urgentes",
+  "settingsAcceptScheduled": "Demandes programmées",
+  "settingsPublicProfile": "Voir mon profil public",
+  "settingsChangesNeedReview": "Ajouter un nouveau métier nécessite une nouvelle vérification de votre dossier."
+}

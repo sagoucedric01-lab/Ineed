@@ -1,0 +1,107 @@
+{
+  "$description": "Textes de l'interface d'administration (Next.js).",
+  "app": {
+    "title": "Ineed Administration",
+    "environmentTest": "Environnement de test",
+    "environmentProduction": "Production"
+  },
+  "auth": {
+    "title": "Connexion à l’administration",
+    "email": "Adresse e-mail",
+    "password": "Mot de passe",
+    "totp": "Code de l’application d’authentification",
+    "totpHelp": "Saisissez le code à 6 chiffres affiché dans votre application (Google Authenticator, Aegis…).",
+    "totpSetupTitle": "Activez la double authentification",
+    "totpSetupBody": "Scannez ce QR code avec votre application d’authentification, puis saisissez le code affiché. Cette étape est obligatoire.",
+    "submit": "Se connecter",
+    "invalid": "Adresse e-mail, mot de passe ou code incorrect.",
+    "locked": "Compte temporairement bloqué après plusieurs échecs. Réessayez dans {minutes} min.",
+    "logout": "Se déconnecter"
+  },
+  "nav": {
+    "dashboard": "Tableau de bord",
+    "clients": "Clients",
+    "pros": "Professionnels",
+    "verification": "Validation des documents",
+    "categories": "Catégories",
+    "services": "Prestations",
+    "requests": "Demandes",
+    "missions": "Missions",
+    "quotes": "Devis",
+    "payments": "Paiements",
+    "refunds": "Remboursements",
+    "commissions": "Commissions",
+    "payouts": "Reversements",
+    "reviews": "Avis",
+    "complaints": "Réclamations",
+    "reports": "Signalements",
+    "zones": "Zones géographiques",
+    "referencePrices": "Tarifs de référence",
+    "promotions": "Promotions",
+    "notifications": "Notifications",
+    "statistics": "Statistiques",
+    "audit": "Journal d’audit",
+    "settings": "Paramètres",
+    "dispatchRules": "Règles d’attribution",
+    "admins": "Administrateurs et rôles"
+  },
+  "dashboard": {
+    "openRequests": "Demandes en recherche",
+    "activeMissions": "Missions en cours",
+    "pendingPayments": "Paiements en attente",
+    "prosToReview": "Dossiers à valider",
+    "openDisputes": "Litiges ouverts",
+    "todayRevenue": "Commissions du jour",
+    "noProviderRate": "Demandes sans professionnel (7 jours)",
+    "reconciliationAlert": "Écart de rapprochement détecté : {count} transaction(s) à vérifier."
+  },
+  "table": {
+    "search": "Rechercher",
+    "filters": "Filtres",
+    "export": "Exporter en CSV",
+    "empty": "Aucun résultat pour ces filtres.",
+    "loading": "Chargement…",
+    "error": "Impossible de charger les données. Réessayez.",
+    "rowsPerPage": "Lignes par page",
+    "createdAt": "Créé le",
+    "status": "Statut",
+    "actions": "Actions"
+  },
+  "verification": {
+    "queueTitle": "Dossiers en attente",
+    "approve": "Valider le professionnel",
+    "approveConfirm": "Confirmer la validation de {name} ? Le badge « Identité vérifiée » sera affiché sur son profil.",
+    "reject": "Refuser",
+    "requestInfo": "Demander des compléments",
+    "reasonRequired": "Indiquez un motif : il sera communiqué au professionnel.",
+    "documentPrivate": "Document privé : l’accès est journalisé.",
+    "approved": "Professionnel validé.",
+    "rejected": "Dossier refusé.",
+    "infoRequested": "Demande de compléments envoyée."
+  },
+  "actions": {
+    "suspendPro": "Suspendre le professionnel",
+    "suspendProConfirm": "{name} ne recevra plus de demandes. Ses missions en cours ne sont pas annulées.",
+    "reactivate": "Réactiver",
+    "disableCategory": "Désactiver la catégorie",
+    "disableCategoryConfirm": "La catégorie {name} ne sera plus proposée aux clients. Les demandes en cours ne sont pas affectées.",
+    "approveRefund": "Approuver le remboursement",
+    "approveRefundConfirm": "Rembourser {amount} au client pour la mission {reference} ?",
+    "approvePayout": "Valider le reversement",
+    "approvePayoutConfirm": "Envoyer {amount} à {name} sur {account} ?",
+    "resolveDispute": "Résoudre le litige",
+    "reasonLabel": "Motif (enregistré dans le journal d’audit)",
+    "saved": "Modifications enregistrées.",
+    "forbidden": "Votre rôle ne permet pas cette action."
+  },
+  "payments": {
+    "sandboxBadge": "TEST",
+    "sandboxWarning": "Transaction de test : aucun argent réel n’a circulé.",
+    "verifiedAt": "Confirmé par le prestataire le {date}",
+    "reconcile": "Revérifier auprès du prestataire",
+    "providerEvents": "Notifications reçues du prestataire"
+  },
+  "payouts": {
+    "providerNotConfigured": "Aucun fournisseur de reversement n’est configuré : les reversements restent en attente et ne peuvent pas être envoyés."
+  }
+}
