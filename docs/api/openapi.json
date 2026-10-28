@@ -1,0 +1,47 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health/live": {
+      "get": {
+        "operationId": "HealthController_live",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Le processus est vivant."
+          }
+        },
+        "tags": [
+          "Santé"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "HealthController_ready",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Base de données, Redis et stockage disponibles."
+          },
+          "503": {
+            "description": "Au moins une dépendance est indisponible."
+          }
+        },
+        "tags": [
+          "Santé"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "API Ineed",
+    "description": "API de la marketplace Ineed (Abidjan). Montants en XOF entiers, dates ISO 8601 en UTC, téléphones au format E.164. Les erreurs suivent le format { error: { code, message, details, requestId } }.",
+    "version": "0.3.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "schemas": {}
+  }
+}
