@@ -1,9 +1,9 @@
 generator client {
-  provider        = "prisma-client"
-  output          = "../src/generated/prisma"
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
   moduleFormat        = "esm"
   importFileExtension = "js"
-  previewFeatures = ["postgresqlExtensions", "partialIndexes"]
+  previewFeatures     = ["postgresqlExtensions", "partialIndexes"]
 }
 
 datasource db {
@@ -1206,7 +1206,7 @@ model User {
   notifications               Notification[]
   payments                    Payment[]
   payouts                     Payout[]
-  proProfile            ProProfile?            @relation("pro_profiles_user_idTousers")
+  proProfile                  ProProfile?            @relation("pro_profiles_user_idTousers")
   proProfilesAsVerifiedByUser ProProfile[]           @relation("pro_profiles_verified_byTousers")
   proVerificationEvents       ProVerificationEvent[]
   promotionRedemptions        PromotionRedemption[]
@@ -1223,7 +1223,7 @@ model User {
   sessions                    Session[]
   settings                    Setting[]
   userRolesAsGrantedByUser    UserRole[]             @relation("user_roles_granted_byTousers")
-  userRolesAsUser             UserRole[]             @relation("user_roles_user_idTousers")
+  userRoles                   UserRole[]             @relation("user_roles_user_idTousers")
   avatarFile                  File?                  @relation("users_avatar_file_idTofiles", fields: [avatarFileId], references: [id], onUpdate: NoAction, map: "users_avatar_fk")
   homeCity                    City?                  @relation(fields: [homeCityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   verificationDocuments       VerificationDocument[]
@@ -1242,20 +1242,20 @@ model VerificationDocumentType {
 }
 
 model VerificationDocument {
-  id                               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  proId                            String                   @map("pro_id") @db.Uuid
-  typeCode                         String                   @map("type_code")
-  fileId                           String                   @map("file_id") @db.Uuid
-  status                           DocumentStatus           @default(PENDING)
-  expiresOn                        DateTime?                @map("expires_on") @db.Date
-  reviewedBy                       String?                  @map("reviewed_by") @db.Uuid
-  reviewedAt                       DateTime?                @map("reviewed_at") @db.Timestamptz(6)
-  rejectionReason                  String?                  @map("rejection_reason")
-  createdAt                        DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
-  file                             File                     @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  pro                              ProProfile               @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
-  reviewedByUser                   User?                    @relation(fields: [reviewedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  typeCodeVerificationDocumentType VerificationDocumentType @relation(fields: [typeCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
+  id              String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId           String                   @map("pro_id") @db.Uuid
+  typeCode        String                   @map("type_code")
+  fileId          String                   @map("file_id") @db.Uuid
+  status          DocumentStatus           @default(PENDING)
+  expiresOn       DateTime?                @map("expires_on") @db.Date
+  reviewedBy      String?                  @map("reviewed_by") @db.Uuid
+  reviewedAt      DateTime?                @map("reviewed_at") @db.Timestamptz(6)
+  rejectionReason String?                  @map("rejection_reason")
+  createdAt       DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  file            File                     @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro             ProProfile               @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  reviewedByUser  User?                    @relation(fields: [reviewedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  type            VerificationDocumentType @relation(fields: [typeCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([proId], map: "verification_documents_pro_idx")
   @@map("verification_documents")

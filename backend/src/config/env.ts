@@ -21,12 +21,16 @@ export const envSchema = z
     PORT: z.coerce.number().int().min(1).max(65535).default(3000),
     LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace']).default('info'),
     CORS_ORIGINS: csv.default([]),
+    /** Nombre de reverse proxys devant l'API (0 en local, 1 derrière Caddy/Traefik). */
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(5).default(0),
     SWAGGER_ENABLED: bool.optional(),
 
     DATABASE_URL: z.url({ protocol: /^postgres(ql)?$/ }),
     REDIS_URL: z.url({ protocol: /^rediss?$/ }),
 
     S3_ENDPOINT: z.url().optional(),
+    /** Adresse du stockage vue par les applications (URL présignées) si différente de S3_ENDPOINT (ex. émulateur Android : http://10.0.2.2:8333). */
+    S3_PUBLIC_ENDPOINT: z.url().optional(),
     S3_REGION: z.string().min(1).default('eu-west-1'),
     S3_ACCESS_KEY_ID: z.string().min(1),
     S3_SECRET_ACCESS_KEY: z.string().min(1),
@@ -34,14 +38,31 @@ export const envSchema = z
     S3_BUCKET_PUBLIC: z.string().min(3),
     S3_BUCKET_PRIVATE: z.string().min(3),
 
-    /** Fournisseur des codes SMS (phase 4). `dev_console` écrit le code dans les journaux : interdit en production. */
-    OTP_PROVIDER: z.enum(['dev_console', 'twilio_verify', 'orange_sms']).default('dev_console'),
+    /** Fournisseur des codes SMS. `dev_console` écrit le code dans les journaux : interdit en production. */
+    OTP_PROVIDER: z.enum(['dev_console', 'twilio_verify']).default('dev_console'),
+    /** Secret servant à hacher les codes SMS en base (HMAC). Au moins 32 caractères. */
+    OTP_PEPPER: z.string().min(32),
+    TWILIO_ACCOUNT_SID: z.string().optional(),
+    TWILIO_AUTH_TOKEN: z.string().optional(),
+    TWILIO_VERIFY_SERVICE_SID: z.string().optional(),
+
+    /** Clé privée ECDSA P-256 (PKCS#8 DER encodé en base64) qui signe les jetons d'accès. */
+    JWT_PRIVATE_KEY_B64: z.string().min(100),
+    JWT_ISSUER: z.string().default('ineed-api'),
+    ACCESS_TOKEN_TTL_S: z.coerce.number().int().min(60).max(3600).default(900),
+    REFRESH_TOKEN_TTL_DAYS: z.coerce.number().int().min(1).max(365).default(60),
+    ADMIN_REFRESH_TOKEN_TTL_HOURS: z.coerce.number().int().min(1).max(72).default(12),
+    /** Clé AES-256 (32 octets en base64) qui chiffre les secrets stockés en base (TOTP, numéros de reversement). */
+    DATA_ENCRYPTION_KEY_B64: z.string().refine((v) => Buffer.from(v, 'base64').length === 32, 'doit contenir 32 octets encodés en base64'),
     /** Fournisseur de paiement (phase 7). `sandbox` simule les paiements : interdit en production. */
     PAYMENT_PROVIDER: z.enum(['sandbox', 'cinetpay', 'wave']).default('sandbox'),
   })
   .superRefine((env, ctx) => {
-    if (env.APP_ENV !== 'production') return;
     const forbid = (path: keyof typeof env, message: string) => ctx.addIssue({ code: 'custom', path: [path], message });
+    if (env.OTP_PROVIDER === 'twilio_verify' && !(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_VERIFY_SERVICE_SID)) {
+      forbid('OTP_PROVIDER', 'twilio_verify exige TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN et TWILIO_VERIFY_SERVICE_SID');
+    }
+    if (env.APP_ENV !== 'production') return;
     if (env.NODE_ENV !== 'production') forbid('NODE_ENV', 'doit valoir "production" quand APP_ENV=production');
     if (env.OTP_PROVIDER === 'dev_console') forbid('OTP_PROVIDER', 'le mode "dev_console" est interdit en production');
     if (env.PAYMENT_PROVIDER === 'sandbox') forbid('PAYMENT_PROVIDER', 'le simulateur "sandbox" est interdit en production');
