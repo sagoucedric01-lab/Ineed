@@ -1,0 +1,13 @@
+packages:
+  - backend
+  - admin
+  - design
+onlyBuiltDependencies:
+  - '@prisma/engines'
+  - prisma
+  - '@nestjs/core'
+  - esbuild
+  - sharp
+  - unrs-resolver
+  - '@swc/core'
+  - msgpackr-extract

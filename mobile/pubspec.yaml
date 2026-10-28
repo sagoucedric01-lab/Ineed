@@ -1,0 +1,14 @@
+# Espace de travail Dart (pub workspaces) : une seule résolution de dépendances pour les 2 applications
+# et les 3 paquets partagés. Commandes depuis ce dossier : `flutter pub get`, `dart run tool/check.dart`.
+name: ineed_mobile
+publish_to: none
+environment:
+  sdk: ^3.13.0
+workspace:
+  - apps/client
+  - apps/pro
+  - packages/ineed_core
+  - packages/ineed_ui
+  - packages/ineed_api
+dev_dependencies:
+  flutter_lints: 6.0.0

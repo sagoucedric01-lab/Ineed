@@ -1,0 +1,6 @@
+# Textes générés depuis design/copy (common_fr.arb + <app>_fr.arb), fusionnés par design/scripts/merge-arb.mjs.
+arb-dir: lib/l10n
+template-arb-file: app_fr.arb
+output-dir: lib/l10n/gen
+output-localization-file: app_localizations.dart
+nullable-getter: false

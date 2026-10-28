@@ -1,0 +1,1546 @@
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  moduleFormat        = "esm"
+  importFileExtension = "js"
+  previewFeatures = ["postgresqlExtensions", "partialIndexes"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  extensions = [citext, pgcrypto, postgis]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model AbuseReport {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reporterId    String       @map("reporter_id") @db.Uuid
+  targetType    ReportTarget @map("target_type")
+  targetId      String       @map("target_id") @db.Uuid
+  reason        String
+  details       String?
+  status        ReportStatus @default(OPEN)
+  handledBy     String?      @map("handled_by") @db.Uuid
+  handledAt     DateTime?    @map("handled_at") @db.Timestamptz(6)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  handledByUser User?        @relation("abuse_reports_handled_byTousers", fields: [handledBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reporter      User         @relation("abuse_reports_reporter_idTousers", fields: [reporterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([reporterId, targetType, targetId])
+  @@map("abuse_reports")
+}
+
+model Address {
+  id              String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId          String                   @map("user_id") @db.Uuid
+  label           String?
+  cityId          String                   @map("city_id") @db.Uuid
+  zoneId          String?                  @map("zone_id") @db.Uuid
+  location        Unsupported("geography")
+  street          String?
+  landmark        String?
+  instructions    String?
+  createdAt       DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt       DateTime?                @map("deleted_at") @db.Timestamptz(6)
+  city            City                     @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user            User                     @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  zone            Zone?                    @relation(fields: [zoneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  serviceRequests ServiceRequest[]
+
+  @@index([userId], map: "addresses_user_idx", where: raw("(deleted_at IS NULL)"))
+  @@map("addresses")
+}
+
+model AdminCredential {
+  userId            String    @id @map("user_id") @db.Uuid
+  passwordHash      String    @map("password_hash")
+  totpSecretEnc     Bytes?    @map("totp_secret_enc")
+  totpEnabledAt     DateTime? @map("totp_enabled_at") @db.Timestamptz(6)
+  failedAttempts    Int       @default(0) @map("failed_attempts")
+  lockedUntil       DateTime? @map("locked_until") @db.Timestamptz(6)
+  passwordChangedAt DateTime  @default(now()) @map("password_changed_at") @db.Timestamptz(6)
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("admin_credentials")
+}
+
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String?  @map("actor_id") @db.Uuid
+  actorRoles String[] @default([]) @map("actor_roles")
+  action     String
+  entityType String   @map("entity_type")
+  entityId   String?  @map("entity_id")
+  before     Json?
+  after      Json?
+  ip         String?  @db.Inet
+  userAgent  String?  @map("user_agent")
+  requestId  String?  @map("request_id")
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  actor      User?    @relation(fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([actorId, createdAt(sort: Desc)], map: "audit_logs_actor_idx")
+  @@index([entityType, entityId, createdAt(sort: Desc)], map: "audit_logs_entity_idx")
+  @@map("audit_logs")
+}
+
+model Category {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  parentId        String?          @map("parent_id") @db.Uuid
+  slug            String           @unique
+  name            String
+  description     String?
+  searchTerms     String[]         @default([]) @map("search_terms")
+  iconKey         String           @map("icon_key")
+  sortOrder       Int              @default(0) @map("sort_order")
+  isActive        Boolean          @default(true) @map("is_active")
+  createdAt       DateTime         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt       DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+  parent          Category?        @relation("categoriesTocategories", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children        Category[]       @relation("categoriesTocategories")
+  commissionRules CommissionRule[]
+  dispatchRules   DispatchRule[]
+  proCategories   ProCategory[]
+  promotions      Promotion[]
+  searchHistories SearchHistory[]
+  serviceRequests ServiceRequest[]
+  services        Service[]
+  skills          Skill[]
+
+  @@map("categories")
+}
+
+model City {
+  id                 String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  countryCode        String                   @map("country_code") @db.Char(2)
+  name               String
+  timezone           String
+  center             Unsupported("geography")
+  isActive           Boolean                  @default(false) @map("is_active")
+  addresses          Address[]
+  countryCodeCountry Country                  @relation(fields: [countryCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
+  dispatchRules      DispatchRule[]
+  proProfiles        ProProfile[]
+  referencePrices    ReferencePrice[]
+  serviceRequests    ServiceRequest[]
+  users              User[]
+  zones              Zone[]
+
+  @@unique([countryCode, name])
+  @@map("cities")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model CommissionRule {
+  id                 String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId         String?      @map("category_id") @db.Uuid
+  rateBps            Int          @map("rate_bps")
+  minXof             BigInt       @default(0) @map("min_xof")
+  appliesToTravelFee Boolean      @default(false) @map("applies_to_travel_fee")
+  validFrom          DateTime     @default(now()) @map("valid_from") @db.Timestamptz(6)
+  validTo            DateTime?    @map("valid_to") @db.Timestamptz(6)
+  createdBy          String?      @map("created_by") @db.Uuid
+  category           Category?    @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdByUser      User?        @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  commissions        Commission[]
+
+  @@map("commission_rules")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Commission {
+  id        String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId String          @map("mission_id") @db.Uuid
+  paymentId String          @unique @map("payment_id") @db.Uuid
+  ruleId    String?         @map("rule_id") @db.Uuid
+  baseXof   BigInt          @map("base_xof")
+  rateBps   Int             @map("rate_bps")
+  amountXof BigInt          @map("amount_xof")
+  createdAt DateTime        @default(now()) @map("created_at") @db.Timestamptz(6)
+  mission   Mission         @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment   Payment         @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  rule      CommissionRule? @relation(fields: [ruleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("commissions")
+}
+
+model ComplaintMessage {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  complaintId String    @map("complaint_id") @db.Uuid
+  authorId    String    @map("author_id") @db.Uuid
+  body        String
+  isInternal  Boolean   @default(false) @map("is_internal")
+  fileId      String?   @map("file_id") @db.Uuid
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  author      User      @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  file        File?     @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("complaint_messages")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Complaint {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference         String             @unique
+  missionId         String?            @map("mission_id") @db.Uuid
+  openedBy          String             @map("opened_by") @db.Uuid
+  category          String
+  description       String
+  status            ComplaintStatus    @default(OPEN)
+  assignedTo        String?            @map("assigned_to") @db.Uuid
+  resolution        String?
+  refundId          String?            @map("refund_id") @db.Uuid
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  resolvedAt        DateTime?          @map("resolved_at") @db.Timestamptz(6)
+  complaintMessages ComplaintMessage[]
+  assignedToUser    User?              @relation("complaints_assigned_toTousers", fields: [assignedTo], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission           Mission?           @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  openedByUser      User               @relation("complaints_opened_byTousers", fields: [openedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  refund            Refund?            @relation(fields: [refundId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("complaints")
+}
+
+model ConversationRead {
+  conversationId String       @map("conversation_id") @db.Uuid
+  userId         String       @map("user_id") @db.Uuid
+  lastReadAt     DateTime     @map("last_read_at") @db.Timestamptz(6)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([conversationId, userId])
+  @@map("conversation_reads")
+}
+
+model Conversation {
+  id                String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  requestId         String             @map("request_id") @db.Uuid
+  clientId          String             @map("client_id") @db.Uuid
+  proId             String             @map("pro_id") @db.Uuid
+  missionId         String?            @map("mission_id") @db.Uuid
+  isLocked          Boolean            @default(false) @map("is_locked")
+  createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  conversationReads ConversationRead[]
+  client            User               @relation(fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission           Mission?           @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro               ProProfile         @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  request           ServiceRequest     @relation(fields: [requestId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  messages          Message[]
+
+  @@unique([requestId, proId])
+  @@map("conversations")
+}
+
+model Country {
+  code        String  @id @db.Char(2)
+  name        String
+  currency    String  @db.Char(3)
+  phonePrefix String  @map("phone_prefix")
+  isActive    Boolean @default(false) @map("is_active")
+  cities      City[]
+
+  @@map("countries")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Device {
+  id         String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId     String    @map("user_id") @db.Uuid
+  app        AppKind
+  platform   String
+  pushToken  String    @unique @map("push_token")
+  appVersion String?   @map("app_version")
+  lastSeenAt DateTime  @default(now()) @map("last_seen_at") @db.Timestamptz(6)
+  disabledAt DateTime? @map("disabled_at") @db.Timestamptz(6)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("devices")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model DispatchRule {
+  id                String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cityId            String?          @map("city_id") @db.Uuid
+  categoryId        String?          @map("category_id") @db.Uuid
+  serviceId         String?          @map("service_id") @db.Uuid
+  mode              RequestMode
+  strategy          DispatchStrategy
+  initialRadiusM    Int              @map("initial_radius_m")
+  radiusStepM       Int              @map("radius_step_m")
+  maxRadiusM        Int              @map("max_radius_m")
+  prosPerWave       Int              @map("pros_per_wave")
+  waveIntervalS     Int              @map("wave_interval_s")
+  offerTtlS         Int              @map("offer_ttl_s")
+  reservationTtlS   Int              @map("reservation_ttl_s")
+  clientConfirmTtlS Int              @map("client_confirm_ttl_s")
+  maxOffersShown    Int              @default(5) @map("max_offers_shown")
+  isActive          Boolean          @default(true) @map("is_active")
+  updatedBy         String?          @map("updated_by") @db.Uuid
+  updatedAt         DateTime         @default(now()) @map("updated_at") @db.Timestamptz(6)
+  category          Category?        @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  city              City?            @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service           Service?         @relation(fields: [serviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  updatedByUser     User?            @relation(fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("dispatch_rules")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model File {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  ownerUserId           String?                @map("owner_user_id") @db.Uuid
+  purpose               String
+  visibility            FileVisibility         @default(PRIVATE)
+  bucket                String
+  objectKey             String                 @map("object_key")
+  mimeType              String                 @map("mime_type")
+  sizeBytes             BigInt                 @map("size_bytes")
+  sha256                String?
+  status                FileStatus             @default(PENDING_UPLOAD)
+  createdAt             DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  deletedAt             DateTime?              @map("deleted_at") @db.Timestamptz(6)
+  complaintMessages     ComplaintMessage[]
+  ownerUser             User?                  @relation("files_owner_user_idTousers", fields: [ownerUserId], references: [id], onUpdate: NoAction)
+  messages              Message[]
+  missionReportFiles    MissionReportFile[]
+  requestMedia          RequestMedia[]
+  users                 User[]                 @relation("users_avatar_file_idTofiles")
+  verificationDocuments VerificationDocument[]
+
+  @@unique([bucket, objectKey])
+  @@map("files")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model IdempotencyKey {
+  userId       String    @map("user_id") @db.Uuid
+  key          String
+  method       String
+  path         String
+  requestHash  String    @map("request_hash")
+  statusCode   Int?      @map("status_code")
+  responseBody Json?     @map("response_body")
+  lockedUntil  DateTime? @map("locked_until") @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([userId, key])
+  @@index([createdAt], map: "idempotency_keys_created_idx")
+  @@map("idempotency_keys")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model LedgerEntry {
+  id            BigInt            @id @default(autoincrement())
+  transactionId String            @map("transaction_id") @db.Uuid
+  account       String
+  proId         String?           @map("pro_id") @db.Uuid
+  amountXof     BigInt            @map("amount_xof")
+  pro           ProProfile?       @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  transaction   LedgerTransaction @relation(fields: [transactionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([proId], map: "ledger_entries_pro_idx", where: raw("(pro_id IS NOT NULL)"))
+  @@map("ledger_entries")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model LedgerTransaction {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  kind          String
+  paymentId     String?       @map("payment_id") @db.Uuid
+  refundId      String?       @map("refund_id") @db.Uuid
+  payoutId      String?       @map("payout_id") @db.Uuid
+  missionId     String?       @map("mission_id") @db.Uuid
+  description   String?
+  createdBy     String?       @map("created_by") @db.Uuid
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
+  ledgerEntries LedgerEntry[]
+  createdByUser User?         @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission       Mission?      @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment       Payment?      @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payout        Payout?       @relation(fields: [payoutId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  refund        Refund?       @relation(fields: [refundId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("ledger_transactions")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model LocationPing {
+  id           BigInt                   @id @default(autoincrement())
+  missionId    String                   @map("mission_id") @db.Uuid
+  userId       String                   @map("user_id") @db.Uuid
+  location     Unsupported("geography")
+  accuracyM    Float?                   @map("accuracy_m") @db.Real
+  recordedAt   DateTime                 @map("recorded_at") @db.Timestamptz(6)
+  receivedAt   DateTime                 @default(now()) @map("received_at") @db.Timestamptz(6)
+  isSuspicious Boolean                  @default(false) @map("is_suspicious")
+  mission      Mission                  @relation(fields: [missionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  user         User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([missionId, receivedAt(sort: Desc)], map: "location_pings_mission_idx")
+  @@map("location_pings")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Message {
+  id             String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  conversationId String       @map("conversation_id") @db.Uuid
+  senderId       String       @map("sender_id") @db.Uuid
+  body           String?
+  fileId         String?      @map("file_id") @db.Uuid
+  clientMsgId    String       @map("client_msg_id")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  hiddenAt       DateTime?    @map("hidden_at") @db.Timestamptz(6)
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  file           File?        @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  sender         User         @relation(fields: [senderId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([senderId, clientMsgId])
+  @@index([conversationId, createdAt], map: "messages_conversation_idx")
+  @@map("messages")
+}
+
+model MissionReportFile {
+  reportId String        @map("report_id") @db.Uuid
+  fileId   String        @map("file_id") @db.Uuid
+  file     File          @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  report   MissionReport @relation(fields: [reportId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([reportId, fileId])
+  @@map("mission_report_files")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model MissionReport {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId          String              @map("mission_id") @db.Uuid
+  authorId           String              @map("author_id") @db.Uuid
+  body               String
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  missionReportFiles MissionReportFile[]
+  author             User                @relation(fields: [authorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission            Mission             @relation(fields: [missionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("mission_reports")
+}
+
+model MissionStatusHistory {
+  id         BigInt         @id @default(autoincrement())
+  missionId  String         @map("mission_id") @db.Uuid
+  fromStatus MissionStatus? @map("from_status")
+  toStatus   MissionStatus  @map("to_status")
+  actorId    String?        @map("actor_id") @db.Uuid
+  reason     String?
+  metadata   Json?
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  actor      User?          @relation(fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission    Mission        @relation(fields: [missionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([missionId, createdAt], map: "mission_status_history_idx")
+  @@map("mission_status_history")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Mission {
+  id                     String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  reference              String                 @unique
+  requestId              String                 @unique(map: "missions_one_active_per_request_uq", where: raw("(status <> 'CANCELLED'::mission_status)")) @map("request_id") @db.Uuid
+  offerId                String?                @map("offer_id") @db.Uuid
+  clientId               String                 @map("client_id") @db.Uuid
+  proId                  String                 @map("pro_id") @db.Uuid
+  pricingModel           PricingModel           @map("pricing_model")
+  status                 MissionStatus
+  scheduledStartAt       DateTime?              @map("scheduled_start_at") @db.Timestamptz(6)
+  confirmedAt            DateTime?              @map("confirmed_at") @db.Timestamptz(6)
+  enRouteAt              DateTime?              @map("en_route_at") @db.Timestamptz(6)
+  arrivedAt              DateTime?              @map("arrived_at") @db.Timestamptz(6)
+  startedAt              DateTime?              @map("started_at") @db.Timestamptz(6)
+  workCompletedAt        DateTime?              @map("work_completed_at") @db.Timestamptz(6)
+  closedAt               DateTime?              @map("closed_at") @db.Timestamptz(6)
+  autoCloseAt            DateTime?              @map("auto_close_at") @db.Timestamptz(6)
+  cancelledAt            DateTime?              @map("cancelled_at") @db.Timestamptz(6)
+  cancelledBy            String?                @map("cancelled_by") @db.Uuid
+  cancelReason           String?                @map("cancel_reason")
+  disputedAt             DateTime?              @map("disputed_at") @db.Timestamptz(6)
+  version                Int                    @default(0)
+  createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  commissions            Commission[]
+  complaints             Complaint[]
+  conversations          Conversation[]
+  ledgerTransactions     LedgerTransaction[]
+  locationPings          LocationPing[]
+  missionReports         MissionReport[]
+  missionStatusHistories MissionStatusHistory[]
+  cancelledByUser        User?                  @relation("missions_cancelled_byTousers", fields: [cancelledBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client                 User                   @relation("missions_client_idTousers", fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  offer                  RequestOffer?          @relation(fields: [offerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro                    ProProfile             @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  request                ServiceRequest         @relation(fields: [requestId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payments               Payment[]
+  payoutItems            PayoutItem[]
+  quote                  Quote?
+  review                 Review?
+
+  @@index([autoCloseAt], map: "missions_autoclose_idx", where: raw("(status = 'WORK_COMPLETED'::mission_status)"))
+  @@index([clientId, createdAt(sort: Desc)], map: "missions_client_idx")
+  @@index([proId, status], map: "missions_pro_idx")
+  @@map("missions")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model NotificationTemplate {
+  type          String
+  channel       String
+  locale        String   @default("fr-CI")
+  title         String
+  body          String
+  isActive      Boolean  @default(true) @map("is_active")
+  updatedBy     String?  @map("updated_by") @db.Uuid
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  updatedByUser User?    @relation(fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([type, channel, locale])
+  @@map("notification_templates")
+}
+
+model Notification {
+  id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId    String             @map("user_id") @db.Uuid
+  type      String
+  title     String
+  body      String
+  data      Json               @default("{}")
+  dedupeKey String?            @map("dedupe_key")
+  status    NotificationStatus @default(QUEUED)
+  attempts  Int                @default(0)
+  sentAt    DateTime?          @map("sent_at") @db.Timestamptz(6)
+  readAt    DateTime?          @map("read_at") @db.Timestamptz(6)
+  createdAt DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([userId, dedupeKey])
+  @@index([userId], map: "notifications_unread_idx", where: raw("(read_at IS NULL)"))
+  @@index([userId, createdAt(sort: Desc)], map: "notifications_user_idx")
+  @@map("notifications")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model OtpChallenge {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phoneE164   String    @map("phone_e164")
+  purpose     String
+  codeHash    String?   @map("code_hash")
+  provider    String
+  providerRef String?   @map("provider_ref")
+  attempts    Int       @default(0)
+  maxAttempts Int       @default(5) @map("max_attempts")
+  expiresAt   DateTime  @map("expires_at") @db.Timestamptz(6)
+  consumedAt  DateTime? @map("consumed_at") @db.Timestamptz(6)
+  ip          String?   @db.Inet
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([phoneE164, createdAt(sort: Desc)], map: "otp_phone_created_idx")
+  @@map("otp_challenges")
+}
+
+model PaymentProviderEvent {
+  id              String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  provider        String
+  providerEventId String    @map("provider_event_id")
+  paymentId       String?   @map("payment_id") @db.Uuid
+  payload         Json
+  signatureValid  Boolean   @map("signature_valid")
+  receivedAt      DateTime  @default(now()) @map("received_at") @db.Timestamptz(6)
+  processedAt     DateTime? @map("processed_at") @db.Timestamptz(6)
+  processingError String?   @map("processing_error")
+  payment         Payment?  @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([provider, providerEventId])
+  @@map("payment_provider_events")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
+model Payment {
+  id                    String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId             String                 @map("mission_id") @db.Uuid
+  quoteId               String?                @map("quote_id") @db.Uuid
+  payerId               String                 @map("payer_id") @db.Uuid
+  purpose               PaymentPurpose
+  grossAmountXof        BigInt                 @map("gross_amount_xof")
+  discountXof           BigInt                 @default(0) @map("discount_xof")
+  amountXof             BigInt                 @map("amount_xof")
+  currency              String                 @default("XOF") @db.Char(3)
+  promotionId           String?                @map("promotion_id") @db.Uuid
+  provider              String
+  isSandbox             Boolean                @map("is_sandbox")
+  merchantReference     String                 @unique @map("merchant_reference")
+  providerTxnId         String?                @map("provider_txn_id")
+  method                String?
+  status                PaymentStatus          @default(INITIATED)
+  checkoutUrl           String?                @map("checkout_url")
+  failureCode           String?                @map("failure_code")
+  failureMessage        String?                @map("failure_message")
+  idempotencyKey        String                 @map("idempotency_key")
+  initiatedAt           DateTime               @default(now()) @map("initiated_at") @db.Timestamptz(6)
+  confirmedAt           DateTime?              @map("confirmed_at") @db.Timestamptz(6)
+  expiresAt             DateTime?              @map("expires_at") @db.Timestamptz(6)
+  lastVerifiedAt        DateTime?              @map("last_verified_at") @db.Timestamptz(6)
+  version               Int                    @default(0)
+  commission            Commission?
+  ledgerTransactions    LedgerTransaction[]
+  paymentProviderEvents PaymentProviderEvent[]
+  mission               Mission                @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payer                 User                   @relation(fields: [payerId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotion             Promotion?             @relation(fields: [promotionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  quote                 Quote?                 @relation(fields: [quoteId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotionRedemption   PromotionRedemption?
+  refunds               Refund[]
+
+  @@unique([payerId, idempotencyKey])
+  @@unique([provider, providerTxnId])
+  @@index([missionId], map: "payments_mission_idx")
+  @@index([status, initiatedAt], map: "payments_pending_idx", where: raw("(status = ANY (ARRAY['INITIATED'::payment_status, 'PENDING'::payment_status]))"))
+  @@map("payments")
+}
+
+model PayoutAccount {
+  id            String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId         String       @unique(map: "payout_accounts_default_uq", where: raw("(is_default AND (disabled_at IS NULL))")) @map("pro_id") @db.Uuid
+  method        PayoutMethod
+  accountRefEnc Bytes        @map("account_ref_enc")
+  accountLast4  String       @map("account_last4")
+  holderName    String       @map("holder_name")
+  isDefault     Boolean      @default(false) @map("is_default")
+  verifiedAt    DateTime?    @map("verified_at") @db.Timestamptz(6)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  disabledAt    DateTime?    @map("disabled_at") @db.Timestamptz(6)
+  pro           ProProfile   @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  payouts       Payout[]
+
+  @@map("payout_accounts")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model PayoutItem {
+  payoutId  String  @map("payout_id") @db.Uuid
+  missionId String  @map("mission_id") @db.Uuid
+  amountXof BigInt  @map("amount_xof")
+  mission   Mission @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payout    Payout  @relation(fields: [payoutId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([payoutId, missionId])
+  @@map("payout_items")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Payout {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId              String              @map("pro_id") @db.Uuid
+  payoutAccountId    String              @map("payout_account_id") @db.Uuid
+  amountXof          BigInt              @map("amount_xof")
+  status             PayoutStatus        @default(PENDING)
+  provider           String?
+  providerRef        String?             @map("provider_ref")
+  idempotencyKey     String              @unique @map("idempotency_key")
+  approvedBy         String?             @map("approved_by") @db.Uuid
+  approvedAt         DateTime?           @map("approved_at") @db.Timestamptz(6)
+  paidAt             DateTime?           @map("paid_at") @db.Timestamptz(6)
+  failureMessage     String?             @map("failure_message")
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  ledgerTransactions LedgerTransaction[]
+  payoutItems        PayoutItem[]
+  approvedByUser     User?               @relation(fields: [approvedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payoutAccount      PayoutAccount       @relation(fields: [payoutAccountId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro                ProProfile          @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("payouts")
+}
+
+model Permission {
+  code            String           @id
+  description     String
+  rolePermissions RolePermission[]
+
+  @@map("permissions")
+}
+
+model ProCategory {
+  proId            String     @map("pro_id") @db.Uuid
+  categoryId       String     @map("category_id") @db.Uuid
+  acceptsUrgent    Boolean    @default(true) @map("accepts_urgent")
+  acceptsScheduled Boolean    @default(true) @map("accepts_scheduled")
+  category         Category   @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro              ProProfile @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([proId, categoryId])
+  @@index([categoryId], map: "pro_categories_cat_idx")
+  @@map("pro_categories")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ProProfile {
+  userId                String                    @id @map("user_id") @db.Uuid
+  kind                  ProKind                   @default(INDIVIDUAL)
+  businessName          String                    @map("business_name")
+  companyRegNumber      String?                   @map("company_reg_number")
+  bio                   String?
+  yearsExperience       Int?                      @map("years_experience") @db.SmallInt
+  cityId                String                    @map("city_id") @db.Uuid
+  baseLocation          Unsupported("geography")? @map("base_location")
+  serviceRadiusM        Int                       @default(10000) @map("service_radius_m")
+  verificationStatus    VerificationStatus        @default(DRAFT) @map("verification_status")
+  verifiedAt            DateTime?                 @map("verified_at") @db.Timestamptz(6)
+  verifiedBy            String?                   @map("verified_by") @db.Uuid
+  isOnline              Boolean                   @default(false) @map("is_online")
+  pausedUntil           DateTime?                 @map("paused_until") @db.Timestamptz(6)
+  lastLocation          Unsupported("geography")? @map("last_location")
+  lastLocationAt        DateTime?                 @map("last_location_at") @db.Timestamptz(6)
+  indicativePriceXof    BigInt?                   @map("indicative_price_xof")
+  ratingAvg             Decimal                   @default(0) @map("rating_avg") @db.Decimal(3, 2)
+  ratingCount           Int                       @default(0) @map("rating_count")
+  missionsCompleted     Int                       @default(0) @map("missions_completed")
+  offersReceived        Int                       @default(0) @map("offers_received")
+  offersAccepted        Int                       @default(0) @map("offers_accepted")
+  cancellationsByPro    Int                       @default(0) @map("cancellations_by_pro")
+  createdAt             DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt             DateTime                  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  conversations         Conversation[]
+  ledgerEntries         LedgerEntry[]
+  missions              Mission[]
+  payoutAccount         PayoutAccount?
+  payouts               Payout[]
+  proCategories         ProCategory[]
+  city                  City                      @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user                  User                      @relation("pro_profiles_user_idTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  verifiedByUser        User?                     @relation("pro_profiles_verified_byTousers", fields: [verifiedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  proServiceZones       ProServiceZone[]
+  proSkills             ProSkill[]
+  proTimeOff            ProTimeOff[]
+  proVerificationEvents ProVerificationEvent[]
+  proWeeklyHours        ProWeeklyHour[]
+  requestOffers         RequestOffer[]
+  reviews               Review[]
+  serviceRequests       ServiceRequest[]
+  verificationDocuments VerificationDocument[]
+
+  @@index([baseLocation], map: "pro_base_location_gix", type: Gist)
+  @@index([cityId], map: "pro_dispatchable_idx", where: raw("(verification_status = 'APPROVED'::verification_status)"))
+  @@index([lastLocation], map: "pro_last_location_gix", type: Gist)
+  @@map("pro_profiles")
+}
+
+model ProServiceZone {
+  proId  String     @map("pro_id") @db.Uuid
+  zoneId String     @map("zone_id") @db.Uuid
+  pro    ProProfile @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  zone   Zone       @relation(fields: [zoneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([proId, zoneId])
+  @@map("pro_service_zones")
+}
+
+model ProSkill {
+  proId   String     @map("pro_id") @db.Uuid
+  skillId String     @map("skill_id") @db.Uuid
+  pro     ProProfile @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  skill   Skill      @relation(fields: [skillId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([proId, skillId])
+  @@map("pro_skills")
+}
+
+model ProTimeOff {
+  id     String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId  String                   @map("pro_id") @db.Uuid
+  period Unsupported("tstzrange")
+  reason String?
+  pro    ProProfile               @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([period], map: "pro_time_off_gix", type: Gist)
+  @@map("pro_time_off")
+}
+
+model ProVerificationEvent {
+  id         String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId      String              @map("pro_id") @db.Uuid
+  fromStatus VerificationStatus? @map("from_status")
+  toStatus   VerificationStatus  @map("to_status")
+  actorId    String?             @map("actor_id") @db.Uuid
+  note       String?
+  createdAt  DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  actor      User?               @relation(fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro        ProProfile          @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@map("pro_verification_events")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ProWeeklyHour {
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId     String     @map("pro_id") @db.Uuid
+  weekday   Int        @db.SmallInt
+  startTime DateTime   @map("start_time") @db.Time(6)
+  endTime   DateTime   @map("end_time") @db.Time(6)
+  pro       ProProfile @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([proId, weekday], map: "pro_weekly_hours_idx")
+  @@map("pro_weekly_hours")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model PromotionRedemption {
+  promotionId String    @map("promotion_id") @db.Uuid
+  userId      String    @map("user_id") @db.Uuid
+  paymentId   String    @unique @map("payment_id") @db.Uuid
+  discountXof BigInt    @map("discount_xof")
+  createdAt   DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  payment     Payment   @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  promotion   Promotion @relation(fields: [promotionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user        User      @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@id([promotionId, paymentId])
+  @@map("promotion_redemptions")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Promotion {
+  id                   String                @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code                 String                @unique @db.Citext
+  description          String
+  kind                 DiscountKind
+  value                Int
+  maxDiscountXof       BigInt?               @map("max_discount_xof")
+  minOrderXof          BigInt                @default(0) @map("min_order_xof")
+  categoryId           String?               @map("category_id") @db.Uuid
+  startsAt             DateTime              @map("starts_at") @db.Timestamptz(6)
+  endsAt               DateTime              @map("ends_at") @db.Timestamptz(6)
+  maxRedemptions       Int?                  @map("max_redemptions")
+  perUserLimit         Int                   @default(1) @map("per_user_limit")
+  isActive             Boolean               @default(true) @map("is_active")
+  createdBy            String?               @map("created_by") @db.Uuid
+  payments             Payment[]
+  promotionRedemptions PromotionRedemption[]
+  category             Category?             @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  createdByUser        User?                 @relation(fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("promotions")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model QuoteLine {
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  quoteId       String        @map("quote_id") @db.Uuid
+  kind          QuoteLineKind
+  label         String
+  quantity      Int           @default(1)
+  unitPriceXof  BigInt        @map("unit_price_xof")
+  amountXof     BigInt?       @default(dbgenerated("(quantity * unit_price_xof)")) @map("amount_xof")
+  justification String?
+  position      Int           @default(0) @db.SmallInt
+  quote         Quote         @relation(fields: [quoteId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([quoteId], map: "quote_lines_quote_idx")
+  @@map("quote_lines")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Quote {
+  id                   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId            String      @unique(map: "quotes_one_pending_uq", where: raw("(status = 'SUBMITTED'::quote_status)")) @map("mission_id") @db.Uuid
+  version              Int
+  kind                 QuoteKind   @default(INITIAL)
+  supersedesId         String?     @map("supersedes_id") @db.Uuid
+  status               QuoteStatus @default(DRAFT)
+  totalXof             BigInt      @map("total_xof")
+  validUntil           DateTime    @map("valid_until") @db.Timestamptz(6)
+  conditions           String?
+  estimatedDurationMin Int?        @map("estimated_duration_min")
+  createdBy            String      @map("created_by") @db.Uuid
+  submittedAt          DateTime?   @map("submitted_at") @db.Timestamptz(6)
+  decidedAt            DateTime?   @map("decided_at") @db.Timestamptz(6)
+  decidedBy            String?     @map("decided_by") @db.Uuid
+  rejectionReason      String?     @map("rejection_reason")
+  createdAt            DateTime    @default(now()) @map("created_at") @db.Timestamptz(6)
+  payments             Payment[]
+  quoteLines           QuoteLine[]
+  createdByUser        User        @relation("quotes_created_byTousers", fields: [createdBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  decidedByUser        User?       @relation("quotes_decided_byTousers", fields: [decidedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission              Mission     @relation(fields: [missionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  supersedes           Quote?      @relation("quotesToquotes", fields: [supersedesId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children             Quote[]     @relation("quotesToquotes")
+
+  @@unique([missionId, version])
+  @@map("quotes")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ReferencePrice {
+  id           String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  serviceId    String    @map("service_id") @db.Uuid
+  cityId       String    @map("city_id") @db.Uuid
+  minXof       BigInt    @map("min_xof")
+  maxXof       BigInt    @map("max_xof")
+  travelFeeXof BigInt?   @map("travel_fee_xof")
+  validFrom    DateTime  @default(now()) @map("valid_from") @db.Timestamptz(6)
+  validTo      DateTime? @map("valid_to") @db.Timestamptz(6)
+  city         City      @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  service      Service   @relation(fields: [serviceId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([serviceId, cityId, validFrom])
+  @@map("reference_prices")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Refund {
+  id                 String              @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  paymentId          String              @map("payment_id") @db.Uuid
+  amountXof          BigInt              @map("amount_xof")
+  reason             String
+  status             RefundStatus        @default(REQUESTED)
+  providerRefundId   String?             @map("provider_refund_id")
+  requestedBy        String?             @map("requested_by") @db.Uuid
+  approvedBy         String?             @map("approved_by") @db.Uuid
+  idempotencyKey     String              @unique @map("idempotency_key")
+  createdAt          DateTime            @default(now()) @map("created_at") @db.Timestamptz(6)
+  completedAt        DateTime?           @map("completed_at") @db.Timestamptz(6)
+  failureMessage     String?             @map("failure_message")
+  complaints         Complaint[]
+  ledgerTransactions LedgerTransaction[]
+  approvedByUser     User?               @relation("refunds_approved_byTousers", fields: [approvedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  payment            Payment             @relation(fields: [paymentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  requestedByUser    User?               @relation("refunds_requested_byTousers", fields: [requestedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([paymentId], map: "refunds_payment_idx")
+  @@map("refunds")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model RequestMedia {
+  requestId String         @map("request_id") @db.Uuid
+  fileId    String         @map("file_id") @db.Uuid
+  kind      String
+  position  Int            @default(0) @db.SmallInt
+  file      File           @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  request   ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([requestId, fileId])
+  @@map("request_media")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model RequestOffer {
+  id                   String         @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  requestId            String         @unique(map: "request_offers_one_selected_uq", where: raw("(status = 'SELECTED'::offer_status)")) @map("request_id") @db.Uuid
+  proId                String         @map("pro_id") @db.Uuid
+  wave                 Int            @db.SmallInt
+  status               OfferStatus    @default(SENT)
+  distanceM            Int            @map("distance_m")
+  etaS                 Int?           @map("eta_s")
+  proposedPriceXof     BigInt?        @map("proposed_price_xof")
+  proposedTravelFeeXof BigInt?        @map("proposed_travel_fee_xof")
+  proposedStartAt      DateTime?      @map("proposed_start_at") @db.Timestamptz(6)
+  message              String?
+  declineReason        String?        @map("decline_reason")
+  sentAt               DateTime       @default(now()) @map("sent_at") @db.Timestamptz(6)
+  seenAt               DateTime?      @map("seen_at") @db.Timestamptz(6)
+  respondedAt          DateTime?      @map("responded_at") @db.Timestamptz(6)
+  expiresAt            DateTime       @map("expires_at") @db.Timestamptz(6)
+  missions             Mission[]
+  pro                  ProProfile     @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  request              ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([requestId, proId])
+  @@index([expiresAt], map: "request_offers_expiry_idx", where: raw("(status = ANY (ARRAY['SENT'::offer_status, 'SEEN'::offer_status]))"))
+  @@index([proId, status], map: "request_offers_pro_idx")
+  @@map("request_offers")
+}
+
+model RequestStatusHistory {
+  id         BigInt         @id @default(autoincrement())
+  requestId  String         @map("request_id") @db.Uuid
+  fromStatus RequestStatus? @map("from_status")
+  toStatus   RequestStatus  @map("to_status")
+  actorId    String?        @map("actor_id") @db.Uuid
+  reason     String?
+  createdAt  DateTime       @default(now()) @map("created_at") @db.Timestamptz(6)
+  actor      User?          @relation(fields: [actorId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  request    ServiceRequest @relation(fields: [requestId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([requestId, createdAt], map: "request_status_history_idx")
+  @@map("request_status_history")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Review {
+  id              String       @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  missionId       String       @unique @map("mission_id") @db.Uuid
+  clientId        String       @map("client_id") @db.Uuid
+  proId           String       @map("pro_id") @db.Uuid
+  rating          Int          @db.SmallInt
+  comment         String?
+  status          ReviewStatus @default(PUBLISHED)
+  proReply        String?      @map("pro_reply")
+  moderatedBy     String?      @map("moderated_by") @db.Uuid
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz(6)
+  client          User         @relation("reviews_client_idTousers", fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  mission         Mission      @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  moderatedByUser User?        @relation("reviews_moderated_byTousers", fields: [moderatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro             ProProfile   @relation(fields: [proId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([proId, createdAt(sort: Desc)], map: "reviews_pro_idx", where: raw("(status = 'PUBLISHED'::review_status)"))
+  @@map("reviews")
+}
+
+model RolePermission {
+  roleId                   String     @map("role_id") @db.Uuid
+  permissionCode           String     @map("permission_code")
+  permissionCodePermission Permission @relation(fields: [permissionCode], references: [code], onDelete: Cascade, onUpdate: NoAction)
+  role                     Role       @relation(fields: [roleId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([roleId, permissionCode])
+  @@map("role_permissions")
+}
+
+model Role {
+  id              String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  code            String           @unique
+  label           String
+  isSystem        Boolean          @default(false) @map("is_system")
+  rolePermissions RolePermission[]
+  userRoles       UserRole[]
+
+  @@map("roles")
+}
+
+model SearchHistory {
+  id         BigInt    @id @default(autoincrement())
+  userId     String    @map("user_id") @db.Uuid
+  query      String?
+  categoryId String?   @map("category_id") @db.Uuid
+  createdAt  DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId, createdAt(sort: Desc)], map: "search_history_user_idx")
+  @@map("search_history")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model ServiceRequest {
+  id                     String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  clientId               String                    @map("client_id") @db.Uuid
+  cityId                 String                    @map("city_id") @db.Uuid
+  categoryId             String                    @map("category_id") @db.Uuid
+  serviceId              String?                   @map("service_id") @db.Uuid
+  pricingModel           PricingModel              @map("pricing_model")
+  mode                   RequestMode
+  status                 RequestStatus             @default(DRAFT)
+  description            String
+  location               Unsupported("geography")
+  zoneId                 String?                   @map("zone_id") @db.Uuid
+  addressId              String?                   @map("address_id") @db.Uuid
+  addressSnapshot        Json                      @map("address_snapshot")
+  desiredWindow          Unsupported("tstzrange")? @map("desired_window")
+  budgetXof              BigInt?                   @map("budget_xof")
+  currentRadiusM         Int?                      @map("current_radius_m")
+  currentWave            Int                       @default(0) @map("current_wave") @db.SmallInt
+  reservedProId          String?                   @map("reserved_pro_id") @db.Uuid
+  reservationExpiresAt   DateTime?                 @map("reservation_expires_at") @db.Timestamptz(6)
+  publishedAt            DateTime?                 @map("published_at") @db.Timestamptz(6)
+  matchingDeadlineAt     DateTime?                 @map("matching_deadline_at") @db.Timestamptz(6)
+  cancelledAt            DateTime?                 @map("cancelled_at") @db.Timestamptz(6)
+  cancelReason           String?                   @map("cancel_reason")
+  version                Int                       @default(0)
+  createdAt              DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt              DateTime                  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  conversations          Conversation[]
+  mission                Mission?
+  requestMedia           RequestMedia[]
+  requestOffer           RequestOffer?
+  requestStatusHistories RequestStatusHistory[]
+  address                Address?                  @relation(fields: [addressId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  category               Category                  @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  city                   City                      @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  client                 User                      @relation(fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  reservedPro            ProProfile?               @relation(fields: [reservedProId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  service                Service?                  @relation(fields: [serviceId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  zone                   Zone?                     @relation(fields: [zoneId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([clientId, createdAt(sort: Desc)], map: "service_requests_client_idx")
+  @@index([location], map: "service_requests_location_gix", type: Gist)
+  @@index([status, reservationExpiresAt], map: "service_requests_open_idx", where: raw("(status = ANY (ARRAY['PUBLISHED'::request_status, 'MATCHING'::request_status, 'OFFERS_RECEIVED'::request_status, 'PROVISIONALLY_RESERVED'::request_status, 'AWAITING_CLIENT_CONFIRMATION'::request_status]))"))
+  @@map("service_requests")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Service {
+  id                  String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId          String           @map("category_id") @db.Uuid
+  slug                String           @unique
+  name                String
+  description         String?
+  pricingModel        PricingModel     @map("pricing_model")
+  referenceMinXof     BigInt?          @map("reference_min_xof")
+  referenceMaxXof     BigInt?          @map("reference_max_xof")
+  fixedPriceXof       BigInt?          @map("fixed_price_xof")
+  defaultTravelFeeXof BigInt?          @map("default_travel_fee_xof")
+  isActive            Boolean          @default(true) @map("is_active")
+  dispatchRules       DispatchRule[]
+  referencePrices     ReferencePrice[]
+  serviceRequests     ServiceRequest[]
+  category            Category         @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("services")
+}
+
+model Session {
+  id               String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId           String    @map("user_id") @db.Uuid
+  app              AppKind
+  refreshTokenHash String    @unique @map("refresh_token_hash")
+  familyId         String    @map("family_id") @db.Uuid
+  deviceLabel      String?   @map("device_label")
+  ip               String?   @db.Inet
+  userAgent        String?   @map("user_agent")
+  createdAt        DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastUsedAt       DateTime  @default(now()) @map("last_used_at") @db.Timestamptz(6)
+  expiresAt        DateTime  @map("expires_at") @db.Timestamptz(6)
+  revokedAt        DateTime? @map("revoked_at") @db.Timestamptz(6)
+  revokedReason    String?   @map("revoked_reason")
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([userId], map: "sessions_user_idx", where: raw("(revoked_at IS NULL)"))
+  @@map("sessions")
+}
+
+model Setting {
+  key           String   @id
+  value         Json
+  description   String?
+  updatedBy     String?  @map("updated_by") @db.Uuid
+  updatedAt     DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  updatedByUser User?    @relation(fields: [updatedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@map("settings")
+}
+
+model Skill {
+  id         String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  categoryId String     @map("category_id") @db.Uuid
+  name       String
+  proSkills  ProSkill[]
+  category   Category   @relation(fields: [categoryId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([categoryId, name])
+  @@map("skills")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model SpatialRefSys {
+  srid      Int     @id
+  authName  String? @map("auth_name") @db.VarChar(256)
+  authSrid  Int?    @map("auth_srid")
+  srtext    String? @db.VarChar(2048)
+  proj4text String? @db.VarChar(2048)
+
+  @@map("spatial_ref_sys")
+  @@ignore
+}
+
+model UserRole {
+  userId        String   @map("user_id") @db.Uuid
+  roleId        String   @map("role_id") @db.Uuid
+  grantedBy     String?  @map("granted_by") @db.Uuid
+  grantedAt     DateTime @default(now()) @map("granted_at") @db.Timestamptz(6)
+  grantedByUser User?    @relation("user_roles_granted_byTousers", fields: [grantedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  role          Role     @relation(fields: [roleId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user          User     @relation("user_roles_user_idTousers", fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model User {
+  id                          String                 @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  phoneE164                   String?                @unique @map("phone_e164")
+  phoneVerifiedAt             DateTime?              @map("phone_verified_at") @db.Timestamptz(6)
+  email                       String?                @unique @db.Citext
+  firstName                   String?                @map("first_name")
+  lastName                    String?                @map("last_name")
+  avatarFileId                String?                @map("avatar_file_id") @db.Uuid
+  status                      UserStatus             @default(ACTIVE)
+  locale                      String                 @default("fr-CI")
+  homeCityId                  String?                @map("home_city_id") @db.Uuid
+  deletionRequestedAt         DateTime?              @map("deletion_requested_at") @db.Timestamptz(6)
+  anonymizedAt                DateTime?              @map("anonymized_at") @db.Timestamptz(6)
+  createdAt                   DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt                   DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
+  abuseReportsAsHandledByUser AbuseReport[]          @relation("abuse_reports_handled_byTousers")
+  abuseReportsAsReporter      AbuseReport[]          @relation("abuse_reports_reporter_idTousers")
+  addresses                   Address[]
+  adminCredential             AdminCredential?
+  auditLogs                   AuditLog[]
+  commissionRules             CommissionRule[]
+  complaintMessages           ComplaintMessage[]
+  complaintsAsAssignedToUser  Complaint[]            @relation("complaints_assigned_toTousers")
+  complaintsAsOpenedByUser    Complaint[]            @relation("complaints_opened_byTousers")
+  conversationReads           ConversationRead[]
+  conversations               Conversation[]
+  devices                     Device[]
+  dispatchRules               DispatchRule[]
+  files                       File[]                 @relation("files_owner_user_idTousers")
+  idempotencyKeys             IdempotencyKey[]
+  ledgerTransactions          LedgerTransaction[]
+  locationPings               LocationPing[]
+  messages                    Message[]
+  missionReports              MissionReport[]
+  missionStatusHistories      MissionStatusHistory[]
+  missionsAsCancelledByUser   Mission[]              @relation("missions_cancelled_byTousers")
+  missionsAsClient            Mission[]              @relation("missions_client_idTousers")
+  notificationTemplates       NotificationTemplate[]
+  notifications               Notification[]
+  payments                    Payment[]
+  payouts                     Payout[]
+  proProfile            ProProfile?            @relation("pro_profiles_user_idTousers")
+  proProfilesAsVerifiedByUser ProProfile[]           @relation("pro_profiles_verified_byTousers")
+  proVerificationEvents       ProVerificationEvent[]
+  promotionRedemptions        PromotionRedemption[]
+  promotions                  Promotion[]
+  quotesAsCreatedByUser       Quote[]                @relation("quotes_created_byTousers")
+  quotesAsDecidedByUser       Quote[]                @relation("quotes_decided_byTousers")
+  refundsAsApprovedByUser     Refund[]               @relation("refunds_approved_byTousers")
+  refundsAsRequestedByUser    Refund[]               @relation("refunds_requested_byTousers")
+  requestStatusHistories      RequestStatusHistory[]
+  reviewsAsClient             Review[]               @relation("reviews_client_idTousers")
+  reviewsAsModeratedByUser    Review[]               @relation("reviews_moderated_byTousers")
+  searchHistories             SearchHistory[]
+  serviceRequests             ServiceRequest[]
+  sessions                    Session[]
+  settings                    Setting[]
+  userRolesAsGrantedByUser    UserRole[]             @relation("user_roles_granted_byTousers")
+  userRolesAsUser             UserRole[]             @relation("user_roles_user_idTousers")
+  avatarFile                  File?                  @relation("users_avatar_file_idTofiles", fields: [avatarFileId], references: [id], onUpdate: NoAction, map: "users_avatar_fk")
+  homeCity                    City?                  @relation(fields: [homeCityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  verificationDocuments       VerificationDocument[]
+
+  @@map("users")
+}
+
+model VerificationDocumentType {
+  code                  String                 @id
+  label                 String
+  requiredFor           ProKind[]              @default([]) @map("required_for")
+  isActive              Boolean                @default(true) @map("is_active")
+  verificationDocuments VerificationDocument[]
+
+  @@map("verification_document_types")
+}
+
+model VerificationDocument {
+  id                               String                   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  proId                            String                   @map("pro_id") @db.Uuid
+  typeCode                         String                   @map("type_code")
+  fileId                           String                   @map("file_id") @db.Uuid
+  status                           DocumentStatus           @default(PENDING)
+  expiresOn                        DateTime?                @map("expires_on") @db.Date
+  reviewedBy                       String?                  @map("reviewed_by") @db.Uuid
+  reviewedAt                       DateTime?                @map("reviewed_at") @db.Timestamptz(6)
+  rejectionReason                  String?                  @map("rejection_reason")
+  createdAt                        DateTime                 @default(now()) @map("created_at") @db.Timestamptz(6)
+  file                             File                     @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  pro                              ProProfile               @relation(fields: [proId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  reviewedByUser                   User?                    @relation(fields: [reviewedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  typeCodeVerificationDocumentType VerificationDocumentType @relation(fields: [typeCode], references: [code], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([proId], map: "verification_documents_pro_idx")
+  @@map("verification_documents")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model Zone {
+  id              String                    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  cityId          String                    @map("city_id") @db.Uuid
+  parentId        String?                   @map("parent_id") @db.Uuid
+  kind            String
+  name            String
+  boundary        Unsupported("geography")?
+  centroid        Unsupported("geography")?
+  isActive        Boolean                   @default(true) @map("is_active")
+  addresses       Address[]
+  proServiceZones ProServiceZone[]
+  serviceRequests ServiceRequest[]
+  city            City                      @relation(fields: [cityId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  parent          Zone?                     @relation("zonesTozones", fields: [parentId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  children        Zone[]                    @relation("zonesTozones")
+
+  @@unique([cityId, parentId, name])
+  @@index([boundary], map: "zones_boundary_gix", type: Gist)
+  @@map("zones")
+}
+
+enum AppKind {
+  CLIENT
+  PRO
+  ADMIN
+
+  @@map("app_kind")
+}
+
+enum ComplaintStatus {
+  OPEN
+  IN_REVIEW
+  WAITING_USER
+  RESOLVED
+  REJECTED
+
+  @@map("complaint_status")
+}
+
+enum DiscountKind {
+  PERCENT
+  FIXED
+
+  @@map("discount_kind")
+}
+
+enum DispatchStrategy {
+  FIRST_ACCEPT
+  CLIENT_CHOICE
+
+  @@map("dispatch_strategy")
+}
+
+enum DocumentStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  EXPIRED
+
+  @@map("document_status")
+}
+
+enum FileStatus {
+  PENDING_UPLOAD
+  UPLOADED
+  READY
+  REJECTED
+  DELETED
+
+  @@map("file_status")
+}
+
+enum FileVisibility {
+  PUBLIC
+  PRIVATE
+
+  @@map("file_visibility")
+}
+
+enum MissionStatus {
+  AWAITING_QUOTE
+  QUOTE_PENDING_APPROVAL
+  CONFIRMED
+  PAYMENT_PENDING
+  PAYMENT_CONFIRMED
+  EN_ROUTE
+  ARRIVED
+  IN_PROGRESS
+  WORK_COMPLETED
+  CLOSED
+  CANCELLED
+  DISPUTED
+
+  @@map("mission_status")
+}
+
+enum NotificationStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  READ
+
+  @@map("notification_status")
+}
+
+enum OfferStatus {
+  SENT
+  SEEN
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  WITHDRAWN
+  NOT_SELECTED
+  SELECTED
+
+  @@map("offer_status")
+}
+
+enum PaymentPurpose {
+  FULL
+  TRAVEL_FEE
+  WORK
+  SUPPLEMENT
+
+  @@map("payment_purpose")
+}
+
+enum PaymentStatus {
+  INITIATED
+  PENDING
+  SUCCEEDED
+  FAILED
+  CANCELLED
+  EXPIRED
+
+  @@map("payment_status")
+}
+
+enum PayoutMethod {
+  ORANGE_MONEY
+  MTN_MOMO
+  MOOV_MONEY
+  WAVE
+  BANK_TRANSFER
+
+  @@map("payout_method")
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  PROCESSING
+  PAID
+  FAILED
+  CANCELLED
+
+  @@map("payout_status")
+}
+
+enum PricingModel {
+  FIXED
+  QUOTE
+  TRAVEL_PLUS_DIAGNOSIS
+
+  @@map("pricing_model")
+}
+
+enum ProKind {
+  INDIVIDUAL
+  COMPANY
+
+  @@map("pro_kind")
+}
+
+enum QuoteKind {
+  INITIAL
+  SUPPLEMENT
+
+  @@map("quote_kind")
+}
+
+enum QuoteLineKind {
+  TRAVEL
+  LABOR
+  MATERIAL
+  OTHER
+
+  @@map("quote_line_kind")
+}
+
+enum QuoteStatus {
+  DRAFT
+  SUBMITTED
+  ACCEPTED
+  REJECTED
+  SUPERSEDED
+  EXPIRED
+  WITHDRAWN
+
+  @@map("quote_status")
+}
+
+enum RefundStatus {
+  REQUESTED
+  APPROVED
+  PROCESSING
+  SUCCEEDED
+  FAILED
+  REJECTED
+
+  @@map("refund_status")
+}
+
+enum ReportStatus {
+  OPEN
+  IN_REVIEW
+  ACTION_TAKEN
+  DISMISSED
+
+  @@map("report_status")
+}
+
+enum ReportTarget {
+  USER
+  PRO_PROFILE
+  MESSAGE
+  REVIEW
+  REQUEST
+
+  @@map("report_target")
+}
+
+enum RequestMode {
+  URGENT
+  SCHEDULED
+
+  @@map("request_mode")
+}
+
+enum RequestStatus {
+  DRAFT
+  PUBLISHED
+  MATCHING
+  OFFERS_RECEIVED
+  PROVISIONALLY_RESERVED
+  AWAITING_CLIENT_CONFIRMATION
+  ASSIGNED
+  NO_PROVIDER_FOUND
+  EXPIRED
+  CANCELLED
+
+  @@map("request_status")
+}
+
+enum ReviewStatus {
+  PUBLISHED
+  PENDING_MODERATION
+  HIDDEN
+
+  @@map("review_status")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETION_REQUESTED
+  DELETED
+
+  @@map("user_status")
+}
+
+enum VerificationStatus {
+  DRAFT
+  SUBMITTED
+  INFO_REQUESTED
+  APPROVED
+  REJECTED
+  SUSPENDED
+
+  @@map("verification_status")
+}

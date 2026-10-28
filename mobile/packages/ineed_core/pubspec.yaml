@@ -1,0 +1,9 @@
+name: ineed_core
+description: Configuration, environnements et formatage (XOF, téléphone, dates) partagés par les applications Ineed.
+publish_to: none
+version: 0.3.0
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+dev_dependencies:
+  test: any

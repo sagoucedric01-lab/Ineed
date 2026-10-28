@@ -1,0 +1,15 @@
+@import 'tailwindcss';
+@import '@ineed/design/tokens.css';
+@import '@ineed/design/tailwind-theme.css';
+
+html,
+body {
+  background: var(--in-background);
+  color: var(--in-text);
+  font-family: var(--in-font-body);
+}
+
+:focus-visible {
+  outline: 2px solid var(--in-focus);
+  outline-offset: 2px;
+}

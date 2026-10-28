@@ -1,0 +1,11 @@
+name: ineed_api
+description: Client HTTP de l'API Ineed (erreurs typées, délais, identifiant de requête).
+publish_to: none
+version: 0.3.0
+resolution: workspace
+environment:
+  sdk: ^3.13.0
+dependencies:
+  dio: 5.11.1
+dev_dependencies:
+  test: any

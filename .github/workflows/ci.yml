@@ -1,0 +1,182 @@
+# Intégration continue Ineed : chaque push et chaque pull request vérifient tout le dépôt.
+name: CI
+
+on:
+  push:
+    branches: [main, 'phase-*']
+  pull_request:
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+env:
+  NODE_VERSION: '22.22.0'
+  PNPM_VERSION: '10.28.0'
+  FLUTTER_VERSION: '3.47.7'
+
+jobs:
+  design:
+    name: Système de design
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Contrastes, textes, fichiers générés, tests
+        run: pnpm --filter @ineed/design run check
+
+  security:
+    name: Audit des dépendances
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - name: Aucune vulnérabilité haute ou critique
+        run: pnpm audit --audit-level high
+
+  backend:
+    name: Backend (lint, types, tests unitaires et d'intégration)
+    runs-on: ubuntu-24.04
+    services:
+      postgres:
+        image: postgis/postgis:16-3.5
+        env: { POSTGRES_USER: ineed, POSTGRES_PASSWORD: ineed, POSTGRES_DB: ineed_ci }
+        ports: ['5432:5432']
+        options: >-
+          --health-cmd "pg_isready -U ineed" --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4-alpine
+        ports: ['6379:6379']
+        options: >-
+          --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      DATABASE_URL: postgresql://ineed:ineed@localhost:5432/ineed_ci
+      SHADOW_DATABASE_URL: postgresql://ineed:ineed@localhost:5432/ineed_shadow
+      TEST_DATABASE_ADMIN_URL: postgresql://ineed:ineed@localhost:5432/postgres
+      REDIS_URL: redis://localhost:6379
+      APP_ENV: test
+      S3_ENDPOINT: http://localhost:8333
+      S3_FORCE_PATH_STYLE: 'true'
+      S3_ACCESS_KEY_ID: ineed-dev-access
+      S3_SECRET_ACCESS_KEY: ineed-dev-secret-change-me
+      S3_BUCKET_PUBLIC: ineed-public
+      S3_BUCKET_PRIVATE: ineed-private
+    defaults:
+      run: { working-directory: backend }
+    steps:
+      - uses: actions/checkout@v5
+      - name: Stockage S3 de test (SeaweedFS)
+        working-directory: .
+        run: |
+          docker run -d --name s3 -p 8333:8333 -v "$PWD/infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro" \
+            chrislusf/seaweedfs:4.46 server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data
+          for i in $(seq 1 60); do curl -sf http://localhost:8333/healthz >/dev/null && break; sleep 2; done
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - name: Tests unitaires
+        run: pnpm test
+      - name: Migrations sur base vide
+        run: pnpm migrate:deploy
+      - name: Aucune dérive entre migrations et schema.prisma
+        run: |
+          psql "postgresql://ineed:ineed@localhost:5432/postgres" -c "CREATE DATABASE ineed_shadow"
+          pnpm migrate:check-drift
+      - name: Seeds (référentiel puis démonstration)
+        run: pnpm seed && pnpm seed:demo
+      - name: Buckets S3 de test
+        run: pnpm buckets:ensure
+      - name: Tests d'intégration (PostGIS, Redis, S3 réels)
+        run: pnpm test:integration
+      - name: Documentation OpenAPI à jour
+        run: |
+          node dist/cli/export-openapi.js
+          git diff --exit-code -- ../docs/api/openapi.json || (echo "docs/api/openapi.json n'est pas à jour : lancez pnpm openapi:export" && exit 1)
+
+  admin:
+    name: Administration (lint, types, tests, build)
+    runs-on: ubuntu-24.04
+    defaults:
+      run: { working-directory: admin }
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+        with: { version: '${{ env.PNPM_VERSION }}' }
+      - uses: actions/setup-node@v5
+        with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  mobile:
+    name: Mobile (analyse, tests, APK de développement)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        # Pas de pnpm dans ce job : on désactive le cache automatique du gestionnaire de paquets.
+        with: { node-version: '${{ env.NODE_VERSION }}', package-manager-cache: false }
+      - uses: actions/setup-java@v5
+        with: { distribution: temurin, java-version: '17' }
+      - uses: subosito/flutter-action@v2
+        with: { flutter-version: '${{ env.FLUTTER_VERSION }}', channel: stable, cache: true }
+      - name: Textes, analyse statique et tests
+        run: bash mobile/tool/check.sh
+      - name: APK de développement (client et pro)
+        run: |
+          for app in client pro; do
+            if ! (cd mobile/apps/$app && flutter build apk --debug --flavor dev --dart-define-from-file=config/dev.json) > build-$app.log 2>&1; then
+              # Erreurs publiées en annotations : lisibles depuis l'interface et l'API GitHub.
+              grep -E -A6 "What went wrong|error:|Error:|FAILURE" build-$app.log | head -40 | sed "s/^/::error title=APK $app::/"
+              exit 1
+            fi
+            ls -lh mobile/apps/$app/build/app/outputs/flutter-apk/
+          done
+
+  docker:
+    name: Images Docker et démarrage complet (docker compose)
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v5
+      - name: Construction des images
+        run: |
+          if ! docker compose -f infra/docker-compose.yml build > build.log 2>&1; then
+            grep -E -B2 -A8 "ERROR|error|failed" build.log | tail -40 | sed "s/^/::error title=Build Docker::/"
+            exit 1
+          fi
+      - name: Démarrage
+        run: docker compose -f infra/docker-compose.yml up -d
+      - name: L'API est prête et l'administration répond
+        run: |
+          for i in $(seq 1 90); do curl -sf http://localhost:3000/health/ready > ready.json && break; sleep 2; done
+          cat ready.json
+          grep -q '"status":"ok"' ready.json
+          test "$(docker inspect -f '{{.State.ExitCode}}' ineed-setup-1)" = "0"
+          for i in $(seq 1 30); do curl -sf http://localhost:3001/ > admin.html && break; sleep 2; done
+          grep -q "État de la plateforme" admin.html
+      - name: Journaux en cas d'échec
+        if: failure()
+        run: |
+          docker compose -f infra/docker-compose.yml ps -a
+          docker compose -f infra/docker-compose.yml logs --no-color --tail 30 | sed "s/^/::error title=docker compose::/" | tail -60
+      - name: Arrêt
+        if: always()
+        run: docker compose -f infra/docker-compose.yml down -v

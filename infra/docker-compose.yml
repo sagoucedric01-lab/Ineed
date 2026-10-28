@@ -1,0 +1,104 @@
+# Environnement local complet d'Ineed.
+#   Services seuls (développement avec `pnpm dev`) : pnpm dev:infra
+#   Tout en conteneurs :                            docker compose -f infra/docker-compose.yml up --build
+# Identifiants de développement UNIQUEMENT : ne jamais les réutiliser ailleurs.
+name: ineed
+
+x-backend-env: &backend-env
+  NODE_ENV: production
+  APP_ENV: local
+  LOG_LEVEL: info
+  DATABASE_URL: postgresql://ineed:ineed@postgres:5432/ineed_dev
+  REDIS_URL: redis://redis:6379
+  S3_ENDPOINT: http://s3:8333
+  S3_REGION: eu-west-1
+  S3_ACCESS_KEY_ID: ineed-dev-access
+  S3_SECRET_ACCESS_KEY: ineed-dev-secret-change-me
+  S3_FORCE_PATH_STYLE: "true"
+  S3_BUCKET_PUBLIC: ineed-public
+  S3_BUCKET_PRIVATE: ineed-private
+  OTP_PROVIDER: dev_console
+  PAYMENT_PROVIDER: sandbox
+  CORS_ORIGINS: http://localhost:3001
+
+services:
+  postgres:
+    image: postgis/postgis:16-3.5
+    environment:
+      POSTGRES_USER: ineed
+      POSTGRES_PASSWORD: ineed
+      POSTGRES_DB: ineed_dev
+    ports: ["5432:5432"]
+    volumes: [postgres-data:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ineed -d ineed_dev"]
+      interval: 5s
+      retries: 20
+
+  redis:
+    image: redis:7.4-alpine
+    command: ["redis-server", "--appendonly", "yes"]
+    ports: ["6379:6379"]
+    volumes: [redis-data:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      retries: 20
+
+  # Stockage S3-compatible (SeaweedFS). MinIO ne publie plus d'images Docker communautaires.
+  s3:
+    image: chrislusf/seaweedfs:4.46
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"]
+    ports: ["8333:8333"]
+    volumes:
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+      - s3-data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://127.0.0.1:8333/healthz || exit 1"]
+      interval: 5s
+      retries: 30
+
+  # Tâche ponctuelle : migrations, référentiel et buckets. L'API attend qu'elle se termine avec succès.
+  setup:
+    image: ineed-setup:local
+    build: { context: .., dockerfile: infra/docker/backend.Dockerfile, target: tools }
+    environment:
+      <<: *backend-env
+      NODE_ENV: development
+    command: ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy && node_modules/.bin/tsx prisma/seed/run.ts && node dist/cli/ensure-buckets.js"]
+    depends_on:
+      postgres: { condition: service_healthy }
+      s3: { condition: service_healthy }
+
+  api:
+    image: ineed-api:local
+    build: { context: .., dockerfile: infra/docker/backend.Dockerfile, target: runtime }
+    environment: *backend-env
+    ports: ["3000:3000"]
+    depends_on:
+      setup: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+
+  worker:
+    image: ineed-api:local
+    command: ["node", "--enable-source-maps", "dist/worker.js"]
+    environment: *backend-env
+    healthcheck: { disable: true }
+    depends_on:
+      api: { condition: service_started }
+      setup: { condition: service_completed_successfully }
+      redis: { condition: service_healthy }
+
+  admin:
+    image: ineed-admin:local
+    build: { context: .., dockerfile: infra/docker/admin.Dockerfile }
+    environment:
+      INEED_API_URL: http://api:3000
+      NEXT_PUBLIC_APP_ENV: local
+    ports: ["3001:3001"]
+    depends_on: [api]
+
+volumes:
+  postgres-data:
+  redis-data:
+  s3-data:
