@@ -8,8 +8,14 @@ const base = {
   S3_SECRET_ACCESS_KEY: 's',
   S3_BUCKET_PUBLIC: 'ineed-public',
   S3_BUCKET_PRIVATE: 'ineed-private',
+  JWT_PRIVATE_KEY_B64: 'x'.repeat(120),
+  DATA_ENCRYPTION_KEY_B64: Buffer.alloc(32, 1).toString('base64'),
+  OTP_PEPPER: 'p'.repeat(40),
 };
-const prod = { ...base, APP_ENV: 'production', NODE_ENV: 'production', OTP_PROVIDER: 'twilio_verify', PAYMENT_PROVIDER: 'cinetpay' };
+const prod = {
+  ...base, APP_ENV: 'production', NODE_ENV: 'production', PAYMENT_PROVIDER: 'cinetpay',
+  OTP_PROVIDER: 'twilio_verify', TWILIO_ACCOUNT_SID: 'AC1', TWILIO_AUTH_TOKEN: 't', TWILIO_VERIFY_SERVICE_SID: 'VA1',
+};
 
 describe('loadEnv', () => {
   it('applique les valeurs par défaut de développement', () => {
@@ -45,6 +51,14 @@ describe('loadEnv', () => {
     ['S3_BUCKET_PRIVATE', 'ineed-public'],
   ])('refuse %s=%s en production', (key, value) => {
     expect(() => loadEnv({ ...prod, [key]: value })).toThrow(new RegExp(key));
+  });
+
+  it('exige les identifiants Twilio quand twilio_verify est choisi, quel que soit l’environnement', () => {
+    expect(() => loadEnv({ ...base, OTP_PROVIDER: 'twilio_verify' })).toThrow(/TWILIO_ACCOUNT_SID/);
+  });
+
+  it('refuse une clé de chiffrement qui ne fait pas 32 octets', () => {
+    expect(() => loadEnv({ ...base, DATA_ENCRYPTION_KEY_B64: Buffer.alloc(16).toString('base64') })).toThrow(/DATA_ENCRYPTION_KEY_B64/);
   });
 
   it('autorise les simulateurs hors production', () => {

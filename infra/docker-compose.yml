@@ -2,6 +2,8 @@
 #   Services seuls (développement avec `pnpm dev`) : pnpm dev:infra
 #   Tout en conteneurs :                            docker compose -f infra/docker-compose.yml up --build
 # Identifiants de développement UNIQUEMENT : ne jamais les réutiliser ailleurs.
+# Secrets (clé de signature, clé de chiffrement) : générés une fois, hors dépôt :
+#   node tools/generate-dev-secrets.mjs --write infra/.env.secrets
 name: ineed
 
 x-backend-env: &backend-env
@@ -48,7 +50,8 @@ services:
   # Stockage S3-compatible (SeaweedFS). MinIO ne publie plus d'images Docker communautaires.
   s3:
     image: chrislusf/seaweedfs:4.46
-    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data"]
+    # volume.max relevé et volumes réduits à 64 Mo : chaque bucket réserve plusieurs volumes.
+    command: ["server", "-s3", "-s3.config=/etc/seaweedfs/s3.json", "-dir=/data", "-volume.max=50", "-master.volumeSizeLimitMB=64"]
     ports: ["8333:8333"]
     volumes:
       - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
@@ -62,6 +65,7 @@ services:
   setup:
     image: ineed-setup:local
     build: { context: .., dockerfile: infra/docker/backend.Dockerfile, target: tools }
+    env_file: [.env.secrets]
     environment:
       <<: *backend-env
       NODE_ENV: development
@@ -73,6 +77,7 @@ services:
   api:
     image: ineed-api:local
     build: { context: .., dockerfile: infra/docker/backend.Dockerfile, target: runtime }
+    env_file: [.env.secrets]
     environment: *backend-env
     ports: ["3000:3000"]
     depends_on:
@@ -82,6 +87,7 @@ services:
   worker:
     image: ineed-api:local
     command: ["node", "--enable-source-maps", "dist/worker.js"]
+    env_file: [.env.secrets]
     environment: *backend-env
     healthcheck: { disable: true }
     depends_on:

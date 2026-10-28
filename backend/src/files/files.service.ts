@@ -41,6 +41,8 @@ export class FilesService {
       endpoint: env.S3_PUBLIC_ENDPOINT ?? env.S3_ENDPOINT,
       forcePathStyle: env.S3_FORCE_PATH_STYLE,
       credentials: { accessKeyId: env.S3_ACCESS_KEY_ID, secretAccessKey: env.S3_SECRET_ACCESS_KEY },
+      // Sinon le SDK signe une somme de contrôle CRC32 calculée sur un corps vide : tout envoi réel serait refusé (BadDigest).
+      requestChecksumCalculation: 'WHEN_REQUIRED',
     });
   }
 

@@ -1,6 +1,1001 @@
 {
   "openapi": "3.0.0",
   "paths": {
+    "/v1/auth/otp/request": {
+      "post": {
+        "description": "Réponse identique que le numéro ait un compte ou non.",
+        "operationId": "AuthController_requestCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpChallengeDto"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Trop de demandes (RATE_LIMITED) ou renvoi trop rapproché (OTP_RESEND_TOO_SOON)."
+          }
+        },
+        "summary": "Envoie un code de connexion par SMS",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/v1/auth/otp/verify": {
+      "post": {
+        "operationId": "AuthController_verifyCode",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LoginResultDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Vérifie le code et ouvre une session (crée le compte à la première connexion)",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/v1/auth/refresh": {
+      "post": {
+        "operationId": "AuthController_refresh",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokensDto"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Échange le jeton de rafraîchissement contre une nouvelle paire de jetons (rotation)",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/v1/auth/logout": {
+      "post": {
+        "operationId": "AuthController_logout",
+        "parameters": [],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Déconnecte cet appareil",
+        "tags": [
+          "Authentification"
+        ]
+      }
+    },
+    "/v1/files": {
+      "post": {
+        "operationId": "FilesController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUploadDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UploadTicketDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Prépare l’envoi d’un fichier (URL présignée valable 10 min)",
+        "tags": [
+          "Fichiers"
+        ]
+      }
+    },
+    "/v1/files/{id}/complete": {
+      "post": {
+        "operationId": "FilesController_complete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FileDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Finalise l’envoi : contrôle du type réel et de la taille, ré-encodage des images",
+        "tags": [
+          "Fichiers"
+        ]
+      }
+    },
+    "/v1/me": {
+      "get": {
+        "operationId": "MeController_me",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Mon compte"
+        ]
+      },
+      "patch": {
+        "operationId": "MeController_update",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMeDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Renseigne ou modifie le prénom et le nom",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/avatar": {
+      "put": {
+        "operationId": "MeController_avatar",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetAvatarDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Définit la photo de profil (fichier AVATAR finalisé)",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/sessions": {
+      "get": {
+        "operationId": "MeController_listSessions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SessionDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Appareils connectés",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/sessions/{id}": {
+      "delete": {
+        "operationId": "MeController_revokeSession",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Déconnecte un appareil",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/deletion/code": {
+      "post": {
+        "operationId": "MeController_requestDeletion",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OtpChallengeDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envoie un code SMS pour confirmer la suppression du compte",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/deletion": {
+      "post": {
+        "operationId": "MeController_confirmDeletion",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmDeletionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Supprime le compte (anonymisation) après vérification du code SMS",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/catalog/categories": {
+      "get": {
+        "operationId": "CatalogController_categories",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CategoryDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Métiers actifs, dans l’ordre défini par l’administration",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/geo/zones": {
+      "get": {
+        "operationId": "CatalogController_zones",
+        "parameters": [
+          {
+            "name": "cityId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ZoneDto"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "summary": "Communes actives d’une ville (Abidjan par défaut)",
+        "tags": [
+          "Référentiel"
+        ]
+      }
+    },
+    "/v1/pro/profile": {
+      "get": {
+        "operationId": "ProController_profile",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mon dossier professionnel (statut, éléments manquants)",
+        "tags": [
+          "Professionnel"
+        ]
+      },
+      "put": {
+        "operationId": "ProController_save",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveProProfileDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Crée ou met à jour le brouillon du dossier",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/document-types": {
+      "get": {
+        "operationId": "ProController_documentTypes",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Justificatifs acceptés, avec ceux obligatoires selon le type de compte",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/documents": {
+      "post": {
+        "operationId": "ProController_addDocument",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddDocumentDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ajoute un justificatif (fichier VERIFICATION_DOC finalisé, stockage privé)",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/profile/submit": {
+      "post": {
+        "operationId": "ProController_submit",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envoie le dossier à la vérification",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/pro/availability": {
+      "patch": {
+        "operationId": "ProController_availability",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AvailabilityDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Disponible maintenant / pause (professionnels validés)",
+        "tags": [
+          "Professionnel"
+        ]
+      }
+    },
+    "/v1/admin/pros": {
+      "get": {
+        "operationId": "AdminProsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "DRAFT",
+                "SUBMITTED",
+                "INFO_REQUESTED",
+                "APPROVED",
+                "REJECTED",
+                "SUSPENDED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 20,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Dossiers professionnels (file d’attente par défaut : les plus anciens d’abord)",
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}": {
+      "get": {
+        "operationId": "AdminProsController_detail",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/documents/{id}/url": {
+      "get": {
+        "operationId": "AdminProsController_documentUrl",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "URL de consultation d’un justificatif (60 s, consultation journalisée)",
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}/approve": {
+      "post": {
+        "operationId": "AdminProsController_approve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}/reject": {
+      "post": {
+        "operationId": "AdminProsController_reject",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}/request-info": {
+      "post": {
+        "operationId": "AdminProsController_requestInfo",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}/suspend": {
+      "post": {
+        "operationId": "AdminProsController_suspend",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/pros/{id}/reactivate": {
+      "post": {
+        "operationId": "AdminProsController_reactivate",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DecisionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — professionnels"
+        ]
+      }
+    },
+    "/v1/admin/auth/login": {
+      "post": {
+        "operationId": "AdminAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminLoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Étape 1 : e-mail et mot de passe (retourne un ticket pour l’étape TOTP)",
+        "tags": [
+          "Administration — connexion"
+        ]
+      }
+    },
+    "/v1/admin/auth/totp": {
+      "post": {
+        "operationId": "AdminAuthController_totp",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminTotpDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Étape 2 : code de l’application d’authentification ; ouvre la session",
+        "tags": [
+          "Administration — connexion"
+        ]
+      }
+    },
+    "/v1/admin/auth/password": {
+      "post": {
+        "operationId": "AdminAuthController_changePassword",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — connexion"
+        ]
+      }
+    },
     "/health/live": {
       "get": {
         "operationId": "HealthController_live",
@@ -36,12 +1031,703 @@
   "info": {
     "title": "API Ineed",
     "description": "API de la marketplace Ineed (Abidjan). Montants en XOF entiers, dates ISO 8601 en UTC, téléphones au format E.164. Les erreurs suivent le format { error: { code, message, details, requestId } }.",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "contact": {}
   },
   "tags": [],
   "servers": [],
   "components": {
-    "schemas": {}
+    "securitySchemes": {
+      "bearer": {
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "type": "http"
+      }
+    },
+    "schemas": {
+      "RequestOtpDto": {
+        "type": "object",
+        "properties": {
+          "phone": {
+            "type": "string",
+            "example": "07 12 34 56 78",
+            "description": "Numéro saisi par l’utilisateur ; le préfixe +225 est ajouté si absent."
+          }
+        },
+        "required": [
+          "phone"
+        ]
+      },
+      "OtpChallengeDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resendAvailableAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "devMode": {
+            "type": "boolean",
+            "description": "Vrai si aucun SMS n’est réellement envoyé (mode développement)."
+          }
+        },
+        "required": [
+          "challengeId",
+          "expiresAt",
+          "resendAvailableAt",
+          "devMode"
+        ]
+      },
+      "VerifyOtpDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "example": "481920"
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "PRO"
+            ]
+          },
+          "deviceLabel": {
+            "type": "string",
+            "example": "Samsung Galaxy A15"
+          }
+        },
+        "required": [
+          "challengeId",
+          "code",
+          "app"
+        ]
+      },
+      "TokensDto": {
+        "type": "object",
+        "properties": {
+          "tokenType": {
+            "type": "string",
+            "example": "Bearer"
+          },
+          "accessToken": {
+            "type": "string"
+          },
+          "accessTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "refreshToken": {
+            "type": "string"
+          },
+          "refreshTokenExpiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "tokenType",
+          "accessToken",
+          "accessTokenExpiresAt",
+          "refreshToken",
+          "refreshTokenExpiresAt"
+        ]
+      },
+      "LoginUserDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "phone": {
+            "type": "string",
+            "example": "+2250712345678"
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "phone",
+          "firstName",
+          "lastName",
+          "roles"
+        ]
+      },
+      "LoginResultDto": {
+        "type": "object",
+        "properties": {
+          "tokens": {
+            "$ref": "#/components/schemas/TokensDto"
+          },
+          "user": {
+            "$ref": "#/components/schemas/LoginUserDto"
+          },
+          "isNewUser": {
+            "type": "boolean"
+          },
+          "profileComplete": {
+            "type": "boolean",
+            "description": "Faux tant que prénom et nom ne sont pas renseignés."
+          }
+        },
+        "required": [
+          "tokens",
+          "user",
+          "isNewUser",
+          "profileComplete"
+        ]
+      },
+      "RefreshDto": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refreshToken"
+        ]
+      },
+      "CreateUploadDto": {
+        "type": "object",
+        "properties": {
+          "purpose": {
+            "type": "string",
+            "enum": [
+              "AVATAR",
+              "VERIFICATION_DOC"
+            ]
+          },
+          "mimeType": {
+            "type": "string",
+            "example": "image/jpeg"
+          },
+          "sizeBytes": {
+            "type": "number",
+            "example": 245760
+          }
+        },
+        "required": [
+          "purpose",
+          "mimeType",
+          "sizeBytes"
+        ]
+      },
+      "UploadTicketDto": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "uploadUrl": {
+            "type": "string",
+            "description": "URL présignée : envoyer le contenu en PUT avec exactement les en-têtes indiqués."
+          },
+          "method": {
+            "type": "string",
+            "example": "PUT"
+          },
+          "headers": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "expiresAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "fileId",
+          "uploadUrl",
+          "method",
+          "headers",
+          "expiresAt"
+        ]
+      },
+      "FileDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "PENDING_UPLOAD",
+              "UPLOADED",
+              "READY",
+              "REJECTED",
+              "DELETED"
+            ]
+          },
+          "mimeType": {
+            "type": "string"
+          },
+          "sizeBytes": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "mimeType",
+          "sizeBytes"
+        ]
+      },
+      "MeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "phone": {
+            "type": "string",
+            "nullable": true
+          },
+          "firstName": {
+            "type": "string",
+            "nullable": true
+          },
+          "lastName": {
+            "type": "string",
+            "nullable": true
+          },
+          "avatarUrl": {
+            "type": "string",
+            "nullable": true,
+            "description": "URL temporaire (1 h)"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "profileComplete": {
+            "type": "boolean"
+          },
+          "proStatus": {
+            "type": "string",
+            "nullable": true,
+            "enum": [
+              "DRAFT",
+              "SUBMITTED",
+              "INFO_REQUESTED",
+              "APPROVED",
+              "REJECTED",
+              "SUSPENDED"
+            ]
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "phone",
+          "firstName",
+          "lastName",
+          "avatarUrl",
+          "roles",
+          "profileComplete",
+          "proStatus",
+          "createdAt"
+        ]
+      },
+      "UpdateMeDto": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "example": "Awa"
+          },
+          "lastName": {
+            "type": "string",
+            "example": "Koné"
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
+        ]
+      },
+      "SetAvatarDto": {
+        "type": "object",
+        "properties": {
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "fileId"
+        ]
+      },
+      "SessionDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Identifiant de l’appareil (famille de sessions)"
+          },
+          "app": {
+            "type": "string",
+            "enum": [
+              "CLIENT",
+              "PRO",
+              "ADMIN"
+            ]
+          },
+          "deviceLabel": {
+            "type": "string",
+            "nullable": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "lastUsedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "current": {
+            "type": "boolean",
+            "description": "Vrai pour l’appareil qui fait la requête"
+          }
+        },
+        "required": [
+          "id",
+          "app",
+          "deviceLabel",
+          "createdAt",
+          "lastUsedAt",
+          "current"
+        ]
+      },
+      "ConfirmDeletionDto": {
+        "type": "object",
+        "properties": {
+          "challengeId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "code": {
+            "type": "string",
+            "example": "481920"
+          }
+        },
+        "required": [
+          "challengeId",
+          "code"
+        ]
+      },
+      "SkillDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "CategoryDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "iconKey": {
+            "type": "string",
+            "description": "Clé de l’icône (design/icons/categories)"
+          },
+          "skills": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SkillDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "iconKey",
+          "skills"
+        ]
+      },
+      "ZoneDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "COMMUNE",
+              "QUARTIER",
+              "SECTEUR"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "kind"
+        ]
+      },
+      "GeoPointDto": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number",
+            "example": 5.37
+          },
+          "lng": {
+            "type": "number",
+            "example": -3.985
+          }
+        },
+        "required": [
+          "lat",
+          "lng"
+        ]
+      },
+      "WeeklyHourDto": {
+        "type": "object",
+        "properties": {
+          "weekday": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 7,
+            "description": "1 = lundi … 7 = dimanche"
+          },
+          "start": {
+            "type": "string",
+            "example": "08:00"
+          },
+          "end": {
+            "type": "string",
+            "example": "18:00"
+          }
+        },
+        "required": [
+          "weekday",
+          "start",
+          "end"
+        ]
+      },
+      "SaveProProfileDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "INDIVIDUAL",
+              "COMPANY"
+            ]
+          },
+          "businessName": {
+            "type": "string",
+            "example": "Koffi Plomberie"
+          },
+          "companyRegNumber": {
+            "type": "string",
+            "example": "CI-ABJ-2024-B-12345"
+          },
+          "bio": {
+            "type": "string"
+          },
+          "yearsExperience": {
+            "type": "number"
+          },
+          "categoryIds": {
+            "description": "1 à 3 métiers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "skillIds": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "zoneIds": {
+            "description": "Communes desservies",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "serviceRadiusM": {
+            "type": "number",
+            "minimum": 500,
+            "maximum": 100000
+          },
+          "baseLocation": {
+            "$ref": "#/components/schemas/GeoPointDto"
+          },
+          "weeklyHours": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/WeeklyHourDto"
+            }
+          }
+        },
+        "required": [
+          "kind",
+          "businessName",
+          "categoryIds",
+          "zoneIds",
+          "weeklyHours"
+        ]
+      },
+      "AddDocumentDto": {
+        "type": "object",
+        "properties": {
+          "typeCode": {
+            "type": "string",
+            "example": "PIECE_IDENTITE"
+          },
+          "fileId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        "required": [
+          "typeCode",
+          "fileId"
+        ]
+      },
+      "AvailabilityDto": {
+        "type": "object",
+        "properties": {
+          "isOnline": {
+            "type": "boolean"
+          },
+          "pausedUntil": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "null pour reprendre immédiatement"
+          }
+        }
+      },
+      "DecisionDto": {
+        "type": "object",
+        "properties": {
+          "note": {
+            "type": "string",
+            "description": "Obligatoire pour refuser, demander des compléments ou suspendre ; communiqué au professionnel."
+          },
+          "rejectedDocumentIds": {
+            "description": "Documents à refuser (demande de compléments)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AdminLoginDto": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string",
+            "example": "exploitation@ineed.ci"
+          },
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "AdminTotpDto": {
+        "type": "object",
+        "properties": {
+          "mfaToken": {
+            "type": "string"
+          },
+          "code": {
+            "type": "string",
+            "example": "123456"
+          }
+        },
+        "required": [
+          "mfaToken",
+          "code"
+        ]
+      },
+      "ChangePasswordDto": {
+        "type": "object",
+        "properties": {
+          "currentPassword": {
+            "type": "string"
+          },
+          "newPassword": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "currentPassword",
+          "newPassword"
+        ]
+      }
+    }
   }
 }

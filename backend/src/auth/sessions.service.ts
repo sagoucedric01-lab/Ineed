@@ -79,24 +79,26 @@ export class SessionsService {
   /** Échange un jeton de rafraîchissement contre une nouvelle paire (rotation). */
   async rotate(refreshToken: string, meta: SessionMeta): Promise<IssuedTokens> {
     const hash = sha256(refreshToken);
-    return this.prisma.$transaction(async (tx) => {
+    const invalid = () => new AppError(401, 'UNAUTHENTICATED', 'Votre session a expiré. Reconnectez-vous pour continuer.');
+    // L'erreur est levée APRÈS la transaction : une révocation pour réutilisation doit être enregistrée,
+    // alors qu'une exception levée dans la transaction l'annulerait.
+    const outcome = await this.prisma.$transaction(async (tx): Promise<IssuedTokens | 'invalid'> => {
       const rows = await tx.$queryRaw<
         { id: string; user_id: string; app: AppKind; family_id: string; expires_at: Date; revoked_at: Date | null; revoked_reason: string | null; device_label: string | null; status: string }[]
       >`SELECT s.id, s.user_id, s.app, s.family_id, s.expires_at, s.revoked_at, s.revoked_reason, s.device_label, u.status
           FROM sessions s JOIN users u ON u.id = s.user_id
          WHERE s.refresh_token_hash = ${hash} FOR UPDATE OF s`;
       const s = rows[0];
-      const invalid = new AppError(401, 'UNAUTHENTICATED', 'Votre session a expiré. Reconnectez-vous pour continuer.');
-      if (!s) throw invalid;
+      if (!s) return 'invalid';
       if (s.revoked_at) {
         if (s.revoked_reason === 'ROTATED' && Date.now() - s.revoked_at.getTime() > ROTATION_GRACE_MS) {
-          // Jeton déjà échangé présenté de nouveau : on coupe tous les appareils de cette famille.
+          // Jeton déjà échangé présenté de nouveau : on coupe la session de cet appareil (toute la famille).
           await this.revokeFamily(s.family_id, 'REUSE_DETECTED', tx);
           this.logger.warn({ familyId: s.family_id, userId: s.user_id }, 'Réutilisation d’un jeton de rafraîchissement : session révoquée');
         }
-        throw invalid;
+        return 'invalid';
       }
-      if (s.expires_at.getTime() <= Date.now() || s.status !== 'ACTIVE') throw invalid;
+      if (s.expires_at.getTime() <= Date.now() || s.status !== 'ACTIVE') return 'invalid';
       await tx.session.update({ where: { id: s.id }, data: { revokedAt: new Date(), revokedReason: 'ROTATED', lastUsedAt: new Date() } });
       return this.issue(tx, {
         userId: s.user_id,
@@ -105,6 +107,8 @@ export class SessionsService {
         meta: { ...meta, deviceLabel: s.device_label },
       });
     });
+    if (outcome === 'invalid') throw invalid();
+    return outcome;
   }
 
   async revokeFamily(familyId: string, reason: string, db: Db = this.prisma): Promise<void> {

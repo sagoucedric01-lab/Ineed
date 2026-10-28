@@ -80,13 +80,15 @@ jobs:
         working-directory: .
         run: |
           docker run -d --name s3 -p 8333:8333 -v "$PWD/infra/seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro" \
-            chrislusf/seaweedfs:4.46 server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data
+            chrislusf/seaweedfs:4.46 server -s3 -s3.config=/etc/seaweedfs/s3.json -dir=/data -volume.max=50 -master.volumeSizeLimitMB=64
           for i in $(seq 1 60); do curl -sf http://localhost:8333/healthz >/dev/null && break; sleep 2; done
       - uses: pnpm/action-setup@v4
         with: { version: '${{ env.PNPM_VERSION }}' }
       - uses: actions/setup-node@v5
         with: { node-version: '${{ env.NODE_VERSION }}', cache: pnpm }
       - run: pnpm install --frozen-lockfile
+      - name: Secrets de test (générés à chaque exécution, jamais stockés)
+        run: node ../tools/generate-dev-secrets.mjs >> "$GITHUB_ENV"
       - run: pnpm build
       - run: pnpm lint
       - run: pnpm typecheck
@@ -156,6 +158,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v5
+      - name: Secrets de développement pour docker compose
+        run: node tools/generate-dev-secrets.mjs --write infra/.env.secrets
       - name: Construction des images
         run: |
           if ! docker compose -f infra/docker-compose.yml build > build.log 2>&1; then
