@@ -94,7 +94,7 @@ void main() {
     expect(find.textContaining('Aucune réclamation'), findsOneWidget);
     await tapAndSettle(tester, find.text('Contacter l’assistance'));
     await tapAndSettle(tester, find.text('Autre'));
-    await tapAndSettle(tester, find.text('Paiement ou remboursement').last);
+    await tapAndSettle(tester, find.text('Problème de paiement').last);
     await tester.enterText(find.byType(TextField), 'Je n’ai pas reçu mon reversement.');
     await tapAndSettle(tester, find.text('Envoyer la réclamation'));
     expect(backend.server.last('POST /v1/complaints').data, {'category': 'PAYMENT', 'description': 'Je n’ai pas reçu mon reversement.'});

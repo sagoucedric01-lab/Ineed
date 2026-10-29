@@ -451,32 +451,6 @@
   "historyEmptyOngoing": "Aucune mission en cours. Décrivez un besoin depuis l’accueil pour trouver un professionnel.",
   "historyEmptyPast": "Vos missions terminées apparaîtront ici, avec leurs reçus.",
   "historyNewRequest": "Nouvelle demande",
-  "complaintTitle": "Nouvelle réclamation",
-  "complaintMission": "Mission concernée",
-  "complaintCategory": "Motif",
-  "complaintCategoryQuality": "Travail mal réalisé",
-  "complaintCategoryPrice": "Prix différent de celui convenu",
-  "complaintCategoryNoShow": "Le professionnel n’est pas venu",
-  "complaintCategoryDamage": "Dégât causé",
-  "complaintCategoryPayment": "Problème de paiement",
-  "complaintCategoryBehaviour": "Comportement",
-  "complaintCategoryOther": "Autre",
-  "complaintDescription": "Décrivez la situation",
-  "complaintAddPhoto": "Ajouter une photo",
-  "complaintSubmit": "Envoyer la réclamation",
-  "complaintSent": "Réclamation {reference} envoyée. L’équipe Ineed vous répond ici.",
-  "@complaintSent": {
-    "placeholders": {
-      "reference": {
-        "type": "String"
-      }
-    }
-  },
-  "complaintStatusOpen": "Ouverte",
-  "complaintStatusInReview": "En cours d’examen",
-  "complaintStatusWaitingUser": "Réponse attendue de votre part",
-  "complaintStatusResolved": "Résolue",
-  "complaintStatusRejected": "Close sans suite",
   "homeComingSoonTitle": "La recherche de professionnels arrive bientôt",
   "homeComingSoonBody": "Votre compte est prêt. Vous pourrez bientôt décrire votre besoin et trouver un professionnel vérifié près de chez vous. Voici les métiers qui seront proposés :",
   "homeCategoriesEmpty": "Aucun métier n’est encore proposé. Revenez bientôt.",

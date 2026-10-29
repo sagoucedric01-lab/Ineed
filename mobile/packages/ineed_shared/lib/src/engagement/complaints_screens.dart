@@ -145,6 +145,7 @@ class _ComplaintFormScreenState extends ConsumerState<ComplaintFormScreen> {
           if (widget.missionId != null) Padding(padding: const EdgeInsets.symmetric(vertical: IneedSpacing.s2), child: IneedBanner(message: l.complaintDisputeNote)),
           DropdownButtonFormField<ComplaintCategory>(
             initialValue: _category,
+            isExpanded: true,
             decoration: InputDecoration(labelText: l.complaintCategory),
             items: [for (final c in ComplaintCategory.values) DropdownMenuItem(value: c, child: Text(complaintCategoryLabel(l, c)))],
             onChanged: (c) => setState(() => _category = c ?? _category),
