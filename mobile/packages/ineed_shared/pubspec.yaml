@@ -14,6 +14,7 @@ dependencies:
   intl: any
   flutter_riverpod: 3.4.3
   flutter_secure_storage: 11.2.0
+  go_router: 18.0.2
   image_picker: 1.2.4
   ineed_api:
     path: ../ineed_api

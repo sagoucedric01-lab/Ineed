@@ -11,6 +11,7 @@ import 'package:ineed_ui/ineed_ui.dart';
 
 import '../l10n/gen/app_localizations.dart';
 import '../providers.dart';
+import '../widgets/open_chat.dart';
 
 final _offerProvider = FutureProvider.autoDispose.family<ProOffer, String>((ref, id) => ref.read(apiProvider).proOffer(id));
 
@@ -149,6 +150,8 @@ class _OfferScreenState extends ConsumerState<OfferScreen> {
                   Text(l.alertPrivacyNote, style: text.bodySmall?.copyWith(color: c.textMuted)),
                   if (_message != null) Padding(padding: const EdgeInsets.only(top: IneedSpacing.s4), child: IneedBanner(message: _message!)),
                   if (!open && o.status == 'ACCEPTED' && _message == null) Padding(padding: const EdgeInsets.only(top: IneedSpacing.s4), child: IneedBanner(message: o.mode == RequestMode.urgent ? l.alertAcceptedWaiting : l.proposalSent, tone: IneedBannerTone.success)),
+                  // Le client et le professionnel peuvent échanger dès l'acceptation.
+                  if (o.status == 'ACCEPTED' || o.status == 'SELECTED') Padding(padding: const EdgeInsets.only(top: IneedSpacing.s3), child: OpenChatButton(requestId: o.requestId)),
                   if (o.status == 'NOT_SELECTED') Padding(padding: const EdgeInsets.only(top: IneedSpacing.s4), child: IneedBanner(message: l.alertClientDeclined)),
                   if (o.missionId != null)
                     Padding(padding: const EdgeInsets.only(top: IneedSpacing.s4), child: IneedButton(label: l.offerSeeMission, onPressed: () => context.push('/missions/${o.missionId}'))),

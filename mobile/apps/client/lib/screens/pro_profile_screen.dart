@@ -91,6 +91,17 @@ class ProProfileScreen extends ConsumerWidget {
                 const SizedBox(height: IneedSpacing.s4),
                 Text(l.proProfileReviews, style: text.titleMedium),
                 Text(l.proProfileReviewsHelp, style: text.bodySmall?.copyWith(color: c.textMuted)),
+                if (p.reviews.isEmpty) Text(l.reviewsNone),
+                for (final r in p.reviews)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    title: Text('${'★' * r.rating}${'☆' * (5 - r.rating)}  ${r.author}', style: TextStyle(color: c.text)),
+                    subtitle: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      if (r.comment != null) Text(r.comment!),
+                      if (r.proReply != null) Text(l.reviewProReply(r.proReply!), style: text.bodySmall?.copyWith(color: c.textMuted)),
+                      Text(formatAbidjanDateTime(r.createdAt), style: text.bodySmall),
+                    ]),
+                  ),
               ],
             ),
           ),

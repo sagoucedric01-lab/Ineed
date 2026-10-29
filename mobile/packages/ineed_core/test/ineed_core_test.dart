@@ -28,6 +28,7 @@ void main() {
 
   test('formatAbidjanDateTime (identique au backend)', () {
     expect(formatAbidjanDateTime(DateTime.utc(2026, 10, 28, 10, 23)), '28/10/2026 à 10:23');
+    expect(formatAbidjanTime(DateTime.utc(2026, 10, 28, 9, 5)), '09:05');
     expect(formatAbidjanDateTime(DateTime.parse('2026-07-01T23:59:00Z')), '01/07/2026 à 23:59');
   });
 

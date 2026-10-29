@@ -273,6 +273,7 @@ class PublicProProfile {
     this.yearsExperience,
     this.ratingAvg,
     this.indicativePriceXof,
+    this.reviews = const [],
   });
   factory PublicProProfile.fromJson(Map<String, Object?> j) => PublicProProfile(
         id: req<String>(j, 'id'),
@@ -290,6 +291,7 @@ class PublicProProfile {
         missionsCompleted: intOrNull(j, 'missionsCompleted') ?? 0,
         indicativePriceXof: intOrNull(j, 'indicativePriceXof'),
         isOnline: j['isOnline'] == true,
+        reviews: listOf(j, 'reviews').map(PublicReview.fromJson).toList(),
       );
   final String id;
   final String businessName;
@@ -306,6 +308,32 @@ class PublicProProfile {
   final int missionsCompleted;
   final int? indicativePriceXof;
   final bool isOnline;
+
+  /// Avis vérifiés les plus récents.
+  final List<PublicReview> reviews;
+}
+
+/// Avis publié : prénom et initiale de l'auteur seulement.
+class PublicReview {
+  const PublicReview({required this.id, required this.rating, required this.author, required this.createdAt, this.comment, this.proReply, this.status});
+  factory PublicReview.fromJson(Map<String, Object?> j) => PublicReview(
+        id: req<String>(j, 'id'),
+        rating: req<num>(j, 'rating').toInt(),
+        author: req<String>(j, 'author'),
+        comment: j['comment'] as String?,
+        proReply: j['proReply'] as String?,
+        status: j['status'] as String?,
+        createdAt: DateTime.parse(req<String>(j, 'createdAt')),
+      );
+  final String id;
+  final int rating;
+  final String author;
+  final String? comment;
+  final String? proReply;
+
+  /// Pour le professionnel : PUBLISHED ou PENDING_MODERATION.
+  final String? status;
+  final DateTime createdAt;
 }
 
 /// Contenu d'un brouillon de demande.
@@ -493,7 +521,7 @@ class RequestSummary {
 }
 
 class AppNotification {
-  const AppNotification({required this.id, required this.type, required this.title, required this.body, required this.read, required this.createdAt});
+  const AppNotification({required this.id, required this.type, required this.title, required this.body, required this.read, required this.createdAt, this.data = const {}});
   factory AppNotification.fromJson(Map<String, Object?> j) => AppNotification(
         id: req<String>(j, 'id'),
         type: req<String>(j, 'type'),
@@ -501,6 +529,7 @@ class AppNotification {
         body: req<String>(j, 'body'),
         read: j['read'] == true,
         createdAt: DateTime.parse(req<String>(j, 'createdAt')),
+        data: {for (final e in (mapOrNull(j, 'data') ?? const {}).entries) if (e.value is String) e.key: e.value! as String},
       );
   final String id;
   final String type;
@@ -508,6 +537,9 @@ class AppNotification {
   final String body;
   final bool read;
   final DateTime createdAt;
+
+  /// Lien profond : missionId, conversationId, complaintId…
+  final Map<String, String> data;
 }
 
 class NotificationsPage {

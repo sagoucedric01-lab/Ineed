@@ -35,7 +35,7 @@ Map<String, Object?> challengeJson() => {
     };
 
 /// Démarre l'application client complète sur un faux serveur.
-Future<ProviderContainer> pumpClientApp(WidgetTester tester, FakeServer server, TokenStore store, {List<Override> overrides = const [], bool tallScreen = false}) async {
+Future<ProviderContainer> pumpClientApp(WidgetTester tester, FakeServer server, TokenStore store, {List<Override> overrides = const [], bool tallScreen = false, List<FakeWebSocketChannel>? realtime}) async {
   if (tallScreen) {
     tester.view.physicalSize = const Size(1080, 2400);
     tester.view.devicePixelRatio = 2;
@@ -44,7 +44,17 @@ Future<ProviderContainer> pumpClientApp(WidgetTester tester, FakeServer server, 
   late final ProviderContainer container;
   final api = IneedApiClient(baseUrl: devEnv.apiBaseUrl, tokenStore: store, adapter: server, uploadAdapter: server, onSessionExpired: () => container.read(sessionProvider.notifier).expired());
   // Pas de relance automatique dans les tests : chaque requête est explicite.
-  container = ProviderContainer(retry: (_, _) => null, overrides: [apiProvider.overrideWithValue(api), appKindProvider.overrideWithValue('CLIENT'), ...overrides]);
+  container = ProviderContainer(retry: (_, _) => null, overrides: [
+    apiProvider.overrideWithValue(api),
+    appKindProvider.overrideWithValue('CLIENT'),
+    // Canal temps réel factice : les tests y poussent les événements du serveur.
+    realtimeChannelFactoryProvider.overrideWithValue((_) {
+      final c = FakeWebSocketChannel();
+      realtime?.add(c);
+      return c;
+    }),
+    ...overrides,
+  ]);
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: IneedApp(environment: devEnv)));
   await tester.pumpAndSettle();

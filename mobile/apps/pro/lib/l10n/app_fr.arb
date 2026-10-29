@@ -478,5 +478,30 @@
   "earningsMissionHeld": "En attente de clôture",
   "earningsMissionAvailable": "Disponible",
   "missionAwaitingQuotePro": "Envoyez votre devis : le client l’accepte dans l’application, puis le paie avant votre déplacement.",
-  "missionAwaitingQuoteOnSite": "Diagnostic fait : envoyez le devis des travaux. Le client doit l’accepter et le payer avant que vous commenciez."
+  "missionAwaitingQuoteOnSite": "Diagnostic fait : envoyez le devis des travaux. Le client doit l’accepter et le payer avant que vous commenciez.",
+  "reviewsTitlePro": "Mes avis",
+  "reviewsEmptyPro": "Aucun avis pour le moment. Les clients peuvent noter une mission une fois clôturée.",
+  "reviewStarsPro": "{count} sur 5 · {author}",
+  "@reviewStarsPro": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      },
+      "author": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPendingModeration": "En attente de vérification par l’équipe Ineed",
+  "reviewReply": "Répondre",
+  "reviewReplyHint": "Votre réponse publique",
+  "reviewReplied": "Réponse publiée.",
+  "reviewYourReply": "Votre réponse : {text}",
+  "@reviewYourReply": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  }
 }

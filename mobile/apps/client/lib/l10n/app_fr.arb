@@ -432,7 +432,7 @@
   "receiptMethod": "Moyen de paiement : {method}",
   "receiptRefunded": "Remboursé",
   "receiptShare": "Partager le reçu",
-  "reviewTitle": "Comment s’est passée l’intervention ?",
+  "reviewTitle": "Votre avis",
   "reviewSubtitle": "Votre avis aide les autres clients et le professionnel.",
   "reviewStarsLabel": "Note sur 5",
   "reviewStar1": "Très décevant",
@@ -440,9 +440,9 @@
   "reviewStar3": "Correct",
   "reviewStar4": "Bien",
   "reviewStar5": "Excellent",
-  "reviewCommentHint": "Qu’avez-vous apprécié ? Qu’est-ce qui pourrait être amélioré ?",
+  "reviewCommentHint": "Votre commentaire (facultatif)",
   "reviewSubmit": "Publier mon avis",
-  "reviewThanks": "Merci, votre avis est publié.",
+  "reviewThanks": "Merci pour votre avis.",
   "reviewLater": "Plus tard",
   "historyTitle": "Mes missions",
   "historyTabOngoing": "En cours",
@@ -803,5 +803,41 @@
       }
     }
   },
-  "trackingCancelFeeDue": "Le professionnel s’est déjà déplacé : les frais de déplacement restent dus, le reste vous est remboursé."
+  "trackingCancelFeeDue": "Le professionnel s’est déjà déplacé : les frais de déplacement restent dus, le reste vous est remboursé.",
+  "reviewPrompt": "Comment s’est passée l’intervention de {proName} ?",
+  "@reviewPrompt": {
+    "placeholders": {
+      "proName": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewStars": "{count} sur 5",
+  "@reviewStars": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewPending": "Merci. Votre avis sera publié après vérification par l’équipe Ineed.",
+  "reviewRateFirst": "Choisissez une note de 1 à 5.",
+  "reviewGive": "Donner mon avis",
+  "reviewMine": "Votre avis : {count} sur 5",
+  "@reviewMine": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewProReply": "Réponse du professionnel : {text}",
+  "@reviewProReply": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "reviewsNone": "Pas encore d’avis."
 }

@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
 import 'api_failure.dart';
+import 'engagement.dart';
 import 'marketplace.dart';
 import 'missions.dart';
 import 'models.dart';
@@ -430,6 +431,73 @@ class IneedApiClient {
       _guard(() async => Quote.fromJson(await _json(_dio.post('/v1/pro/missions/$missionId/quotes/$quoteId/withdraw', options: _auth()))));
 
   Future<Earnings> earnings() => _guard(() async => Earnings.fromJson(await _json(_dio.get('/v1/pro/earnings', options: _auth()))));
+
+  // ---------------------------------------------------------------- Messagerie
+
+  Future<List<Conversation>> conversations() =>
+      _guard(() async => (await _jsonList(_dio.get('/v1/conversations', options: _auth()))).map(Conversation.fromJson).toList());
+
+  Future<int> unreadMessages() => _guard(() async => ((await _json(_dio.get('/v1/conversations/unread', options: _auth())))['unread'] as num? ?? 0).toInt());
+
+  /// Ouvre (ou retrouve) la conversation d'une demande ; [proId] est requis côté client.
+  Future<Conversation> openConversation(String requestId, {String? proId}) =>
+      _guard(() async => Conversation.fromJson(await _json(_dio.post('/v1/conversations', data: {'requestId': requestId, 'proId': ?proId}, options: _auth()))));
+
+  Future<Conversation> conversation(String id) => _guard(() async => Conversation.fromJson(await _json(_dio.get('/v1/conversations/$id', options: _auth()))));
+
+  Future<MessagesPage> messages(String conversationId, {DateTime? before}) => _guard(
+        () async => MessagesPage.fromJson(await _json(_dio.get('/v1/conversations/$conversationId/messages',
+            queryParameters: {if (before != null) 'before': before.toUtc().toIso8601String()}, options: _auth()))),
+      );
+
+  Future<SendMessageResult> sendMessage(String conversationId, {required String clientMsgId, String? body, String? fileId}) => _guard(
+        () async => SendMessageResult.fromJson(await _json(_dio.post('/v1/conversations/$conversationId/messages',
+            data: {'clientMsgId': clientMsgId, if (body != null && body.trim().isNotEmpty) 'body': body.trim(), 'fileId': ?fileId}, options: _auth()))),
+      );
+
+  Future<void> markConversationRead(String conversationId) => _guard(() => _dio.post<void>('/v1/conversations/$conversationId/read', options: _auth()));
+
+  Future<void> report({required String targetType, required String targetId, required ReportReason reason, String? details}) => _guard(
+        () => _dio.post<void>('/v1/reports', data: {'targetType': targetType, 'targetId': targetId, 'reason': reason.code, if (details != null && details.trim().isNotEmpty) 'details': details.trim()}, options: _auth()),
+      );
+
+  // ---------------------------------------------------------------- Avis
+
+  Future<MissionReviewState> missionReview(String missionId) =>
+      _guard(() async => MissionReviewState.fromJson(await _json(_dio.get('/v1/missions/$missionId/review', options: _auth()))));
+
+  Future<MyReview> submitReview(String missionId, {required int rating, String? comment}) => _guard(
+        () async => MyReview.fromJson(await _json(_dio.post('/v1/missions/$missionId/review', data: {'rating': rating, if (comment != null && comment.trim().isNotEmpty) 'comment': comment.trim()}, options: _auth()))),
+      );
+
+  Future<List<PublicReview>> proOwnReviews() => _guard(() async => (await _jsonList(_dio.get('/v1/pro/reviews', options: _auth()))).map(PublicReview.fromJson).toList());
+
+  Future<PublicReview> replyToReview(String reviewId, String reply) =>
+      _guard(() async => PublicReview.fromJson(await _json(_dio.post('/v1/pro/reviews/$reviewId/reply', data: {'reply': reply}, options: _auth()))));
+
+  // ---------------------------------------------------------------- Réclamations
+
+  Future<List<ComplaintSummary>> complaints() => _guard(() async => (await _jsonList(_dio.get('/v1/complaints', options: _auth()))).map(ComplaintSummary.fromJson).toList());
+
+  Future<Complaint> complaint(String id) => _guard(() async => Complaint.fromJson(await _json(_dio.get('/v1/complaints/$id', options: _auth()))));
+
+  Future<Complaint> createComplaint({required ComplaintCategory category, required String description, String? missionId, List<String> fileIds = const []}) => _guard(
+        () async => Complaint.fromJson(await _json(_dio.post('/v1/complaints',
+            data: {'category': category.code, 'description': description.trim(), 'missionId': ?missionId, if (fileIds.isNotEmpty) 'fileIds': fileIds}, options: _auth()))),
+      );
+
+  Future<Complaint> replyToComplaint(String id, String body) =>
+      _guard(() async => Complaint.fromJson(await _json(_dio.post('/v1/complaints/$id/messages', data: {'body': body.trim()}, options: _auth()))));
+
+  // ---------------------------------------------------------------- Appareils (notifications push)
+
+  Future<void> registerDevice({required String pushToken, required String platform, String? appVersion}) =>
+      _guard(() => _dio.put<void>('/v1/me/devices', data: {'pushToken': pushToken, 'platform': platform, 'appVersion': ?appVersion}, options: _auth()));
+
+  Future<void> unregisterDevice(String pushToken) => _guard(() => _dio.delete<void>('/v1/me/devices/${Uri.encodeComponent(pushToken)}', options: _auth()));
+
+  /// Jeton d'accès courant (canal temps réel).
+  Future<String?> currentAccessToken() async => (await tokenStore.read())?.accessToken;
 
   // ---------------------------------------------------------------- Notifications
 

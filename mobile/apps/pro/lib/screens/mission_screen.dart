@@ -12,6 +12,7 @@ import '../l10n/gen/app_localizations.dart';
 import '../location.dart';
 import '../providers.dart';
 import '../trip_tracker.dart';
+import '../widgets/open_chat.dart';
 
 /// P-13 à P-16 : mission du professionnel (adresse précise, étapes, partage de position pendant le trajet).
 class ProMissionScreen extends ConsumerStatefulWidget {
@@ -226,6 +227,14 @@ class _ProMissionScreenState extends ConsumerState<ProMissionScreen> {
                       },
                     ),
                   if (m.status == 'WORK_COMPLETED') IneedBanner(message: l.missionWaitingClientConfirmation),
+                  const SizedBox(height: IneedSpacing.s4),
+                  OpenChatButton(requestId: m.requestId),
+                  if (m.status != 'CANCELLED')
+                    TextButton.icon(
+                      onPressed: () => context.push('/reclamations/nouvelle', extra: <String, String?>{'missionId': m.id, 'missionReference': m.reference}),
+                      icon: const Icon(Icons.report_problem_outlined),
+                      label: Text(common.complaintNew),
+                    ),
                   if (const {'AWAITING_QUOTE', 'QUOTE_PENDING_APPROVAL', 'CONFIRMED', 'PAYMENT_PENDING', 'PAYMENT_CONFIRMED', 'EN_ROUTE', 'ARRIVED'}.contains(m.status)) ...[
                     const SizedBox(height: IneedSpacing.s6),
                     TextButton(

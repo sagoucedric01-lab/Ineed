@@ -165,7 +165,7 @@ Map<String, Object?> filledProfile({List<Map<String, Object?>> documents = const
     };
 
 /// Démarre l'application Pro complète sur le faux serveur, sur un écran de téléphone haut.
-Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, TokenStore store, {PositionFinder? position}) async {
+Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, TokenStore store, {PositionFinder? position, List<FakeWebSocketChannel>? realtime, PushToken? pushToken}) async {
   tester.view.physicalSize = const Size(1080, 2400);
   tester.view.devicePixelRatio = 2;
   addTearDown(tester.view.reset);
@@ -183,6 +183,12 @@ Future<ProviderContainer> pumpProApp(WidgetTester tester, ProBackend backend, To
     photoPickerProvider.overrideWithValue((_) async => jpegBytes),
     pdfPickerProvider.overrideWithValue(() async => pdfBytes),
     positionFinderProvider.overrideWithValue(position ?? () async => const LatLng(5.36, -3.97)),
+    realtimeChannelFactoryProvider.overrideWithValue((_) {
+      final c = FakeWebSocketChannel();
+      realtime?.add(c);
+      return c;
+    }),
+    pushTokenSourceProvider.overrideWithValue(() async => pushToken),
   ]);
   addTearDown(container.dispose);
   await tester.pumpWidget(UncontrolledProviderScope(container: container, child: IneedProApp(environment: devEnv)));
