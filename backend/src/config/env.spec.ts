@@ -15,6 +15,7 @@ const base = {
 const prod = {
   ...base, APP_ENV: 'production', NODE_ENV: 'production', PAYMENT_PROVIDER: 'cinetpay',
   OTP_PROVIDER: 'twilio_verify', TWILIO_ACCOUNT_SID: 'AC1', TWILIO_AUTH_TOKEN: 't', TWILIO_VERIFY_SERVICE_SID: 'VA1',
+  PUSH_PROVIDER: 'fcm', FCM_SERVICE_ACCOUNT_B64: 'e30=',
   CINETPAY_API_KEY: 'k', CINETPAY_SITE_ID: '1', CINETPAY_SECRET_KEY: 's', PUBLIC_API_URL: 'https://api.ineed.test', PAYMENT_RETURN_URL: 'https://ineed.test/retour',
 };
 
@@ -83,5 +84,12 @@ describe('loadEnv', () => {
   it('refuse une adresse publique non chiffrée en production et l’adaptateur Wave non livré', () => {
     expect(() => loadEnv({ ...prod, PUBLIC_API_URL: 'http://api.ineed.test' })).toThrow(/https/);
     expect(() => loadEnv({ ...base, PAYMENT_PROVIDER: 'wave' })).toThrow(/Wave/);
+  });
+
+  it('notifications push : le mode développement est refusé en production, FCM exige son compte de service', () => {
+    expect(() => loadEnv({ ...prod, PUSH_PROVIDER: 'dev_log' })).toThrow(/dev_log/);
+    const noKey: Record<string, string> = { ...prod };
+    delete noKey.FCM_SERVICE_ACCOUNT_B64;
+    expect(() => loadEnv(noKey)).toThrow(/FCM_SERVICE_ACCOUNT_B64/);
   });
 });

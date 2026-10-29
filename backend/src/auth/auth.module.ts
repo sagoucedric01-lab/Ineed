@@ -33,8 +33,9 @@ export function otpProviderFactory(env: Env): OtpProvider {
     AuthService,
     RateLimiterService,
     { provide: OTP_PROVIDER, inject: [ENV], useFactory: otpProviderFactory },
-    { provide: APP_GUARD, useClass: AccessGuard },
+    AccessGuard,
+    { provide: APP_GUARD, useExisting: AccessGuard },
   ],
-  exports: [TokensService, SessionsService, OtpService, RateLimiterService, OTP_PROVIDER],
+  exports: [TokensService, SessionsService, OtpService, RateLimiterService, OTP_PROVIDER, AccessGuard],
 })
 export class AuthModule {}

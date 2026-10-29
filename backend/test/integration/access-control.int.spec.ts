@@ -57,6 +57,17 @@ const MATRIX: { method: 'get' | 'post' | 'put' | 'patch' | 'delete'; path: strin
   // Un rôle SUPPORT ne peut pas approuver un remboursement.
   { method: 'post', path: `/v1/admin/payments/${UUID}/refunds`, body: { amountXof: 100, reason: 'Test de droits' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 'ok', super: 'ok' } },
   { method: 'post', path: `/v1/admin/refunds/${UUID}/complete`, body: { providerRefundId: 'X-1' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 'ok', super: 'ok' } },
+  { method: 'get', path: '/v1/conversations', expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'get', path: `/v1/conversations/${UUID}/messages`, expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'put', path: '/v1/me/devices', body: {}, expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'post', path: '/v1/reports', body: {}, expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'post', path: `/v1/missions/${UUID}/review`, body: { rating: 5 }, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/pros/${UUID}/reviews`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/pro/reviews/${UUID}/reply`, body: { reply: 'Merci' }, expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: '/v1/complaints', body: {}, expect: { anonyme: 401, client: 'ok', pro: 'ok', support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'get', path: '/v1/admin/complaints', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 403, finance: 403, super: 'ok' } },
+  { method: 'post', path: `/v1/admin/complaints/${UUID}/status`, body: { status: 'IN_REVIEW' }, expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 403, finance: 403, super: 'ok' } },
+  { method: 'get', path: '/v1/admin/notification-templates', expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 403, super: 'ok' } },
 ];
 
 describe('T24 — contrôle d’accès', () => {

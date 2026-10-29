@@ -25,7 +25,7 @@ describe('migrations sur une base vide', () => {
     const applied = await c.query('SELECT migration_name FROM _prisma_migrations WHERE finished_at IS NOT NULL ORDER BY 1');
     expect(applied.rows.map((r: { migration_name: string }) => r.migration_name)).toEqual([
       '20261028000000_init',
-      '20261028120000_zones_unique_nulls_not_distinct', '20261029000000_dispatch', '20261030000000_payments',
+      '20261028120000_zones_unique_nulls_not_distinct', '20261029000000_dispatch', '20261030000000_payments', '20261031000000_messaging',
     ]);
     const tables = await c.query(`SELECT count(*)::int AS n FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE' AND table_name NOT IN ('spatial_ref_sys', '_prisma_migrations')`);
     expect(tables.rows[0].n).toBe(64);

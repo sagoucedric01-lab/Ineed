@@ -54,6 +54,10 @@ export const envSchema = z
     ADMIN_REFRESH_TOKEN_TTL_HOURS: z.coerce.number().int().min(1).max(72).default(12),
     /** Clé AES-256 (32 octets en base64) qui chiffre les secrets stockés en base (TOTP, numéros de reversement). */
     DATA_ENCRYPTION_KEY_B64: z.string().refine((v) => Buffer.from(v, 'base64').length === 32, 'doit contenir 32 octets encodés en base64'),
+    /** Notifications push. `dev_log` n'envoie rien (écrit dans les journaux) : interdit en production. */
+    PUSH_PROVIDER: z.enum(['dev_log', 'fcm']).default('dev_log'),
+    /** Compte de service Firebase (fichier JSON encodé en base64), pour l'API FCM HTTP v1. */
+    FCM_SERVICE_ACCOUNT_B64: z.string().min(1).optional(),
     /** Fournisseur de paiement (phase 7). `sandbox` simule les paiements : interdit en production. */
     PAYMENT_PROVIDER: z.enum(['sandbox', 'cinetpay', 'wave']).default('sandbox'),
     /** Adresse publique de l'API (notifications de paiement du prestataire, page de paiement simulée). */
@@ -76,11 +80,13 @@ export const envSchema = z
         if (!env[k]) forbid(k, 'obligatoire avec PAYMENT_PROVIDER=cinetpay');
       }
     }
+    if (env.PUSH_PROVIDER === 'fcm' && !env.FCM_SERVICE_ACCOUNT_B64) forbid('FCM_SERVICE_ACCOUNT_B64', 'obligatoire avec PUSH_PROVIDER=fcm');
     if (env.PAYMENT_PROVIDER === 'wave') forbid('PAYMENT_PROVIDER', 'l’adaptateur Wave n’est pas encore disponible : utilisez cinetpay');
     if (env.APP_ENV !== 'production') return;
     if (env.PUBLIC_API_URL && !env.PUBLIC_API_URL.startsWith('https://')) forbid('PUBLIC_API_URL', 'doit être en https en production');
     if (env.NODE_ENV !== 'production') forbid('NODE_ENV', 'doit valoir "production" quand APP_ENV=production');
     if (env.OTP_PROVIDER === 'dev_console') forbid('OTP_PROVIDER', 'le mode "dev_console" est interdit en production');
+    if (env.PUSH_PROVIDER === 'dev_log') forbid('PUSH_PROVIDER', 'le mode "dev_log" (aucune notification envoyée) est interdit en production');
     if (env.PAYMENT_PROVIDER === 'sandbox') forbid('PAYMENT_PROVIDER', 'le simulateur "sandbox" est interdit en production');
     if (env.S3_BUCKET_PUBLIC === env.S3_BUCKET_PRIVATE) {
       forbid('S3_BUCKET_PRIVATE', 'les documents privés doivent être dans un bucket distinct du bucket public');

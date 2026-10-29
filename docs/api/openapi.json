@@ -158,6 +158,123 @@
         ]
       }
     },
+    "/v1/me/devices": {
+      "put": {
+        "operationId": "DevicesController_register",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterDeviceDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Enregistre l’appareil pour les notifications push (un jeton passé à un autre compte lui est retiré)",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/me/devices/{pushToken}": {
+      "delete": {
+        "operationId": "DevicesController_remove",
+        "parameters": [
+          {
+            "name": "pushToken",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retire l’appareil (déconnexion) : plus aucune notification push n’y est envoyée",
+        "tags": [
+          "Mon compte"
+        ]
+      }
+    },
+    "/v1/admin/notification-templates": {
+      "get": {
+        "operationId": "AdminTemplatesController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — notifications"
+        ]
+      }
+    },
+    "/v1/admin/notification-templates/{type}": {
+      "put": {
+        "operationId": "AdminTemplatesController_update",
+        "parameters": [
+          {
+            "name": "type",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateTemplateDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Modifier le texte d’une notification (mêmes variables que le gabarit d’origine) ou la désactiver",
+        "tags": [
+          "Administration — notifications"
+        ]
+      }
+    },
     "/v1/auth/otp/request": {
       "post": {
         "description": "Réponse identique que le numéro ait un compte ou non.",
@@ -3136,6 +3253,670 @@
         ]
       }
     },
+    "/v1/conversations": {
+      "get": {
+        "operationId": "MessagingController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mes conversations (dernier message, non lus, écriture possible)",
+        "tags": [
+          "Messagerie"
+        ]
+      },
+      "post": {
+        "operationId": "MessagingController_open",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OpenConversationDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ouvrir la conversation d’une demande (professionnel ayant accepté, ou mission confirmée)",
+        "tags": [
+          "Messagerie"
+        ]
+      }
+    },
+    "/v1/conversations/unread": {
+      "get": {
+        "operationId": "MessagingController_unread",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Messagerie"
+        ]
+      }
+    },
+    "/v1/conversations/{id}": {
+      "get": {
+        "operationId": "MessagingController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Messagerie"
+        ]
+      }
+    },
+    "/v1/conversations/{id}/messages": {
+      "get": {
+        "operationId": "MessagingController_messages",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "before",
+            "required": false,
+            "in": "query",
+            "description": "Messages antérieurs à cette date (pagination)",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Messages (50 par page, du plus ancien au plus récent)",
+        "tags": [
+          "Messagerie"
+        ]
+      },
+      "post": {
+        "operationId": "MessagingController_send",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envoyer un message ou une photo ; renvoyer le même clientMsgId ne crée pas de doublon",
+        "tags": [
+          "Messagerie"
+        ]
+      }
+    },
+    "/v1/conversations/{id}/read": {
+      "post": {
+        "operationId": "MessagingController_read",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Messagerie"
+        ]
+      }
+    },
+    "/v1/reports": {
+      "post": {
+        "operationId": "ReportsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Signaler un abus (message, utilisateur, profil, avis, demande) à la modération",
+        "tags": [
+          "Signalements"
+        ]
+      }
+    },
+    "/v1/missions/{missionId}/review": {
+      "get": {
+        "operationId": "ClientReviewsController_get",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mon avis sur la mission, et si je peux encore en donner un",
+        "tags": [
+          "Avis"
+        ]
+      },
+      "post": {
+        "operationId": "ClientReviewsController_create",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Noter le professionnel (mission clôturée seulement, une fois)",
+        "tags": [
+          "Avis"
+        ]
+      }
+    },
+    "/v1/pros/{proId}/reviews": {
+      "get": {
+        "operationId": "PublicReviewsController_list",
+        "parameters": [
+          {
+            "name": "proId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Avis publiés sur un professionnel",
+        "tags": [
+          "Avis"
+        ]
+      }
+    },
+    "/v1/pro/reviews": {
+      "get": {
+        "operationId": "ProReviewsController_list",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Professionnel — avis"
+        ]
+      }
+    },
+    "/v1/pro/reviews/{id}/reply": {
+      "post": {
+        "operationId": "ProReviewsController_reply",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReplyReviewDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Répondre publiquement à un avis (une fois)",
+        "tags": [
+          "Professionnel — avis"
+        ]
+      }
+    },
+    "/v1/complaints": {
+      "get": {
+        "operationId": "ComplaintsController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réclamations"
+        ]
+      },
+      "post": {
+        "operationId": "ComplaintsController_create",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateComplaintDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ouvrir une réclamation (sur une mission non clôturée : litige, reversement gelé)",
+        "tags": [
+          "Réclamations"
+        ]
+      }
+    },
+    "/v1/complaints/{id}": {
+      "get": {
+        "operationId": "ComplaintsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Réclamations"
+        ]
+      }
+    },
+    "/v1/complaints/{id}/messages": {
+      "post": {
+        "operationId": "ComplaintsController_message",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComplaintMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Répondre au support",
+        "tags": [
+          "Réclamations"
+        ]
+      }
+    },
+    "/v1/admin/complaints": {
+      "get": {
+        "operationId": "AdminComplaintsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "OPEN",
+                "IN_REVIEW",
+                "WAITING_USER",
+                "RESOLVED",
+                "REJECTED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — réclamations"
+        ]
+      }
+    },
+    "/v1/admin/complaints/{id}": {
+      "get": {
+        "operationId": "AdminComplaintsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — réclamations"
+        ]
+      }
+    },
+    "/v1/admin/complaints/{id}/messages": {
+      "post": {
+        "operationId": "AdminComplaintsController_message",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SupportMessageDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Répondre à l’utilisateur, ou ajouter une note interne (invisible pour lui)",
+        "tags": [
+          "Administration — réclamations"
+        ]
+      }
+    },
+    "/v1/admin/complaints/{id}/status": {
+      "post": {
+        "operationId": "AdminComplaintsController_status",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ComplaintStatusDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Changer le statut ; clore avec une décision (et le remboursement accordé s’il y en a un)",
+        "tags": [
+          "Administration — réclamations"
+        ]
+      }
+    },
     "/v1/pro/profile": {
       "get": {
         "operationId": "ProController_profile",
@@ -3821,6 +4602,44 @@
           }
         }
       },
+      "RegisterDeviceDto": {
+        "type": "object",
+        "properties": {
+          "pushToken": {
+            "type": "string",
+            "description": "Jeton d’enregistrement Firebase Cloud Messaging de l’appareil"
+          },
+          "platform": {
+            "type": "string",
+            "enum": [
+              "ANDROID",
+              "IOS"
+            ]
+          },
+          "appVersion": {
+            "type": "string",
+            "example": "0.4.0"
+          }
+        },
+        "required": [
+          "pushToken",
+          "platform"
+        ]
+      },
+      "UpdateTemplateDto": {
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "isActive": {
+            "type": "boolean"
+          }
+        }
+      },
       "RequestOtpDto": {
         "type": "object",
         "properties": {
@@ -3998,7 +4817,9 @@
               "AVATAR",
               "VERIFICATION_DOC",
               "REQUEST_PHOTO",
-              "REQUEST_VOICE"
+              "REQUEST_VOICE",
+              "MESSAGE_PHOTO",
+              "COMPLAINT_ATTACHMENT"
             ]
           },
           "mimeType": {
@@ -5073,6 +5894,196 @@
         },
         "required": [
           "providerRefundId"
+        ]
+      },
+      "OpenConversationDto": {
+        "type": "object",
+        "properties": {
+          "requestId": {
+            "type": "string"
+          },
+          "proId": {
+            "type": "string",
+            "description": "Professionnel (obligatoire pour le client)"
+          }
+        },
+        "required": [
+          "requestId"
+        ]
+      },
+      "SendMessageDto": {
+        "type": "object",
+        "properties": {
+          "clientMsgId": {
+            "type": "string",
+            "description": "Identifiant généré par l’application : un renvoi après coupure ne crée pas de doublon"
+          },
+          "body": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string",
+            "description": "Photo (fichier MESSAGE_PHOTO finalisé)"
+          }
+        },
+        "required": [
+          "clientMsgId"
+        ]
+      },
+      "ReportDto": {
+        "type": "object",
+        "properties": {
+          "targetType": {
+            "type": "string",
+            "enum": [
+              "USER",
+              "PRO_PROFILE",
+              "MESSAGE",
+              "REVIEW",
+              "REQUEST"
+            ]
+          },
+          "targetId": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "SPAM",
+              "HARASSMENT",
+              "FRAUD",
+              "OFF_PLATFORM_PAYMENT",
+              "INAPPROPRIATE",
+              "OTHER"
+            ]
+          },
+          "details": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "targetType",
+          "targetId",
+          "reason"
+        ]
+      },
+      "CreateReviewDto": {
+        "type": "object",
+        "properties": {
+          "rating": {
+            "type": "number",
+            "minimum": 1,
+            "maximum": 5
+          },
+          "comment": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "rating"
+        ]
+      },
+      "ReplyReviewDto": {
+        "type": "object",
+        "properties": {
+          "reply": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "reply"
+        ]
+      },
+      "CreateComplaintDto": {
+        "type": "object",
+        "properties": {
+          "missionId": {
+            "type": "string",
+            "description": "Mission concernée (facultatif pour une question générale)"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "QUALITY",
+              "PRICE",
+              "NO_SHOW",
+              "DAMAGE",
+              "PAYMENT",
+              "BEHAVIOUR",
+              "OTHER"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "fileIds": {
+            "description": "Pièces jointes (fichiers COMPLAINT_ATTACHMENT finalisés)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "category",
+          "description"
+        ]
+      },
+      "ComplaintMessageDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "SupportMessageDto": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string"
+          },
+          "fileId": {
+            "type": "string"
+          },
+          "internal": {
+            "type": "boolean",
+            "description": "Note interne au support, invisible de l’utilisateur"
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "ComplaintStatusDto": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "IN_REVIEW",
+              "WAITING_USER",
+              "RESOLVED",
+              "REJECTED"
+            ]
+          },
+          "resolution": {
+            "type": "string",
+            "description": "Décision, obligatoire pour clore"
+          },
+          "refundId": {
+            "type": "string",
+            "description": "Remboursement accordé (créé par un rôle habilité)"
+          }
+        },
+        "required": [
+          "status"
         ]
       },
       "GeoPointDto": {

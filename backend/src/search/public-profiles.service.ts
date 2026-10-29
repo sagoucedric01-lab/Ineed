@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { AppError } from '../common/http/api-error.js';
 import { FilesService } from '../files/files.service.js';
 import { PrismaService } from '../infra/prisma.service.js';
+import { reviewerName } from '../reviews/reviews.service.js';
 import { MIN_RATINGS } from './ranking.js';
 
 const fromTime = (d: Date) => d.toISOString().slice(11, 16);
@@ -26,6 +27,7 @@ export class PublicProfilesService {
       },
     });
     if (!p) throw new AppError(404, 'NOT_FOUND', 'Ce professionnel n’est pas disponible sur Ineed.');
+    const reviews = await this.prisma.review.findMany({ where: { proId: id, status: 'PUBLISHED' }, orderBy: { createdAt: 'desc' }, take: 5, include: { client: true } });
     const avatar = p.user.avatarFile?.status === 'READY' ? p.user.avatarFile : null;
     return {
       id: p.userId,
@@ -45,8 +47,8 @@ export class PublicProfilesService {
       missionsCompleted: p.missionsCompleted,
       indicativePriceXof: p.indicativePriceXof === null ? null : Number(p.indicativePriceXof),
       isOnline: p.isOnline && (!p.pausedUntil || p.pausedUntil < new Date()),
-      /** Avis vérifiés : publiés à partir de la phase 8 (évaluations). */
-      reviews: [] as { rating: number; comment: string | null; createdAt: string }[],
+      /** Avis vérifiés : laissés par des clients après une mission réellement clôturée (5 plus récents). */
+      reviews: reviews.map((r) => ({ id: r.id, rating: r.rating, comment: r.comment, author: reviewerName(r.client.firstName, r.client.lastName), proReply: r.proReply, createdAt: r.createdAt.toISOString() })),
     };
   }
 }

@@ -252,6 +252,8 @@ export const SETTINGS: { key: string; value: unknown; description: string }[] = 
   { key: 'payment.checkout_ttl_minutes', value: 30, description: 'Durée pendant laquelle une page de paiement reste utilisable' },
   { key: 'payment.reminder_minutes', value: 15, description: 'Relance du client qui n’a pas payé après ce délai' },
   { key: 'payment.timeout_minutes', value: 120, description: 'Annulation sans frais d’une mission non payée avant le déplacement du professionnel' },
+  { key: 'review.window_days', value: 30, description: 'Délai pour donner son avis après la clôture d’une mission' },
+  { key: 'messages.write_after_close_days', value: 7, description: 'Délai pendant lequel la conversation reste ouverte après la fin de la mission' },
   { key: 'app.min_version.client', value: '0.1.0', description: 'Version minimale de l’application client' },
   { key: 'app.min_version.pro', value: '0.1.0', description: 'Version minimale de l’application professionnel' },
 ];

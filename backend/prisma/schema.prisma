@@ -27,6 +27,7 @@ model AbuseReport {
   reporter      User         @relation("abuse_reports_reporter_idTousers", fields: [reporterId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([reporterId, targetType, targetId])
+  @@index([status, createdAt], map: "abuse_reports_status_idx")
   @@map("abuse_reports")
 }
 
@@ -176,6 +177,7 @@ model ComplaintMessage {
   complaint   Complaint @relation(fields: [complaintId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   file        File?     @relation(fields: [fileId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([complaintId, createdAt], map: "complaint_messages_idx")
   @@map("complaint_messages")
 }
 
@@ -193,12 +195,16 @@ model Complaint {
   refundId          String?            @map("refund_id") @db.Uuid
   createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
   resolvedAt        DateTime?          @map("resolved_at") @db.Timestamptz(6)
+  openedFrom        AppKind            @default(CLIENT) @map("opened_from")
   complaintMessages ComplaintMessage[]
   assignedToUser    User?              @relation("complaints_assigned_toTousers", fields: [assignedTo], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mission           Mission?           @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   openedByUser      User               @relation("complaints_opened_byTousers", fields: [openedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
   refund            Refund?            @relation(fields: [refundId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@index([openedBy, createdAt(sort: Desc)], map: "complaints_opened_by_idx")
+  @@index([status, createdAt], map: "complaints_status_idx")
+  @@index([missionId], map: "complaints_open_mission_idx", where: raw("(status = ANY (ARRAY['OPEN'::complaint_status, 'IN_REVIEW'::complaint_status, 'WAITING_USER'::complaint_status]))"))
   @@map("complaints")
 }
 
@@ -221,6 +227,7 @@ model Conversation {
   missionId         String?            @map("mission_id") @db.Uuid
   isLocked          Boolean            @default(false) @map("is_locked")
   createdAt         DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastMessageAt     DateTime?          @map("last_message_at") @db.Timestamptz(6)
   conversationReads ConversationRead[]
   client            User               @relation(fields: [clientId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   mission           Mission?           @relation(fields: [missionId], references: [id], onDelete: NoAction, onUpdate: NoAction)
@@ -229,6 +236,8 @@ model Conversation {
   messages          Message[]
 
   @@unique([requestId, proId])
+  @@index([clientId], map: "conversations_client_idx")
+  @@index([proId], map: "conversations_pro_idx")
   @@map("conversations")
 }
 
@@ -255,6 +264,7 @@ model Device {
   disabledAt DateTime? @map("disabled_at") @db.Timestamptz(6)
   user       User      @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
+  @@index([userId, app], map: "devices_user_idx", where: raw("(disabled_at IS NULL)"))
   @@map("devices")
 }
 
@@ -511,21 +521,25 @@ model NotificationTemplate {
 }
 
 model Notification {
-  id        String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  userId    String             @map("user_id") @db.Uuid
-  type      String
-  title     String
-  body      String
-  data      Json               @default("{}")
-  dedupeKey String?            @map("dedupe_key")
-  status    NotificationStatus @default(QUEUED)
-  attempts  Int                @default(0)
-  sentAt    DateTime?          @map("sent_at") @db.Timestamptz(6)
-  readAt    DateTime?          @map("read_at") @db.Timestamptz(6)
-  createdAt DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
-  user      User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  id            String             @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  userId        String             @map("user_id") @db.Uuid
+  type          String
+  title         String
+  body          String
+  data          Json               @default("{}")
+  dedupeKey     String?            @map("dedupe_key")
+  status        NotificationStatus @default(QUEUED)
+  attempts      Int                @default(0)
+  sentAt        DateTime?          @map("sent_at") @db.Timestamptz(6)
+  readAt        DateTime?          @map("read_at") @db.Timestamptz(6)
+  createdAt     DateTime           @default(now()) @map("created_at") @db.Timestamptz(6)
+  nextAttemptAt DateTime           @default(now()) @map("next_attempt_at") @db.Timestamptz(6)
+  lastError     String?            @map("last_error")
+  pushResult    String?            @map("push_result")
+  user          User               @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@unique([userId, dedupeKey])
+  @@index([nextAttemptAt], map: "notifications_queue_idx", where: raw("(status = 'QUEUED'::notification_status)"))
   @@index([userId], map: "notifications_unread_idx", where: raw("(read_at IS NULL)"))
   @@index([userId, createdAt(sort: Desc)], map: "notifications_user_idx")
   @@map("notifications")
