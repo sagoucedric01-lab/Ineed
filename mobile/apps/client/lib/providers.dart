@@ -30,3 +30,15 @@ final selectedAddressProvider = Provider.autoDispose<AsyncValue<Address?>>((ref)
   final id = ref.watch(selectedAddressIdProvider);
   return ref.watch(addressesProvider).whenData((list) => list.where((a) => a.id == id).firstOrNull ?? list.firstOrNull);
 });
+
+final requestOffersProvider = FutureProvider.autoDispose.family<RequestOffers, String>((ref, id) => ref.read(apiProvider).requestOffers(id));
+
+final activeMissionsProvider = FutureProvider.autoDispose<List<MissionSummary>>((ref) => ref.read(apiProvider).missions());
+
+final missionProvider = FutureProvider.autoDispose.family<Mission, String>((ref, id) => ref.read(apiProvider).mission(id));
+
+/// Statuts pendant lesquels l'écran d'une demande se rafraîchit seul.
+const liveRequestStatuses = {'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'PROVISIONALLY_RESERVED', 'AWAITING_CLIENT_CONFIRMATION'};
+
+/// Rafraîchissement automatique (en attendant les notifications push de la phase 8).
+const liveRefreshInterval = Duration(seconds: 5);

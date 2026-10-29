@@ -9,6 +9,7 @@ import 'dev_status_screen.dart';
 import 'screens/address_edit_screen.dart';
 import 'screens/addresses_screen.dart';
 import 'screens/home_screen.dart';
+import 'screens/mission_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pro_profile_screen.dart';
@@ -92,6 +93,7 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
         builder: (_, state) => RequestFormScreen(args: state.extra! as RequestFormArgs),
       ),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
+      GoRoute(path: '/missions/:id', builder: (_, state) => MissionScreen(missionId: state.pathParameters['id']!)),
       GoRoute(
         path: '/compte',
         builder: (context, _) => AccountScreen(

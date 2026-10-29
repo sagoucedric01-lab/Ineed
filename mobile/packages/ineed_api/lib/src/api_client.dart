@@ -5,6 +5,7 @@ import 'package:dio/dio.dart';
 
 import 'api_failure.dart';
 import 'marketplace.dart';
+import 'missions.dart';
 import 'models.dart';
 import 'readiness.dart';
 import 'tokens.dart';
@@ -319,6 +320,84 @@ class IneedApiClient {
   Future<ServiceRequest> cancelRequest(String id, {String? reason}) => _guard(
         () async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$id/cancel', data: {'reason': ?reason}, options: _auth()))),
       );
+
+  // ---------------------------------------------------------------- Mise en relation (client)
+
+  Future<RequestOffers> requestOffers(String requestId) =>
+      _guard(() async => RequestOffers.fromJson(await _json(_dio.get('/v1/requests/$requestId/offers', options: _auth()))));
+
+  Future<ServiceRequest> chooseOffer(String requestId, String offerId) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$requestId/offers/$offerId/choose', options: _auth()))));
+
+  Future<ServiceRequest> confirmRequest(String requestId) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$requestId/confirm', options: _auth()))));
+
+  Future<ServiceRequest> declineReservation(String requestId) =>
+      _guard(() async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$requestId/decline-reservation', options: _auth()))));
+
+  Future<ServiceRequest> retryRequest(String requestId, {TimeWindow? window}) => _guard(
+        () async => ServiceRequest.fromJson(await _json(_dio.post('/v1/requests/$requestId/retry', data: {'window': ?window?.toJson()}, options: _auth()))),
+      );
+
+  // ---------------------------------------------------------------- Missions (client)
+
+  Future<List<MissionSummary>> missions({String scope = 'active'}) => _guard(
+        () async => (await _jsonList(_dio.get('/v1/missions', queryParameters: {'scope': scope}, options: _auth()))).map(MissionSummary.fromJson).toList(),
+      );
+
+  Future<Mission> mission(String id) => _guard(() async => Mission.fromJson(await _json(_dio.get('/v1/missions/$id', options: _auth()))));
+
+  Future<Mission> cancelMission(String id, {String? reason}) =>
+      _guard(() async => Mission.fromJson(await _json(_dio.post('/v1/missions/$id/cancel', data: {'reason': ?reason}, options: _auth()))));
+
+  Future<Mission> confirmCompletion(String id) => _guard(() async => Mission.fromJson(await _json(_dio.post('/v1/missions/$id/confirm-completion', options: _auth()))));
+
+  Future<Mission> reportProblem(String id, String reason) =>
+      _guard(() async => Mission.fromJson(await _json(_dio.post('/v1/missions/$id/problem', data: {'reason': reason}, options: _auth()))));
+
+  // ---------------------------------------------------------------- Demandes reçues et missions (professionnel)
+
+  Future<List<ProOffer>> proOffers() => _guard(() async => (await _jsonList(_dio.get('/v1/pro/offers', options: _auth()))).map(ProOffer.fromJson).toList());
+
+  Future<ProOffer> proOffer(String id) => _guard(() async => ProOffer.fromJson(await _json(_dio.get('/v1/pro/offers/$id', options: _auth()))));
+
+  Future<ProOffer> acceptOffer(String id) => _guard(() async => ProOffer.fromJson(await _json(_dio.post('/v1/pro/offers/$id/accept', options: _auth()))));
+
+  Future<ProOffer> proposeOffer(String id, {required DateTime start, int? priceXof, int? travelFeeXof, String? message}) => _guard(
+        () async => ProOffer.fromJson(await _json(_dio.post('/v1/pro/offers/$id/propose',
+            data: {
+              'proposedStartAt': start.toUtc().toIso8601String(),
+              'proposedPriceXof': ?priceXof,
+              'proposedTravelFeeXof': ?travelFeeXof,
+              if (message != null && message.trim().isNotEmpty) 'message': message.trim(),
+            },
+            options: _auth()))),
+      );
+
+  Future<ProOffer> declineOffer(String id, {String? reason}) =>
+      _guard(() async => ProOffer.fromJson(await _json(_dio.post('/v1/pro/offers/$id/decline', data: {'reason': ?reason}, options: _auth()))));
+
+  Future<List<MissionSummary>> proMissions({String scope = 'active'}) => _guard(
+        () async => (await _jsonList(_dio.get('/v1/pro/missions', queryParameters: {'scope': scope}, options: _auth()))).map(MissionSummary.fromJson).toList(),
+      );
+
+  Future<Mission> proMission(String id) => _guard(() async => Mission.fromJson(await _json(_dio.get('/v1/pro/missions/$id', options: _auth()))));
+
+  /// Étape de la mission : `depart`, `arrive` ou `start`. Renvoyer une étape déjà faite est sans effet.
+  Future<Mission> missionStep(String id, String step) =>
+      _guard(() async => Mission.fromJson(await _json(_dio.post('/v1/pro/missions/$id/$step', options: _auth()))));
+
+  Future<Mission> completeMission(String id, {String? report}) => _guard(
+        () async => Mission.fromJson(await _json(_dio.post('/v1/pro/missions/$id/complete',
+            data: {if (report != null && report.trim().isNotEmpty) 'report': report.trim()}, options: _auth()))),
+      );
+
+  Future<Mission> withdrawFromMission(String id, String reason) =>
+      _guard(() async => Mission.fromJson(await _json(_dio.post('/v1/pro/missions/$id/cancel', data: {'reason': reason}, options: _auth()))));
+
+  /// Positions du trajet ; renvoyer un lot déjà reçu est sans effet (dédoublonnage par horodatage).
+  Future<void> sendTripPoints(String missionId, List<TripPoint> points) =>
+      _guard(() => _dio.post<void>('/v1/pro/missions/$missionId/locations', data: {'points': [for (final p in points) p.toJson()]}, options: _auth()));
 
   // ---------------------------------------------------------------- Notifications
 

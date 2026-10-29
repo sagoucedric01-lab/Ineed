@@ -418,6 +418,9 @@ class ServiceRequest {
     this.publishedAt,
     this.cancelledAt,
     this.cancelReason,
+    this.reservationExpiresAt,
+    this.searchRadiusM,
+    this.missionId,
   });
   factory ServiceRequest.fromJson(Map<String, Object?> j) => ServiceRequest(
         id: req<String>(j, 'id'),
@@ -436,6 +439,9 @@ class ServiceRequest {
         publishedAt: dateOrNull(j, 'publishedAt'),
         cancelledAt: dateOrNull(j, 'cancelledAt'),
         cancelReason: j['cancelReason'] as String?,
+        reservationExpiresAt: dateOrNull(j, 'reservationExpiresAt'),
+        searchRadiusM: intOrNull(j, 'searchRadiusM'),
+        missionId: j['missionId'] as String?,
       );
   final String id;
   final String status;
@@ -443,6 +449,11 @@ class ServiceRequest {
   final CategoryRef category;
   final ServiceRef? service;
   final PricingModel pricingModel;
+  final DateTime? reservationExpiresAt;
+  final int? searchRadiusM;
+
+  /// Mission créée à la confirmation du client.
+  final String? missionId;
   final String description;
   final RequestPlace place;
   final TimeWindow? window;
@@ -455,7 +466,8 @@ class ServiceRequest {
   final String? cancelReason;
 
   bool get isDraft => status == 'DRAFT';
-  bool get canCancel => const {'DRAFT', 'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'NO_PROVIDER_FOUND'}.contains(status);
+  bool get canCancel =>
+      const {'DRAFT', 'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'NO_PROVIDER_FOUND', 'PROVISIONALLY_RESERVED', 'AWAITING_CLIENT_CONFIRMATION'}.contains(status);
 }
 
 class RequestSummary {

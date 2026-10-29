@@ -3,6 +3,7 @@ library;
 
 export 'l10n/gen/common_localizations.dart';
 export 'src/errors.dart';
+export 'src/mission_status.dart';
 export 'src/screens/account_screen.dart';
 export 'src/screens/complete_profile_screen.dart';
 export 'src/screens/delete_account_screen.dart';

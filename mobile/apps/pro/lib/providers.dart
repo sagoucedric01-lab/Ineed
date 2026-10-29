@@ -24,3 +24,12 @@ final pdfPickerProvider = Provider<PdfPicker>((ref) => () async {
 
 /// Statuts dans lesquels le professionnel complète encore son dossier.
 bool isEditableStatus(String? status) => status == null || status == 'DRAFT' || status == 'INFO_REQUESTED';
+
+final proOffersProvider = FutureProvider.autoDispose<List<ProOffer>>((ref) => ref.read(apiProvider).proOffers());
+
+final proMissionsProvider = FutureProvider.autoDispose<List<MissionSummary>>((ref) => ref.read(apiProvider).proMissions());
+
+final proMissionProvider = FutureProvider.autoDispose.family<Mission, String>((ref, id) => ref.read(apiProvider).proMission(id));
+
+/// Rafraîchissement des demandes reçues tant que le professionnel est disponible (avant les notifications push).
+const offersRefreshInterval = Duration(seconds: 10);

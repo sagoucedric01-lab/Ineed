@@ -290,5 +290,22 @@
   "serviceAreaBaseSet": "Point de départ enregistré.",
   "serviceAreaOutside": "Ce point est en dehors de la zone desservie par Ineed.",
   "locationDeniedPro": "La localisation est refusée : vous êtes proposé aux clients de vos communes et autour de votre point de départ.",
-  "dashboardLocationShared": "Votre position est utilisée tant que vous êtes disponible, puis effacée."
+  "dashboardLocationShared": "Votre position est utilisée tant que vous êtes disponible, puis effacée.",
+  "proposalStartInvalid": "Choisissez une heure dans le créneau du client.",
+  "missionsTitle": "Mes missions",
+  "missionsEmpty": "Aucune mission en cours.",
+  "missionClientName": "Client : {name}",
+  "@missionClientName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "missionNextStepPending": "Le devis et le paiement dans l’application arrivent dans la prochaine version : la mission avancera ensuite.",
+  "missionCancelReasonRequired": "Indiquez le motif (5 caractères au moins).",
+  "missionCancelled": "Mission annulée.",
+  "offerSeeMission": "Voir la mission",
+  "alertAcceptedWaiting": "Vous êtes réservé. Le client doit maintenant confirmer : vous serez prévenu.",
+  "missionsActiveTitle": "Missions en cours"
 }

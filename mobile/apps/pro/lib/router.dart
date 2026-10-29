@@ -12,6 +12,8 @@ import 'screens/activity_screen.dart';
 import 'screens/dashboard_screen.dart';
 import 'screens/documents_screen.dart';
 import 'screens/dossier_screen.dart';
+import 'screens/mission_screen.dart';
+import 'screens/offer_screen.dart';
 import 'screens/status_screen.dart';
 
 const publicRoutes = {'/connexion', '/connexion/code'};
@@ -74,6 +76,8 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
       GoRoute(path: '/dossier/justificatifs', builder: (_, _) => const DocumentsScreen()),
       GoRoute(path: '/statut', builder: (_, _) => const StatusScreen()),
       GoRoute(path: '/tableau-de-bord', builder: (_, _) => const DashboardScreen()),
+      GoRoute(path: '/demandes-recues/:id', builder: (_, state) => OfferScreen(offerId: state.pathParameters['id']!)),
+      GoRoute(path: '/missions/:id', builder: (_, state) => ProMissionScreen(missionId: state.pathParameters['id']!)),
       GoRoute(
         path: '/compte',
         builder: (context, _) => AccountScreen(

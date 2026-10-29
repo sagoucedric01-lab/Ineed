@@ -2,7 +2,7 @@
 
 Mis à jour à la fin de chaque phase. Légende : ✅ terminé et testé · 🟡 partiel · 🧪 simulé (développement uniquement) · ⏳ pas commencé.
 
-Dernière mise à jour : fin de la phase 5 (28/10/2026).
+Dernière mise à jour : fin de la phase 6 (29/10/2026).
 
 ## Socle technique
 
@@ -16,8 +16,8 @@ Dernière mise à jour : fin de la phase 5 (28/10/2026).
 | API : configuration validée, garde-fous de production | ✅ | Simulateurs OTP et paiement refusés quand `APP_ENV=production` |
 | API : santé (`/health/live`, `/health/ready`) | ✅ | Base + PostGIS, Redis, stockage S3, présence du worker |
 | API : format d'erreur français, identifiant de requête, journaux structurés masqués | ✅ | |
-| Documentation OpenAPI (`/docs`, `docs/api/openapi.json`) | ✅ | 63 routes |
-| Worker (tâches de fond) | 🟡 | Démarre et signale sa présence ; aucune file de tâches métier avant la phase 6 |
+| Documentation OpenAPI (`/docs`, `docs/api/openapi.json`) | ✅ | 90 routes |
+| Worker (tâches de fond) | ✅ | Moteur d'attribution (tick toutes les 5 s, verrou Redis), clôtures automatiques, purge des positions |
 | Stockage S3 | ✅ | Dépôt direct par URL présignée, contrôle du contenu réel, photos ré-encodées sans métadonnées (GPS compris), justificatifs dans un bucket privé |
 | Administration web | 🟡 | Page « État de la plateforme » uniquement. L'API d'administration (connexion avec TOTP, file de validation des pros) existe ; l'interface arrive en phase 9 |
 | Applications mobiles Ineed et Ineed Pro | 🟡 | Connexion, compte et inscription pro (voir ci-dessous). Testées sur faux serveur uniquement : **aucun essai sur téléphone ou émulateur** dans cet environnement |
@@ -48,10 +48,12 @@ Dernière mise à jour : fin de la phase 5 (28/10/2026).
 | Adresses avec repère, commune vérifiée, point sur la carte | ✅ | Carte affichée seulement si un fond de carte est configuré (`INEED_MAP_TILE_URL`) ; **aucun géocodage d'adresse textuelle** (pas de clé Google Maps) |
 | Recherche de professionnels proches (urgence et programmé), classement, délai estimé, pistes sans résultat | ✅ | T4, T6. Délai = estimation à vitesse urbaine moyenne, pas un calcul d'itinéraire |
 | Profil public d'un professionnel | 🟡 | Sans avis (phase 8) |
-| Création de demande (photos, note vocale, budget, relecture, publication, annulation) | ✅ | T5. **Une demande publiée n'est encore transmise à aucun professionnel** : la mise en relation arrive en phase 6, et l'application le dit |
+| Création de demande (photos, note vocale, budget, relecture, publication, annulation) | ✅ | T5 |
 | Position du professionnel disponible, point de départ, rayon | ✅ | Une seule position conservée, effacée au passage hors ligne |
 | Notifications dans l'application (liste, lecture) | 🟡 | Sans push (phase 8) |
-| Propositions, attribution, suivi de mission | ⏳ | Phase 6 |
+| Mise en relation : vagues d'alertes, acceptation (urgence), propositions et choix (programmé), confirmation du client | ✅ | T7, T8 (acceptations simultanées : une seule réservation), T9, T10, T11. **Alertes visibles dans Ineed Pro ouverte** (rafraîchissement toutes les 10 s) : pas de notification push avant la phase 8 |
+| Missions : étapes, trajet suivi par le client, fin d'intervention, clôture (client ou automatique), litige, annulations | 🟡 | T18 à T21, T26, T27 sur API. **Une mission ne dépasse pas l'étape « devis » ou « paiement »** tant que la phase 7 n'est pas livrée ; trajet et fin testés en simulant un paiement confirmé |
+| Reprise après redémarrage du serveur | ✅ | T27 : tout l'état d'attribution est en base |
 | Devis, paiements, remboursements, reversements | ⏳ | Phase 7 |
 | Notifications push, messagerie, avis, réclamations | ⏳ | Phase 8 |
 | Administration (23 modules) | ⏳ | Phase 9 |

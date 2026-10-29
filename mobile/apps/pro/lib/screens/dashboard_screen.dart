@@ -29,10 +29,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   bool _locationDenied = false;
   double? _radiusKm;
   Timer? _timer;
+  Timer? _offersTimer;
 
   @override
   void dispose() {
     _timer?.cancel();
+    _offersTimer?.cancel();
     super.dispose();
   }
 
@@ -53,9 +55,12 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
   void _syncTimer(bool online) {
     if (online && _timer == null) {
       _timer = Timer.periodic(locationRefreshInterval, (_) => _sendLocation());
+      _offersTimer = Timer.periodic(offersRefreshInterval, (_) => ref.invalidate(proOffersProvider));
     } else if (!online) {
       _timer?.cancel();
       _timer = null;
+      _offersTimer?.cancel();
+      _offersTimer = null;
     }
   }
 
@@ -153,14 +158,75 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
                 onChanged: p == null ? null : (v) => setState(() => _radiusKm = v),
                 onChangeEnd: (v) => _saveArea(radiusM: v.round() * 1000),
               ),
+              const _ActiveMissions(),
               const SizedBox(height: IneedSpacing.s6),
               Text(l.dashboardIncoming, style: text.titleMedium),
               const SizedBox(height: IneedSpacing.s2),
-              Text(l.dashboardIncomingEmpty, style: text.bodyMedium?.copyWith(color: c.textMuted)),
+              const _IncomingOffers(),
             ],
           );
         },
       ),
+    );
+  }
+}
+
+String _km(int m) => (m / 1000).toStringAsFixed(1).replaceAll('.', ',');
+
+class _IncomingOffers extends ConsumerWidget {
+  const _IncomingOffers();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final c = context.ineedColors;
+    final offers = (ref.watch(proOffersProvider).value ?? const <ProOffer>[]).where((o) => o.isOpen || o.status == 'ACCEPTED').toList();
+    if (offers.isEmpty) return Text(l.dashboardIncomingEmpty, style: Theme.of(context).textTheme.bodyMedium?.copyWith(color: c.textMuted));
+    return Column(children: [
+      for (final o in offers)
+        Card(
+          child: ListTile(
+            leading: Icon(o.mode == RequestMode.urgent ? Icons.bolt : Icons.event, color: o.mode == RequestMode.urgent ? c.urgent : c.action),
+            title: Text(o.service?.name ?? o.category.name),
+            subtitle: Text(l.alertDistance(_km(o.distanceM), o.zoneName)),
+            trailing: o.isOpen ? Text(o.mode == RequestMode.urgent ? l.alertTitleUrgent : l.alertTitleScheduled) : const Icon(Icons.check),
+            onTap: () async {
+              await context.push('/demandes-recues/${o.id}');
+              ref.invalidate(proOffersProvider);
+              ref.invalidate(proMissionsProvider);
+            },
+          ),
+        ),
+    ]);
+  }
+}
+
+class _ActiveMissions extends ConsumerWidget {
+  const _ActiveMissions();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final l = AppLocalizations.of(context);
+    final common = CommonLocalizations.of(context);
+    final missions = ref.watch(proMissionsProvider).value ?? const <MissionSummary>[];
+    if (missions.isEmpty) return const SizedBox.shrink();
+    return Padding(
+      padding: const EdgeInsets.only(top: IneedSpacing.s6),
+      child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        Text(l.missionsActiveTitle, style: Theme.of(context).textTheme.titleMedium),
+        for (final m in missions)
+          Card(
+            child: ListTile(
+              title: Text(m.service?.name ?? m.category.name),
+              subtitle: Text('${m.zoneName ?? ''} · ${missionStatusLabel(common, m.status)}'),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () async {
+                await context.push('/missions/${m.id}');
+                ref.invalidate(proMissionsProvider);
+              },
+            ),
+          ),
+      ]),
     );
   }
 }

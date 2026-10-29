@@ -18,6 +18,7 @@ class HomeScreen extends ConsumerWidget {
     ref.invalidate(addressesProvider);
     ref.invalidate(recentSearchesProvider);
     ref.invalidate(activeRequestsProvider);
+    ref.invalidate(activeMissionsProvider);
     ref.invalidate(notificationsProvider);
     ref.invalidate(categoriesProvider);
     await ref.read(categoriesProvider.future);
@@ -171,8 +172,9 @@ class _OngoingRequests extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final common = CommonLocalizations.of(context);
-    final requests = ref.watch(activeRequestsProvider).value ?? const [];
-    if (requests.isEmpty) return const SizedBox.shrink();
+    final requests = (ref.watch(activeRequestsProvider).value ?? const <RequestSummary>[]).where((r) => r.status != 'ASSIGNED').toList();
+    final missions = ref.watch(activeMissionsProvider).value ?? const <MissionSummary>[];
+    if (requests.isEmpty && missions.isEmpty) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: IneedSpacing.s6),
       child: Column(
@@ -184,6 +186,16 @@ class _OngoingRequests extends ConsumerWidget {
               TextButton(onPressed: () => context.push('/demandes'), child: Text(common.actionSeeAll)),
             ],
           ),
+          for (final m in missions.take(3))
+            Card(
+              child: ListTile(
+                leading: IneedCategoryIcon(iconKey: m.category.iconKey),
+                title: Text(m.service?.name ?? m.category.name),
+                subtitle: Text('${m.proName} · ${missionStatusLabel(common, m.status)}'),
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () => context.push('/missions/${m.id}'),
+              ),
+            ),
           for (final r in requests.take(3))
             Card(
               child: ListTile(

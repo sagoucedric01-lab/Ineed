@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -10,6 +12,7 @@ import '../l10n/gen/app_localizations.dart';
 import '../providers.dart';
 import '../widgets/request_status.dart';
 import '../widgets/slot_picker.dart';
+import 'matching_section.dart';
 import 'request_form_screen.dart';
 
 /// C-16 : relecture d'un brouillon avant publication, puis suivi de la demande publiée.
@@ -24,6 +27,26 @@ class RequestDetailScreen extends ConsumerStatefulWidget {
 
 class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
   bool _busy = false;
+  Timer? _refresh;
+
+  @override
+  void initState() {
+    super.initState();
+    // Tant que la recherche est en cours, l'écran se met à jour seul (réponses des professionnels, échéances).
+    _refresh = Timer.periodic(liveRefreshInterval, (_) {
+      final status = ref.read(requestProvider(widget.requestId)).value?.status;
+      if (status != null && liveRequestStatuses.contains(status)) {
+        ref.invalidate(requestProvider(widget.requestId));
+        ref.invalidate(requestOffersProvider(widget.requestId));
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _refresh?.cancel();
+    super.dispose();
+  }
 
   Future<void> _run(Future<ServiceRequest> Function() action, String done) async {
     final messenger = ScaffoldMessenger.of(context);
@@ -92,7 +115,7 @@ class _RequestDetailScreenState extends ConsumerState<RequestDetailScreen> {
                     RequestStatusChip(status: r.status),
                   ]),
                   const SizedBox(height: IneedSpacing.s4),
-                  if (r.status == 'PUBLISHED') ...[IneedBanner(message: l.requestPublishedPending), const SizedBox(height: IneedSpacing.s4)],
+                  MatchingSection(request: r, onChanged: () => ref.invalidate(requestProvider(widget.requestId))),
                   row(l.requestReviewService, [r.category.name, if (r.service != null) r.service!.name].join(' · ')),
                   row(l.requestReviewWhen, r.window == null ? l.requestModeUrgent : slotLabel(l, r.window!)),
                   row(

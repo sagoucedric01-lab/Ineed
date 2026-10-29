@@ -600,11 +600,34 @@
   "requestStatusAssigned": "Professionnel confirmé",
   "requestStatusExpired": "Expirée",
   "requestStatusCancelled": "Annulée",
-  "requestPublishedPending": "Votre demande est enregistrée. Les professionnels ne sont pas encore prévenus automatiquement : la mise en relation arrive dans la prochaine version d’Ineed.",
   "requestCancelConfirm": "Annuler cette demande ?",
   "requestCancelled": "Demande annulée.",
   "requestHistory": "Historique",
   "requestEditDraft": "Modifier la demande",
   "requestDraftSaved": "Brouillon enregistré.",
-  "searchServices": "Prestations"
+  "searchServices": "Prestations",
+  "requestRetry": "Relancer la recherche",
+  "requestSeeMission": "Suivre la mission",
+  "missionNextStepPending": "Le devis et le paiement dans l’application arrivent dans la prochaine version d’Ineed : la mission avancera ensuite.",
+  "trackingDistance": "À {km} km de chez vous",
+  "@trackingDistance": {
+    "placeholders": {
+      "km": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingEta": "Arrivée estimée dans {minutes} min",
+  "@trackingEta": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "trackingCancelFeeNoAmount": "Le professionnel est déjà en route : les frais de déplacement restent dus. Le reste vous est remboursé.",
+  "trackingCancelConfirm": "Annuler l’intervention ?",
+  "completionProblemHint": "Décrivez le problème (5 caractères au moins)",
+  "completionProblemSent": "Problème signalé. L’équipe Ineed va vous contacter.",
+  "missionsTitle": "Mes missions"
 }
