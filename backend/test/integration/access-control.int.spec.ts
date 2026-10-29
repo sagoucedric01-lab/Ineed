@@ -46,6 +46,17 @@ const MATRIX: { method: 'get' | 'post' | 'put' | 'patch' | 'delete'; path: strin
   { method: 'get', path: '/v1/admin/missions', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
   { method: 'post', path: `/v1/admin/missions/${UUID}/cancel`, body: { reason: 'Test' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
   { method: 'get', path: '/v1/admin/requests', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 403, super: 'ok' } },
+  { method: 'post', path: `/v1/missions/${UUID}/quotes/${UUID}/accept`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/pro/missions/${UUID}/quotes`, body: {}, expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/missions/${UUID}/payments`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/payments/${UUID}`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/payments/${UUID}/receipt`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/pro/earnings', expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/admin/payments', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 403, finance: 'ok', super: 'ok' } },
+  { method: 'get', path: '/v1/admin/ledger/balances', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 403, finance: 'ok', super: 'ok' } },
+  // Un rôle SUPPORT ne peut pas approuver un remboursement.
+  { method: 'post', path: `/v1/admin/payments/${UUID}/refunds`, body: { amountXof: 100, reason: 'Test de droits' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 'ok', super: 'ok' } },
+  { method: 'post', path: `/v1/admin/refunds/${UUID}/complete`, body: { providerRefundId: 'X-1' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 'ok', super: 'ok' } },
 ];
 
 describe('T24 — contrôle d’accès', () => {
@@ -125,11 +136,18 @@ describe('T24 — contrôle d’accès', () => {
         'GET health/ready',
         'GET v1/catalog/categories',
         'GET v1/geo/zones',
+        // Paiement : retour du prestataire, contrôle de l'adresse de notification, page simulée (404 hors simulateur).
+        'GET v1/payment-return',
+        'GET v1/payments/notify/:provider',
+        'GET v1/payments/sandbox/checkout/:ref',
         'POST v1/admin/auth/login',
         'POST v1/admin/auth/totp',
         'POST v1/auth/otp/request',
         'POST v1/auth/otp/verify',
         'POST v1/auth/refresh',
+        // Notifications du prestataire : authentifiées par leur signature, jamais par un jeton.
+        'POST v1/payments/notify/:provider',
+        'POST v1/payments/sandbox/checkout/:ref',
       ]);
     });
 

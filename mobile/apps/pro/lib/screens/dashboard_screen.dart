@@ -112,7 +112,10 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(CommonLocalizations.of(context).appNamePro),
-        actions: [IconButton(tooltip: CommonLocalizations.of(context).profileTitle, icon: const Icon(Icons.person_outline), onPressed: () => context.push('/compte'))],
+        actions: [
+          IconButton(tooltip: l.earningsTitle, icon: const Icon(Icons.account_balance_wallet_outlined), onPressed: () => context.push('/revenus')),
+          IconButton(tooltip: CommonLocalizations.of(context).profileTitle, icon: const Icon(Icons.person_outline), onPressed: () => context.push('/compte')),
+        ],
       ),
       body: AsyncBody(
         value: ref.watch(proProfileProvider),

@@ -466,6 +466,8 @@ model Mission {
   cancelReason           String?                @map("cancel_reason")
   disputedAt             DateTime?              @map("disputed_at") @db.Timestamptz(6)
   version                Int                    @default(0)
+  paymentPendingSince    DateTime?              @map("payment_pending_since") @db.Timestamptz(6)
+  paymentReminderAt      DateTime?              @map("payment_reminder_at") @db.Timestamptz(6)
   createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime               @default(now()) @map("updated_at") @db.Timestamptz(6)
   commissions            Commission[]
@@ -482,12 +484,13 @@ model Mission {
   request                ServiceRequest         @relation(fields: [requestId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   payments               Payment[]
   payoutItems            PayoutItem[]
-  quote                  Quote?
+  quotes                 Quote[]
   review                 Review?
 
   @@index([autoCloseAt], map: "missions_autoclose_idx", where: raw("(status = 'WORK_COMPLETED'::mission_status)"))
   @@index([clientId, createdAt(sort: Desc)], map: "missions_client_idx")
   @@index([proId, status], map: "missions_pro_idx")
+  @@index([paymentPendingSince], map: "missions_payment_pending_idx", where: raw("(status = 'PAYMENT_PENDING'::mission_status)"))
   @@map("missions")
 }
 
@@ -591,6 +594,7 @@ model Payment {
   expiresAt             DateTime?              @map("expires_at") @db.Timestamptz(6)
   lastVerifiedAt        DateTime?              @map("last_verified_at") @db.Timestamptz(6)
   version               Int                    @default(0)
+  isDuplicate           Boolean                @default(false) @map("is_duplicate")
   commission            Commission?
   ledgerTransactions    LedgerTransaction[]
   paymentProviderEvents PaymentProviderEvent[]
@@ -851,7 +855,7 @@ model QuoteLine {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 model Quote {
   id                   String      @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
-  missionId            String      @unique(map: "quotes_one_pending_uq", where: raw("(status = 'SUBMITTED'::quote_status)")) @map("mission_id") @db.Uuid
+  missionId            String      @map("mission_id") @db.Uuid
   version              Int
   kind                 QuoteKind   @default(INITIAL)
   supersedesId         String?     @map("supersedes_id") @db.Uuid
@@ -875,6 +879,8 @@ model Quote {
   children             Quote[]     @relation("quotesToquotes")
 
   @@unique([missionId, version])
+  @@unique([missionId, status], map: "quotes_one_pending_uq", where: raw("(status = 'SUBMITTED'::quote_status)"))
+  @@index([validUntil], map: "quotes_expiry_idx", where: raw("(status = 'SUBMITTED'::quote_status)"))
   @@map("quotes")
 }
 
@@ -916,6 +922,7 @@ model Refund {
   requestedByUser    User?               @relation("refunds_requested_byTousers", fields: [requestedBy], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
   @@index([paymentId], map: "refunds_payment_idx")
+  @@index([createdAt], map: "refunds_todo_idx", where: raw("(status = 'APPROVED'::refund_status)"))
   @@map("refunds")
 }
 

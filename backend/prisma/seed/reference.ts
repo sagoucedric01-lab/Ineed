@@ -3,7 +3,7 @@ import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import type { Prisma, PrismaClient } from '../../src/generated/prisma/client.js';
 import {
-  CATEGORIES, CITY, COMMUNES, COUNTRY, DEFAULT_DISPATCH_RULES, PERMISSIONS, ROLES, SETTINGS,
+  CATEGORIES, CITY, COMMUNES, COUNTRY, DEFAULT_COMMISSION_RULE, DEFAULT_DISPATCH_RULES, PERMISSIONS, ROLES, SETTINGS,
   VERIFICATION_DOCUMENT_TYPES,
 } from './reference-data.js';
 
@@ -31,6 +31,7 @@ export async function seedReference(prisma: PrismaClient): Promise<void> {
       await seedVerificationTypes(tx);
       await seedDispatchRules(tx);
       await seedSettings(tx);
+      await seedCommissionRule(tx);
       await seedNotificationTemplates(tx);
     },
     { timeout: 60_000 },
@@ -113,6 +114,11 @@ async function seedDispatchRules(tx: Tx): Promise<void> {
     });
     if (!existing) await tx.dispatchRule.create({ data: { ...r } });
   }
+}
+
+async function seedCommissionRule(tx: Tx): Promise<void> {
+  const existing = await tx.commissionRule.findFirst({ where: { categoryId: null } });
+  if (!existing) await tx.commissionRule.create({ data: { categoryId: null, ...DEFAULT_COMMISSION_RULE, validFrom: new Date('2026-01-01T00:00:00Z') } });
 }
 
 async function seedSettings(tx: Tx): Promise<void> {

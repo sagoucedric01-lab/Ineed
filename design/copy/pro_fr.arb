@@ -177,11 +177,11 @@
   },
   "quoteAddLine": "Ajouter une ligne",
   "quoteLineType": "Type",
-  "quoteLineLabel": "Désignation",
+  "quoteLineLabel": "Description",
   "quoteLineLabelHint": "Ex. : Remplacement du siphon",
   "quoteLineQuantity": "Quantité",
   "quoteLineUnitPrice": "Prix unitaire (F CFA)",
-  "quoteLineJustification": "Justification (facultatif)",
+  "quoteLineJustification": "Pourquoi est-ce nécessaire ?",
   "quoteValidity": "Validité du devis",
   "quoteValidity24h": "24 heures",
   "quoteValidity3d": "3 jours",
@@ -231,7 +231,7 @@
   "earningsPayoutStatusPaid": "Versé",
   "earningsPayoutStatusFailed": "Échec, nouvel essai prévu",
   "earningsHistory": "Historique",
-  "earningsEmpty": "Vos revenus apparaîtront ici après votre première mission.",
+  "earningsEmpty": "Aucun revenu pour le moment.",
   "earningsPayoutAccount": "Compte de reversement",
   "earningsPayoutsUnavailable": "Les reversements automatiques ne sont pas encore activés. Les montants dus sont conservés et vous seront versés dès leur activation.",
   "earningsPeriodWeek": "Cette semaine",
@@ -303,10 +303,181 @@
       }
     }
   },
-  "missionNextStepPending": "Le devis et le paiement dans l’application arrivent dans la prochaine version : la mission avancera ensuite.",
   "missionCancelReasonRequired": "Indiquez le motif (5 caractères au moins).",
   "missionCancelled": "Mission annulée.",
   "offerSeeMission": "Voir la mission",
   "alertAcceptedWaiting": "Vous êtes réservé. Le client doit maintenant confirmer : vous serez prévenu.",
-  "missionsActiveTitle": "Missions en cours"
+  "missionsActiveTitle": "Missions en cours",
+  "quoteWrite": "Rédiger le devis",
+  "quoteNewVersion": "Envoyer une nouvelle version",
+  "quoteSupplement": "Proposer des frais supplémentaires",
+  "quoteEditorTitle": "Devis",
+  "quoteEditorSupplementTitle": "Frais supplémentaires",
+  "quoteEditorHelp": "Détaillez chaque poste. Le client accepte ou refuse le devis dans l’application. Une fois envoyé, il ne peut plus être modifié : vous pourrez seulement le remplacer par une nouvelle version.",
+  "quoteEditorSupplementHelp": "Ces frais ne s’appliquent que si le client les accepte. Expliquez pourquoi chacun est nécessaire.",
+  "quoteKindTravel": "Déplacement",
+  "quoteKindLabor": "Main-d’œuvre",
+  "quoteKindMaterial": "Pièces et matériaux",
+  "quoteKindOther": "Autre",
+  "quoteLineKind": "Type",
+  "quoteRemoveLine": "Retirer la ligne",
+  "quoteTotal": "Total : {amount}",
+  "@quoteTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteValidityHours": "{hours} heures",
+  "@quoteValidityHours": {
+    "placeholders": {
+      "hours": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteConditions": "Conditions (garantie, ce qui n’est pas compris…)",
+  "quoteDuration": "Durée estimée (minutes)",
+  "quoteSend": "Envoyer le devis",
+  "quoteSent": "Devis envoyé au client.",
+  "quoteErrorLabel": "Décrivez chaque ligne (2 caractères au moins).",
+  "quoteErrorTotal": "Le total doit être supérieur à zéro.",
+  "quoteErrorMultiple": "Le total doit être un multiple de 5 F CFA pour pouvoir être payé par Mobile Money.",
+  "quoteErrorJustification": "Expliquez pourquoi chaque frais supplémentaire est nécessaire.",
+  "quoteStatusSubmitted": "Devis n° {version} envoyé : en attente de la réponse du client.",
+  "@quoteStatusSubmitted": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusAccepted": "Devis n° {version} accepté par le client.",
+  "@quoteStatusAccepted": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusRejected": "Devis n° {version} refusé par le client.",
+  "@quoteStatusRejected": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusExpired": "Devis n° {version} expiré sans réponse.",
+  "@quoteStatusExpired": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteStatusWithdrawn": "Devis n° {version} retiré.",
+  "@quoteStatusWithdrawn": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteRejectReason": "Motif : {reason}",
+  "@quoteRejectReason": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "quoteWithdraw": "Retirer le devis",
+  "quoteWithdrawn": "Devis retiré.",
+  "paymentWaitingClient": "En attente du paiement du client ({amount}). Vous serez prévenu dès qu’il est confirmé.",
+  "@paymentWaitingClient": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "paymentConfirmedPro": "Paiement confirmé : vous pouvez intervenir.",
+  "supplementWaitingPayment": "Frais supplémentaires acceptés : en attente du paiement du client ({amount}) avant de terminer.",
+  "@supplementWaitingPayment": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyPaidPro": "Payé par le client : {amount}",
+  "@moneyPaidPro": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyCommissionPro": "Commission Ineed : {amount}",
+  "@moneyCommissionPro": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyNetPro": "Montant qui vous est dû : {amount}",
+  "@moneyNetPro": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneySandboxPro": "Paiements simulés (environnement de test) : aucun argent réel.",
+  "earningsTotal": "Montant dû par Ineed : {amount}",
+  "@earningsTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsHeld": "En attente de la fin des missions : {amount}",
+  "@earningsHeld": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsAvailable": "Disponible : {amount}",
+  "@earningsAvailable": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsPayoutNote": "Les reversements sur votre compte Mobile Money ne sont pas encore ouverts : le montant dû reste enregistré, mission par mission.",
+  "earningsMissionLine": "Payé {gross} · commission {commission} · net {net}",
+  "@earningsMissionLine": {
+    "placeholders": {
+      "gross": {
+        "type": "String"
+      },
+      "commission": {
+        "type": "String"
+      },
+      "net": {
+        "type": "String"
+      }
+    }
+  },
+  "earningsMissionHeld": "En attente de clôture",
+  "earningsMissionAvailable": "Disponible",
+  "missionAwaitingQuotePro": "Envoyez votre devis : le client l’accepte dans l’application, puis le paie avant votre déplacement.",
+  "missionAwaitingQuoteOnSite": "Diagnostic fait : envoyez le devis des travaux. Le client doit l’accepter et le payer avant que vous commenciez."
 }

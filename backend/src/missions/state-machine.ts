@@ -9,6 +9,8 @@ export interface MissionContext {
   autoCloseAt: Date | null;
   /** Devis (ou supplément) soumis et pas encore accepté ni refusé (phase 7). */
   hasPendingQuote: boolean;
+  /** Frais supplémentaires acceptés mais pas encore payés. */
+  hasUnpaidSupplement: boolean;
   now: Date;
 }
 
@@ -51,7 +53,7 @@ export const MISSION_TRANSITIONS: Transition[] = [
     actors: ['PRO'],
     guard: (c) => (c.pricingModel === 'TRAVEL_PLUS_DIAGNOSIS' ? 'Le client doit d’abord accepter et payer le devis des travaux.' : null),
   },
-  { from: 'IN_PROGRESS', to: 'WORK_COMPLETED', actors: ['PRO'], guard: (c) => (c.hasPendingQuote ? 'Un devis ou des frais supplémentaires attendent la réponse du client.' : null) },
+  { from: 'IN_PROGRESS', to: 'WORK_COMPLETED', actors: ['PRO'], guard: (c) => (c.hasPendingQuote ? 'Un devis ou des frais supplémentaires attendent la réponse du client.' : c.hasUnpaidSupplement ? 'Les frais supplémentaires acceptés doivent d’abord être payés par le client.' : null) },
   // Clôture
   {
     from: 'WORK_COMPLETED',
@@ -87,10 +89,12 @@ export type CancellationTerms = 'FREE' | 'TRAVEL_FEE_DUE';
 
 /**
  * Conditions d'une annulation par le client : gratuite tant que le professionnel n'est pas parti ;
- * une fois en route ou arrivé, les frais de déplacement restent dus. Annulation par le professionnel ou
- * l'administration : toujours sans frais pour le client. Le montant est calculé par le module de paiement.
+ * une fois qu'il s'est déplacé (en route, arrivé, ou devis des travaux en cours après le diagnostic), les
+ * frais de déplacement restent dus. Annulation par le professionnel ou l'administration : toujours sans frais
+ * pour le client. Les montants sont calculés par le module de remboursement (billing).
  */
-export function cancellationTerms(status: MissionStatus, actor: MissionActor): CancellationTerms {
-  if (actor === 'CLIENT' && (status === 'EN_ROUTE' || status === 'ARRIVED')) return 'TRAVEL_FEE_DUE';
+export function cancellationTerms(status: MissionStatus, actor: MissionActor, enRouteAt: Date | null = null): CancellationTerms {
+  if (actor !== 'CLIENT') return 'FREE';
+  if (status === 'EN_ROUTE' || status === 'ARRIVED' || enRouteAt) return 'TRAVEL_FEE_DUE';
   return 'FREE';
 }

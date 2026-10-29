@@ -198,16 +198,32 @@ export async function restartApi(ctx: TestContext): Promise<void> {
   ctx.otp = app.get<DevConsoleOtpProvider>(OTP_PROVIDER);
 }
 
-/** Simule la confirmation d'un paiement vérifié (module de paiement : phase 7). Réservé aux tests. */
-export async function simulateConfirmedPayment(ctx: TestContext, missionId: string): Promise<void> {
-  const { MissionsService } = await import('../../src/missions/missions.service.js');
-  const missions = ctx.app.get(MissionsService);
+export const DEFAULT_QUOTE_LINES = [
+  { kind: 'TRAVEL' as const, label: 'Déplacement', unitPriceXof: 2000 },
+  { kind: 'LABOR' as const, label: 'Main-d’œuvre', unitPriceXof: 13000 },
+];
+
+/**
+ * Parcours de paiement réel avec le simulateur (PAYMENT_PROVIDER=sandbox) : devis du professionnel accepté par
+ * le client si la mission en attend un, création du paiement, issue choisie sur la page simulée, notification
+ * signée, vérification serveur. Renvoie l'identifiant du paiement.
+ */
+export async function payWithSandbox(
+  ctx: TestContext,
+  missionId: string,
+  o: { outcome?: 'SUCCEEDED' | 'FAILED' | 'CANCELLED'; lines?: { kind: 'TRAVEL' | 'LABOR' | 'MATERIAL' | 'OTHER'; label: string; unitPriceXof: number; quantity?: number }[] } = {},
+): Promise<string> {
+  const { QuotesService } = await import('../../src/quotes/quotes.service.js');
+  const { PaymentsService } = await import('../../src/payments/payments.service.js');
+  const quotes = ctx.app.get(QuotesService);
+  const payments = ctx.app.get(PaymentsService);
   const m = await ctx.prisma.mission.findUniqueOrThrow({ where: { id: missionId } });
   if (m.status === 'AWAITING_QUOTE') {
-    // Devis soumis puis accepté : remplacé en phase 7 par le vrai parcours de devis.
-    await missions.transition(missionId, 'QUOTE_PENDING_APPROVAL', 'PRO', m.proId);
-    await missions.transition(missionId, 'CONFIRMED', 'CLIENT', m.clientId);
+    const q = await quotes.submit(m.proId, missionId, { lines: o.lines ?? DEFAULT_QUOTE_LINES });
+    await quotes.accept(m.clientId, missionId, q.id);
   }
-  await missions.transition(missionId, 'PAYMENT_PENDING', 'SYSTEM', null);
-  await missions.transition(missionId, 'PAYMENT_CONFIRMED', 'PAYMENT', null);
+  const p = await payments.initiate(m.clientId, missionId, `test-${missionId}-${Date.now()}`);
+  const ref = p.checkoutUrl!.split('/').pop()!;
+  await ctx.http.post(`/v1/payments/sandbox/checkout/${ref}`).type('form').send({ outcome: o.outcome ?? 'SUCCEEDED', method: 'ORANGE_MONEY' }).expect(200);
+  return p.id;
 }

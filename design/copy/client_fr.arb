@@ -413,7 +413,7 @@
   "completionProblemTitle": "Que s’est-il passé ?",
   "completionProblemBody": "Le paiement au professionnel est suspendu le temps que l’équipe Ineed examine la situation.",
   "completionClosed": "Mission clôturée. Merci d’avoir utilisé Ineed.",
-  "receiptTitle": "Reçu",
+  "receiptTitle": "Reçu de paiement",
   "receiptNumber": "Reçu n° {number}",
   "@receiptNumber": {
     "placeholders": {
@@ -430,7 +430,7 @@
       }
     }
   },
-  "receiptMethod": "Moyen de paiement",
+  "receiptMethod": "Moyen de paiement : {method}",
   "receiptRefunded": "Remboursé",
   "receiptShare": "Partager le reçu",
   "reviewTitle": "Comment s’est passée l’intervention ?",
@@ -609,7 +609,6 @@
   "searchServices": "Prestations",
   "requestRetry": "Relancer la recherche",
   "requestSeeMission": "Suivre la mission",
-  "missionNextStepPending": "Le devis et le paiement dans l’application arrivent dans la prochaine version d’Ineed : la mission avancera ensuite.",
   "trackingDistance": "À {km} km de chez vous",
   "@trackingDistance": {
     "placeholders": {
@@ -630,5 +629,180 @@
   "trackingCancelConfirm": "Annuler l’intervention ?",
   "completionProblemHint": "Décrivez le problème (5 caractères au moins)",
   "completionProblemSent": "Problème signalé. L’équipe Ineed va vous contacter.",
-  "missionsTitle": "Mes missions"
+  "missionsTitle": "Mes missions",
+  "moneyQuoteTitle": "Devis n° {version}",
+  "@moneyQuoteTitle": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "moneySupplementTitle": "Frais supplémentaires proposés",
+  "moneyQuoteValidUntil": "Valable jusqu’au {date}",
+  "@moneyQuoteValidUntil": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyQuoteDuration": "Durée estimée : {minutes} min",
+  "@moneyQuoteDuration": {
+    "placeholders": {
+      "minutes": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyQuoteTotal": "Total : {amount}",
+  "@moneyQuoteTotal": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyQuoteAccept": "Accepter le devis",
+  "moneySupplementAccept": "Accepter ces frais",
+  "moneyQuoteReject": "Refuser",
+  "moneyQuoteRejectTitle": "Refuser ce devis ?",
+  "moneyQuoteRejectBody": "Le professionnel pourra vous proposer une nouvelle version.",
+  "moneyQuoteRejectHint": "Motif (facultatif)",
+  "moneyQuoteAccepted": "Devis accepté. Il reste à régler l’intervention.",
+  "moneySupplementAccepted": "Frais acceptés. Réglez-les pour que le professionnel puisse terminer.",
+  "moneyQuoteRejected": "Devis refusé. Le professionnel est prévenu.",
+  "moneyQuoteWaiting": "Le professionnel prépare son devis : vous le recevrez ici.",
+  "moneyDueTitle": "À régler : {amount}",
+  "@moneyDueTitle": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyPay": "Payer {amount}",
+  "@moneyPay": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyEscrowNote": "Votre paiement est conservé par notre prestataire de paiement agréé et n’est versé au professionnel qu’après la fin de l’intervention.",
+  "moneyPaymentChecking": "Paiement en cours de vérification. Validez l’opération sur votre téléphone si on vous le demande.",
+  "moneyOpenCheckout": "Ouvrir la page de paiement",
+  "moneyCheckPayment": "Vérifier le paiement",
+  "moneyPaymentConfirmed": "Paiement de {amount} confirmé.",
+  "@moneyPaymentConfirmed": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyPaymentFailed": "Le paiement n’a pas abouti. {reason}",
+  "@moneyPaymentFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyPaymentFailedGeneric": "Le paiement n’a pas abouti. Vous pouvez réessayer.",
+  "moneyCheckoutOpenFailed": "Impossible d’ouvrir la page de paiement. Réessayez.",
+  "moneySandbox": "Paiement simulé (environnement de test) : aucun argent réel n’est débité.",
+  "moneyPaymentsTitle": "Paiements",
+  "moneyPurposeFull": "Prestation",
+  "moneyPurposeTravel": "Frais de déplacement",
+  "moneyPurposeWork": "Travaux",
+  "moneyPurposeSupplement": "Frais supplémentaires",
+  "moneyPaidLine": "{label} · {amount} · payé le {date}",
+  "@moneyPaidLine": {
+    "placeholders": {
+      "label": {
+        "type": "String"
+      },
+      "amount": {
+        "type": "String"
+      },
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyReceipt": "Voir le reçu",
+  "moneyRefunded": "Remboursé : {amount}",
+  "@moneyRefunded": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "moneyRefundPending": "Remboursement en cours : {amount}",
+  "@moneyRefundPending": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptDate": "Payé le {date}",
+  "@receiptDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptPro": "Professionnel : {name}",
+  "@receiptPro": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptMission": "Mission {reference}",
+  "@receiptMission": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "@receiptMethod": {
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptTransaction": "Référence de l’opération : {reference}",
+  "@receiptTransaction": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptPhone": "Numéro : {phone}",
+  "@receiptPhone": {
+    "placeholders": {
+      "phone": {
+        "type": "String"
+      }
+    }
+  },
+  "receiptTotal": "Total payé",
+  "receiptRefund": "Remboursé : {amount}",
+  "@receiptRefund": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingCancelFeeDue": "Le professionnel s’est déjà déplacé : les frais de déplacement restent dus, le reste vous est remboursé."
 }

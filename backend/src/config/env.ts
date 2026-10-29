@@ -56,13 +56,29 @@ export const envSchema = z
     DATA_ENCRYPTION_KEY_B64: z.string().refine((v) => Buffer.from(v, 'base64').length === 32, 'doit contenir 32 octets encodés en base64'),
     /** Fournisseur de paiement (phase 7). `sandbox` simule les paiements : interdit en production. */
     PAYMENT_PROVIDER: z.enum(['sandbox', 'cinetpay', 'wave']).default('sandbox'),
+    /** Adresse publique de l'API (notifications de paiement du prestataire, page de paiement simulée). */
+    PUBLIC_API_URL: z.url().optional(),
+    /** Page vers laquelle le prestataire renvoie le client après le paiement. */
+    PAYMENT_RETURN_URL: z.url().optional(),
+    CINETPAY_API_URL: z.url().default('https://api-checkout.cinetpay.com'),
+    CINETPAY_API_KEY: z.string().min(1).optional(),
+    CINETPAY_SITE_ID: z.string().min(1).optional(),
+    /** Clé secrète du compte marchand : vérifie la signature (x-token) des notifications. */
+    CINETPAY_SECRET_KEY: z.string().min(1).optional(),
   })
   .superRefine((env, ctx) => {
     const forbid = (path: keyof typeof env, message: string) => ctx.addIssue({ code: 'custom', path: [path], message });
     if (env.OTP_PROVIDER === 'twilio_verify' && !(env.TWILIO_ACCOUNT_SID && env.TWILIO_AUTH_TOKEN && env.TWILIO_VERIFY_SERVICE_SID)) {
       forbid('OTP_PROVIDER', 'twilio_verify exige TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN et TWILIO_VERIFY_SERVICE_SID');
     }
+    if (env.PAYMENT_PROVIDER === 'cinetpay') {
+      for (const k of ['CINETPAY_API_KEY', 'CINETPAY_SITE_ID', 'CINETPAY_SECRET_KEY', 'PUBLIC_API_URL', 'PAYMENT_RETURN_URL'] as const) {
+        if (!env[k]) forbid(k, 'obligatoire avec PAYMENT_PROVIDER=cinetpay');
+      }
+    }
+    if (env.PAYMENT_PROVIDER === 'wave') forbid('PAYMENT_PROVIDER', 'l’adaptateur Wave n’est pas encore disponible : utilisez cinetpay');
     if (env.APP_ENV !== 'production') return;
+    if (env.PUBLIC_API_URL && !env.PUBLIC_API_URL.startsWith('https://')) forbid('PUBLIC_API_URL', 'doit être en https en production');
     if (env.NODE_ENV !== 'production') forbid('NODE_ENV', 'doit valoir "production" quand APP_ENV=production');
     if (env.OTP_PROVIDER === 'dev_console') forbid('OTP_PROVIDER', 'le mode "dev_console" est interdit en production');
     if (env.PAYMENT_PROVIDER === 'sandbox') forbid('PAYMENT_PROVIDER', 'le simulateur "sandbox" est interdit en production');

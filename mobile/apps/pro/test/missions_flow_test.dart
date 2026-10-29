@@ -129,7 +129,7 @@ void main() {
     expect(find.text('Terminer l’intervention'), findsOneWidget);
   });
 
-  testWidgets('mission en attente du devis ou du paiement : étape suivante expliquée, aucune action de trajet', (tester) async {
+  testWidgets('mission en attente du devis : étape suivante expliquée, aucune action de trajet', (tester) async {
     final backend = approvedPro();
     backend.server.routes['GET /v1/pro/missions'] = (_) async => jsonResponse(200, [
           {'id': 'm1', 'reference': 'IN-2026-000042', 'status': 'AWAITING_QUOTE', 'category': {'id': 'c1', 'name': 'Plomberie', 'iconKey': 'plomberie'}, 'service': {'id': 's1', 'name': 'Fuite d’eau'}, 'zoneName': 'Cocody', 'proName': 'Koffi Plomberie', 'scheduledStartAt': null, 'createdAt': '2026-10-29T10:00:00.000Z'},
@@ -137,8 +137,8 @@ void main() {
     backend.server.routes['GET /v1/pro/missions/m1'] = (_) async => jsonResponse(200, missionJson('AWAITING_QUOTE'));
     await pumpProApp(tester, backend, signedInStore());
     await tapAndSettle(tester, find.textContaining('En attente de devis'));
-    expect(find.text('Le client doit d’abord accepter votre devis.'), findsOneWidget);
-    expect(find.textContaining('arrivent dans la prochaine version'), findsOneWidget);
+    expect(find.textContaining('Envoyez votre devis'), findsOneWidget);
+    expect(find.text('Rédiger le devis'), findsOneWidget);
     expect(find.text('Je pars'), findsNothing);
   });
 

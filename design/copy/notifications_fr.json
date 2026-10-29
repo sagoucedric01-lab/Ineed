@@ -72,6 +72,10 @@
     "COMPLAINT_UPDATED": {
       "title": "Réponse à votre réclamation",
       "body": "L’équipe Ineed a répondu à votre réclamation {{reference}}."
+    },
+    "PAYMENT_REMINDER": {
+      "title": "Paiement en attente",
+      "body": "Réglez {{amount}} pour confirmer l’intervention {{reference}}. Sans paiement, elle sera annulée."
     }
   },
   "pro": {
@@ -150,6 +154,10 @@
     "MISSION_VALIDATED": {
       "title": "Mission clôturée",
       "body": "La mission {{reference}} est clôturée. Merci pour votre intervention."
+    },
+    "QUOTE_EXPIRED": {
+      "title": "Devis expiré",
+      "body": "Votre devis pour la mission {{reference}} a expiré sans réponse. Vous pouvez en envoyer une nouvelle version."
     }
   },
   "sms": {

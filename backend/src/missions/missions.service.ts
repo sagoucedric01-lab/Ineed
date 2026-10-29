@@ -1,6 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import type { AddressSnapshot } from '../addresses/addresses.service.js';
+import { BillingService } from '../billing/billing.service.js';
+import { LedgerService } from '../billing/ledger.service.js';
+import { RefundsService } from '../billing/refunds.service.js';
+import { paymentView, quoteView } from '../billing/views.js';
 import { AppError } from '../common/http/api-error.js';
+import { formatXof } from '../common/money/xof.js';
 import { FilesService } from '../files/files.service.js';
 import { Prisma, type MissionStatus, type PricingModel } from '../generated/prisma/client.js';
 import { pointSql } from '../geo/geo.service.js';
@@ -42,6 +47,7 @@ interface MissionRow {
 
 const TIMESTAMP_FOR: Partial<Record<MissionStatus, string>> = {
   CONFIRMED: 'confirmedAt',
+  PAYMENT_PENDING: 'paymentPendingSince',
   EN_ROUTE: 'enRouteAt',
   ARRIVED: 'arrivedAt',
   IN_PROGRESS: 'startedAt',
@@ -60,6 +66,9 @@ export class MissionsService {
     private readonly notifications: NotificationsService,
     private readonly settings: SettingsService,
     private readonly files: FilesService,
+    private readonly billing: BillingService,
+    private readonly refunds: RefundsService,
+    private readonly ledger: LedgerService,
   ) {}
 
   // ------------------------------------------------------------------ création
@@ -77,6 +86,8 @@ export class MissionsService {
       },
     });
     await tx.missionStatusHistory.create({ data: { missionId: m.id, fromStatus: null, toStatus: status, actorId: p.clientId, createdAt: p.now } });
+    // Prix fixe ou frais de déplacement connus : le paiement est demandé tout de suite.
+    if (status === 'CONFIRMED') await this.transition(m.id, 'PAYMENT_PENDING', 'SYSTEM', null, { now: p.now }, tx);
     return { id: m.id, reference };
   }
 
@@ -110,7 +121,8 @@ export class MissionsService {
       if (actor === 'PRO' && m.proId !== actorUserId) throw new AppError(404, 'NOT_FOUND', 'Cette mission n’existe pas.');
       if (m.status === to) return { status: m.status, changed: false };
       const hasPendingQuote = (await tx.quote.count({ where: { missionId, status: 'SUBMITTED' } })) > 0;
-      const check = checkTransition(m.status, to, actor, { pricingModel: m.pricingModel, arrivedAt: m.arrivedAt, autoCloseAt: m.autoCloseAt, hasPendingQuote, now });
+      const hasUnpaidSupplement = to === 'WORK_COMPLETED' && (await this.billing.hasUnpaidSupplement(tx, missionId));
+      const check = checkTransition(m.status, to, actor, { pricingModel: m.pricingModel, arrivedAt: m.arrivedAt, autoCloseAt: m.autoCloseAt, hasPendingQuote, hasUnpaidSupplement, now });
       if (!check.ok) {
         const message =
           check.reason === 'TRANSITION_NOT_ALLOWED' || check.reason === 'ACTOR_NOT_ALLOWED'
@@ -125,17 +137,25 @@ export class MissionsService {
       const ts = TIMESTAMP_FOR[to];
       if (ts) data[ts] = now;
       const metadata: Record<string, unknown> = { ...opts.metadata };
+      if (to === 'PAYMENT_PENDING') data.paymentReminderAt = null;
       if (to === 'WORK_COMPLETED') data.autoCloseAt = new Date(now.getTime() + (await this.settings.number('mission.auto_close_hours', 48)) * 3_600_000);
       if (to === 'CANCELLED') {
         data.cancelledBy = actorUserId;
         data.cancelReason = opts.reason ?? null;
-        metadata.terms = cancellationTerms(m.status, actor);
+        metadata.terms = cancellationTerms(m.status, actor, m.enRouteAt);
       }
       await tx.mission.update({ where: { id: missionId }, data });
       await tx.missionStatusHistory.create({
         data: { missionId, fromStatus: m.status, toStatus: to, actorId: actorUserId, reason: opts.reason ?? null, metadata: Object.keys(metadata).length ? (metadata as Prisma.InputJsonValue) : undefined, createdAt: now },
       });
       if (opts.report) await tx.missionReport.create({ data: { missionId, authorId: actorUserId!, body: opts.report, createdAt: now } });
+      if (to === 'CANCELLED') {
+        // Devis en attente retirés : la mission ne peut plus être engagée.
+        await tx.quote.updateMany({ where: { missionId, status: 'SUBMITTED' }, data: { status: 'WITHDRAWN', decidedAt: now } });
+        const r = await this.refunds.onMissionCancelled(tx, missionId, metadata.terms as 'FREE' | 'TRAVEL_FEE_DUE', now);
+        metadata.refundedXof = Number(r.refundedXof);
+        metadata.retainedXof = Number(r.retainedXof);
+      }
       await this.afterTransition(tx, m, to, actor, metadata, now);
       return { status: to, changed: true };
     };
@@ -146,6 +166,18 @@ export class MissionsService {
     const pro = await tx.proProfile.findUniqueOrThrow({ where: { userId: m.proId } });
     const ids = { missionId: m.id };
     switch (to) {
+      case 'CONFIRMED':
+        // Devis accepté avant le déplacement : le paiement est demandé.
+        await this.transition(m.id, 'PAYMENT_PENDING', 'SYSTEM', null, { now }, tx);
+        break;
+      case 'PAYMENT_PENDING': {
+        const due = await this.billing.due(tx, m.id);
+        if (!due || due.amountXof === 0n) {
+          // Rien à régler (frais de déplacement offerts) : la mission continue sans paiement.
+          await this.transition(m.id, 'PAYMENT_CONFIRMED', 'PAYMENT', null, { now, reason: 'Aucun montant à régler' }, tx);
+        }
+        break;
+      }
       case 'EN_ROUTE':
         await this.notifications.notify(m.clientId, 'client.PRO_EN_ROUTE', { proName: pro.businessName }, ids, tx);
         break;
@@ -170,7 +202,16 @@ export class MissionsService {
         if (actor === 'CLIENT') await this.notifications.notify(m.proId, 'pro.MISSION_DISPUTED', { reference: m.reference }, ids, tx);
         break;
       case 'CANCELLED': {
-        const refundInfo = metadata.terms === 'TRAVEL_FEE_DUE' ? 'Les frais de déplacement restent dus ; le reste vous est remboursé.' : 'Aucun frais ne vous sera facturé.';
+        const refunded = BigInt(Number(metadata.refundedXof ?? 0));
+        const retained = BigInt(Number(metadata.retainedXof ?? 0));
+        const refundInfo =
+          refunded > 0n
+            ? retained > 0n
+              ? `${formatXof(refunded)} vous sont remboursés ; ${formatXof(retained)} de frais de déplacement restent dus.`
+              : `${formatXof(refunded)} vous sont remboursés.`
+            : retained > 0n
+              ? `${formatXof(retained)} de frais de déplacement restent dus.`
+              : 'Aucun frais ne vous sera facturé.';
         if (actor === 'PRO') {
           await tx.proProfile.update({ where: { userId: m.proId }, data: { cancellationsByPro: { increment: 1 } } });
           const reassign = await this.settings.get<boolean>('mission.reassign_on_pro_cancel', true);
@@ -344,9 +385,10 @@ export class MissionsService {
         place: { zoneName: snapshot.zoneName, cityName: snapshot.cityName, label: snapshot.label, landmark: snapshot.landmark },
         tracking: await this.tracking(m, now),
         /** Conditions qui s'appliqueraient si le client annulait maintenant (null : annulation impossible). */
-        cancelTerms: checkTransition(m.status, 'CANCELLED', 'CLIENT', { pricingModel: m.pricingModel, arrivedAt: m.arrivedAt, autoCloseAt: m.autoCloseAt, hasPendingQuote: false, now }).ok
-          ? cancellationTerms(m.status, 'CLIENT')
+        cancelTerms: checkTransition(m.status, 'CANCELLED', 'CLIENT', { pricingModel: m.pricingModel, arrivedAt: m.arrivedAt, autoCloseAt: m.autoCloseAt, hasPendingQuote: false, hasUnpaidSupplement: false, now }).ok
+          ? cancellationTerms(m.status, 'CLIENT', m.enRouteAt)
           : null,
+        money: await this.money(m, 'CLIENT', now),
       };
     }
     // Professionnel retenu : adresse précise et prénom du client, uniquement une fois la mission créée.
@@ -362,6 +404,35 @@ export class MissionsService {
       client: { firstName: m.client.firstName },
       place: { ...snapshot, location: loc ? { lat: loc.lat, lng: loc.lng } : null },
       media: audience === 'PRO' ? media : media.map(({ url: _, ...x }) => x),
+      money: await this.money(m, audience, now),
+    };
+  }
+
+  /** Devis (toutes versions), paiements, montant dû ; côté professionnel : commission et net de la mission. */
+  private async money(m: { id: string; proId: string; status: MissionStatus }, audience: 'CLIENT' | 'PRO' | 'ADMIN', now: Date) {
+    const [quotes, payments] = await Promise.all([
+      this.prisma.quote.findMany({ where: { missionId: m.id, status: { not: 'DRAFT' } }, orderBy: { version: 'asc' }, include: { quoteLines: true } }),
+      this.prisma.payment.findMany({ where: { missionId: m.id }, orderBy: { initiatedAt: 'asc' }, include: { refunds: true, commission: true } }),
+    ]);
+    let due = null;
+    try {
+      const d = await this.billing.due(this.prisma, m.id);
+      due = d && d.amountXof > 0n ? { purpose: d.purpose, quoteId: d.quoteId, amountXof: Number(d.amountXof), label: d.label } : null;
+    } catch (e) {
+      if (!(e instanceof AppError)) throw e;
+    }
+    const succeeded = payments.filter((p) => p.status === 'SUCCEEDED');
+    const paidXof = succeeded.reduce((s, p) => s + p.amountXof, 0n);
+    const refundedXof = payments.flatMap((p) => p.refunds).filter((r) => r.status === 'SUCCEEDED').reduce((s, r) => s + r.amountXof, 0n);
+    const base = { quotes: quotes.map((q) => quoteView(q, now)), due, paidXof: Number(paidXof), refundedXof: Number(refundedXof) };
+    if (audience === 'CLIENT') return { ...base, payments: payments.map(paymentView) };
+    const commissionXof = succeeded.reduce((s, p) => s + (p.commission?.amountXof ?? 0n), 0n);
+    return {
+      ...base,
+      payments: payments.filter((p) => p.status === 'SUCCEEDED').map((p) => ({ id: p.id, purpose: p.purpose, amountXof: Number(p.amountXof), confirmedAt: p.confirmedAt?.toISOString() ?? null, isSandbox: p.isSandbox })),
+      commissionXof: Number(commissionXof),
+      /** Montant dû au professionnel pour cette mission (après commission et remboursements). */
+      netXof: Number(await this.ledger.proPayable(m.proId, m.id)),
     };
   }
 

@@ -52,9 +52,15 @@ Dernière mise à jour : fin de la phase 6 (29/10/2026).
 | Position du professionnel disponible, point de départ, rayon | ✅ | Une seule position conservée, effacée au passage hors ligne |
 | Notifications dans l'application (liste, lecture) | 🟡 | Sans push (phase 8) |
 | Mise en relation : vagues d'alertes, acceptation (urgence), propositions et choix (programmé), confirmation du client | ✅ | T7, T8 (acceptations simultanées : une seule réservation), T9, T10, T11. **Alertes visibles dans Ineed Pro ouverte** (rafraîchissement toutes les 10 s) : pas de notification push avant la phase 8 |
-| Missions : étapes, trajet suivi par le client, fin d'intervention, clôture (client ou automatique), litige, annulations | 🟡 | T18 à T21, T26, T27 sur API. **Une mission ne dépasse pas l'étape « devis » ou « paiement »** tant que la phase 7 n'est pas livrée ; trajet et fin testés en simulant un paiement confirmé |
+| Missions : étapes, trajet suivi par le client, fin d'intervention, clôture (client ou automatique), litige, annulations | ✅ | T18 à T21, T26, T27, avec le vrai parcours devis → paiement (simulateur) |
 | Reprise après redémarrage du serveur | ✅ | T27 : tout l'état d'attribution est en base |
-| Devis, paiements, remboursements, reversements | ⏳ | Phase 7 |
+| Devis : versions, remplacement, frais supplémentaires justifiés, acceptation, refus, expiration | ✅ | T12, T13 (API et applications) |
+| Paiement : création, page du prestataire, notification signée, vérification serveur, relances, échéance | 🧪 | T14, T15, T16 avec le **simulateur**. Adaptateur **CinetPay** écrit et couvert par des tests de contrat sur le format documenté, **jamais essayé sur un compte marchand** (non fourni) |
+| Grand livre, commissions, rapprochement | ✅ | Somme du grand livre = 0, écritures en ajout seul ; commission par défaut **10 % provisoire** (D9 à chiffrer) |
+| Remboursements (barème d'annulation, administration, paiement en double ou tardif) | 🟡 | T17. Exécutés automatiquement avec le simulateur ; avec CinetPay, **exécution manuelle** dans l'espace marchand puis saisie dans Ineed (pas d'API de remboursement connue côté CinetPay Checkout, à confirmer) |
+| Reçus de paiement | 🟡 | Reçu dans l'application ; **pas une facture** : mentions fiscales à définir (conseil) ; pas de PDF ni d'envoi par e-mail |
+| Revenus du professionnel | 🟡 | Montant dû par mission (après commission) ; **reversements : phase 9** (validation administrative, fournisseur de transfert) |
+| Promotions | ⏳ | Tables prêtes ; non utilisées (phase 9) |
 | Notifications push, messagerie, avis, réclamations | ⏳ | Phase 8 |
 | Administration (23 modules) | ⏳ | Phase 9 |
 
@@ -63,4 +69,4 @@ Dernière mise à jour : fin de la phase 6 (29/10/2026).
 | Simulation | Où | Garde-fou |
 |---|---|---|
 | Codes SMS affichés dans les journaux (`OTP_PROVIDER=dev_console`) | **Actif** : valeur par défaut hors production ; les applications affichent « Mode développement » | Démarrage refusé en production |
-| Paiements simulés (`PAYMENT_PROVIDER=sandbox`) | Valeur par défaut hors production (utilisée à partir de la phase 7) | Démarrage refusé en production ; transactions marquées `is_sandbox` |
+| Paiements simulés (`PAYMENT_PROVIDER=sandbox`) | **Actif** : valeur par défaut hors production. Page de paiement simulée (bandeau rouge « SIMULATION »), notification signée, remboursement immédiat ; applications et reçus affichent « simulation » | Démarrage refusé en production (configuration **et** construction du prestataire) ; page simulée et notification « sandbox » en 404 en production (testé) ; paiements marqués `is_sandbox` |

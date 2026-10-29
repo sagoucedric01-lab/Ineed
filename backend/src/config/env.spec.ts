@@ -15,6 +15,7 @@ const base = {
 const prod = {
   ...base, APP_ENV: 'production', NODE_ENV: 'production', PAYMENT_PROVIDER: 'cinetpay',
   OTP_PROVIDER: 'twilio_verify', TWILIO_ACCOUNT_SID: 'AC1', TWILIO_AUTH_TOKEN: 't', TWILIO_VERIFY_SERVICE_SID: 'VA1',
+  CINETPAY_API_KEY: 'k', CINETPAY_SITE_ID: '1', CINETPAY_SECRET_KEY: 's', PUBLIC_API_URL: 'https://api.ineed.test', PAYMENT_RETURN_URL: 'https://ineed.test/retour',
 };
 
 describe('loadEnv', () => {
@@ -63,5 +64,24 @@ describe('loadEnv', () => {
 
   it('autorise les simulateurs hors production', () => {
     expect(() => loadEnv({ ...base, APP_ENV: 'staging', PAYMENT_PROVIDER: 'sandbox' })).not.toThrow();
+  });
+
+  it('CinetPay exige ses clés et les adresses de notification et de retour', () => {
+    const missing: Record<string, string> = { ...prod };
+    delete missing.CINETPAY_SECRET_KEY;
+    delete missing.PUBLIC_API_URL;
+    try {
+      loadEnv(missing);
+      expect.unreachable();
+    } catch (e) {
+      const text = (e as EnvValidationError).issues.join('\n');
+      expect(text).toContain('CINETPAY_SECRET_KEY');
+      expect(text).toContain('PUBLIC_API_URL');
+    }
+  });
+
+  it('refuse une adresse publique non chiffrée en production et l’adaptateur Wave non livré', () => {
+    expect(() => loadEnv({ ...prod, PUBLIC_API_URL: 'http://api.ineed.test' })).toThrow(/https/);
+    expect(() => loadEnv({ ...base, PAYMENT_PROVIDER: 'wave' })).toThrow(/Wave/);
   });
 });

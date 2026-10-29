@@ -2,6 +2,7 @@
 
 import 'json.dart';
 import 'marketplace.dart';
+import 'money.dart';
 
 /// Proposition de mission reçue par un professionnel (quartier et distance approximative seulement).
 class ProOffer {
@@ -211,6 +212,7 @@ class Mission {
     this.cancelTerms,
     this.clientFirstName,
     this.proAvatarUrl,
+    this.money,
   });
   factory Mission.fromJson(Map<String, Object?> j) {
     final request = req<Map<String, Object?>>(j, 'request');
@@ -235,6 +237,7 @@ class Mission {
       cancelTerms: j['cancelTerms'] as String?,
       clientFirstName: mapOrNull(j, 'client')?['firstName'] as String?,
       timeline: listOf(j, 'timeline').map(TimelineEvent.fromJson).toList(),
+      money: mapOrNull(j, 'money') == null ? null : MissionMoney.fromJson(mapOrNull(j, 'money')!),
     );
   }
   final String id;
@@ -259,8 +262,12 @@ class Mission {
   final String? cancelTerms;
   final String? clientFirstName;
 
+  /// Devis, paiements, montant dû (absent des réponses antérieures à la phase 7).
+  final MissionMoney? money;
+
   /// Étapes qui dépendent du devis et du paiement dans l'application (phase suivante).
   bool get waitsForQuoteOrPayment => const {'AWAITING_QUOTE', 'QUOTE_PENDING_APPROVAL', 'CONFIRMED', 'PAYMENT_PENDING'}.contains(status);
+  bool get isActive => status != 'CLOSED' && status != 'CANCELLED';
 }
 
 class MissionSummary {

@@ -2555,6 +2555,587 @@
         ]
       }
     },
+    "/v1/missions/{missionId}/quotes": {
+      "get": {
+        "operationId": "ClientQuotesController_list",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Devis de la mission, toutes versions",
+        "tags": [
+          "Devis"
+        ]
+      }
+    },
+    "/v1/missions/{missionId}/quotes/{quoteId}/accept": {
+      "post": {
+        "operationId": "ClientQuotesController_accept",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quoteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par action (renvoyée telle quelle en cas de nouvel essai)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Accepter le devis (version courante et encore valable) : le paiement est ensuite demandé",
+        "tags": [
+          "Devis"
+        ]
+      }
+    },
+    "/v1/missions/{missionId}/quotes/{quoteId}/reject": {
+      "post": {
+        "operationId": "ClientQuotesController_reject",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quoteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par action (renvoyée telle quelle en cas de nouvel essai)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectQuoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Refuser le devis : le professionnel peut proposer une nouvelle version",
+        "tags": [
+          "Devis"
+        ]
+      }
+    },
+    "/v1/pro/missions/{missionId}/quotes": {
+      "get": {
+        "operationId": "ProQuotesController_list",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Professionnel — devis"
+        ]
+      },
+      "post": {
+        "operationId": "ProQuotesController_submit",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par action (renvoyée telle quelle en cas de nouvel essai)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SubmitQuoteDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Envoyer un devis (ou une nouvelle version, qui remplace la précédente) ; pendant les travaux : frais supplémentaires",
+        "tags": [
+          "Professionnel — devis"
+        ]
+      }
+    },
+    "/v1/pro/missions/{missionId}/quotes/{quoteId}/withdraw": {
+      "post": {
+        "operationId": "ProQuotesController_withdraw",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "quoteId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Retirer un devis encore sans réponse",
+        "tags": [
+          "Professionnel — devis"
+        ]
+      }
+    },
+    "/v1/missions/{missionId}/payments": {
+      "get": {
+        "operationId": "MissionPaymentsController_list",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Paiements"
+        ]
+      },
+      "post": {
+        "operationId": "MissionPaymentsController_initiate",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par action (renvoyée telle quelle en cas de nouvel essai)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Payer ce qui est dû (montant calculé par le serveur) : renvoie la page de paiement du prestataire",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/{id}": {
+      "get": {
+        "operationId": "PaymentsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "État du paiement, vérifié auprès du prestataire s’il est en attente (seul le serveur confirme un paiement)",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/{id}/receipt": {
+      "get": {
+        "operationId": "PaymentsController_receipt",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Reçu d’un paiement confirmé",
+        "tags": [
+          "Paiements"
+        ]
+      }
+    },
+    "/v1/payments/notify/{provider}": {
+      "post": {
+        "operationId": "PaymentNotificationsController_notify",
+        "parameters": [
+          {
+            "name": "provider",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Notification de paiement (signature vérifiée ; le résultat est ensuite contrôlé auprès du prestataire)",
+        "tags": [
+          "Paiements — notifications du prestataire"
+        ]
+      },
+      "get": {
+        "operationId": "PaymentNotificationsController_ping",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "summary": "Contrôle de disponibilité de l’adresse de notification par le prestataire",
+        "tags": [
+          "Paiements — notifications du prestataire"
+        ]
+      }
+    },
+    "/v1/pro/earnings": {
+      "get": {
+        "operationId": "ProEarningsController_get",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Montant dû par mission (après commission et remboursements), en attente ou disponible",
+        "tags": [
+          "Professionnel — revenus"
+        ]
+      }
+    },
+    "/v1/admin/payments": {
+      "get": {
+        "operationId": "AdminPaymentsController_list",
+        "parameters": [
+          {
+            "name": "missionId",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "INITIATED",
+                "PENDING",
+                "SUCCEEDED",
+                "FAILED",
+                "CANCELLED",
+                "EXPIRED"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — paiements"
+        ]
+      }
+    },
+    "/v1/admin/ledger/balances": {
+      "get": {
+        "operationId": "AdminPaymentsController_balances",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rapprochement : soldes par compte du grand livre (leur somme vaut toujours 0)",
+        "tags": [
+          "Administration — paiements"
+        ]
+      }
+    },
+    "/v1/admin/payments/{id}/refunds": {
+      "post": {
+        "operationId": "AdminPaymentsController_refund",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Clé unique par action (renvoyée telle quelle en cas de nouvel essai)",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdminRefundDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Rembourser tout ou partie d’un paiement (plafonné au montant payé ; journalisé)",
+        "tags": [
+          "Administration — paiements"
+        ]
+      }
+    },
+    "/v1/admin/refunds/{id}/complete": {
+      "post": {
+        "operationId": "AdminPaymentsController_complete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteRefundDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Déclarer exécuté un remboursement fait dans l’espace marchand du prestataire",
+        "tags": [
+          "Administration — paiements"
+        ]
+      }
+    },
     "/v1/pro/profile": {
       "get": {
         "operationId": "ProController_profile",
@@ -4392,6 +4973,106 @@
         },
         "required": [
           "points"
+        ]
+      },
+      "RejectQuoteDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Trop cher, je voudrais une autre proposition"
+          }
+        }
+      },
+      "QuoteLineDto": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "TRAVEL",
+              "LABOR",
+              "MATERIAL",
+              "OTHER"
+            ],
+            "description": "Déplacement, main-d’œuvre, pièces et matériaux, autre"
+          },
+          "label": {
+            "type": "string",
+            "example": "Remplacement du siphon"
+          },
+          "quantity": {
+            "type": "number",
+            "default": 1
+          },
+          "unitPriceXof": {
+            "type": "number",
+            "description": "Prix unitaire en F CFA (entier)"
+          },
+          "justification": {
+            "type": "string",
+            "description": "Justification (obligatoire pour des frais supplémentaires)"
+          }
+        },
+        "required": [
+          "kind",
+          "label",
+          "unitPriceXof"
+        ]
+      },
+      "SubmitQuoteDto": {
+        "type": "object",
+        "properties": {
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/QuoteLineDto"
+            }
+          },
+          "validForHours": {
+            "type": "number",
+            "description": "Durée de validité en heures (48 h par défaut)"
+          },
+          "conditions": {
+            "type": "string",
+            "description": "Conditions : garantie, délai, ce qui n’est pas compris"
+          },
+          "estimatedDurationMin": {
+            "type": "number",
+            "description": "Durée estimée des travaux (minutes)"
+          }
+        },
+        "required": [
+          "lines"
+        ]
+      },
+      "AdminRefundDto": {
+        "type": "object",
+        "properties": {
+          "amountXof": {
+            "type": "number",
+            "description": "Montant à rembourser (F CFA)"
+          },
+          "reason": {
+            "type": "string",
+            "example": "Litige résolu : intervention incomplète"
+          }
+        },
+        "required": [
+          "amountXof",
+          "reason"
+        ]
+      },
+      "CompleteRefundDto": {
+        "type": "object",
+        "properties": {
+          "providerRefundId": {
+            "type": "string",
+            "description": "Référence du remboursement dans l’espace marchand du prestataire"
+          }
+        },
+        "required": [
+          "providerRefundId"
         ]
       },
       "GeoPointDto": {

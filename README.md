@@ -2,10 +2,11 @@
 
 Marketplace de services de proximité (plombiers, électriciens, mécaniciens…) — marché initial : Abidjan, Côte d'Ivoire.
 
-**État actuel : phase 6 (mise en relation et missions) terminée, en mode développement pour les SMS.**
-Connexion, inscription et validation des professionnels, recherche, demandes, mise en relation (alertes, acceptation,
-propositions, confirmation) et suivi des missions fonctionnent et sont testés. Devis et paiements : phase 7 ; une mission
-s'arrête donc à l'étape du devis ou du paiement. Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
+**État actuel : phase 7 (devis, paiements, remboursements) terminée, en mode développement pour les SMS et les paiements.**
+Connexion, inscription et validation des professionnels, recherche, demandes, mise en relation, devis, paiement, suivi des
+missions et remboursements fonctionnent et sont testés. **Les paiements passent par un simulateur** (aucun argent réel) tant
+que le compte marchand CinetPay n'est pas configuré ; l'adaptateur CinetPay est écrit mais pas encore essayé sur un compte réel.
+Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
 
 ## Organisation du dépôt
 
