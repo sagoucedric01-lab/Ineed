@@ -146,6 +146,10 @@
     "NEW_REVIEW": {
       "title": "Nouvel avis",
       "body": "Un client vous a donné {{rating}} sur 5."
+    },
+    "MISSION_VALIDATED": {
+      "title": "Mission clôturée",
+      "body": "La mission {{reference}} est clôturée. Merci pour votre intervention."
     }
   },
   "sms": {

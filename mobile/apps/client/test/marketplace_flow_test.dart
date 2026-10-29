@@ -192,8 +192,8 @@ void main() {
     await tapAndSettle(tester, find.text('Publier la demande'));
     expect(b.server.count('POST /v1/requests/r1/publish'), 1);
     expect(find.text('Publiée'), findsWidgets);
-    // Honnêteté : la mise en relation automatique n'existe pas encore.
-    expect(find.textContaining('Les professionnels ne sont pas encore prévenus automatiquement'), findsOneWidget);
+    // Recherche lancée : le client voit qu'elle est en cours.
+    expect(find.text('Recherche en cours'), findsOneWidget);
 
     await tapAndSettle(tester, find.text('Annuler la demande'));
     await tapAndSettle(tester, find.text('Annuler la demande').last);

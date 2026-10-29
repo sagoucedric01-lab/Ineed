@@ -345,5 +345,25 @@
   "profileNameRequired": "Indiquez votre prénom et votre nom.",
   "profileNameInvalid": "Utilisez uniquement des lettres, des espaces, des tirets ou des apostrophes.",
   "actionRefresh": "Actualiser",
-  "apiStatusLink": "État de la connexion à l’API"
+  "apiStatusLink": "État de la connexion à l’API",
+  "missionStatusAwaitingQuote": "En attente de devis",
+  "missionStatusQuotePending": "Devis à valider",
+  "missionStatusConfirmed": "Intervention confirmée",
+  "missionStatusPaymentPending": "Paiement en attente",
+  "missionStatusPaymentConfirmed": "Paiement confirmé",
+  "missionStatusEnRoute": "Professionnel en route",
+  "missionStatusArrived": "Professionnel arrivé",
+  "missionStatusInProgress": "Intervention en cours",
+  "missionStatusWorkCompleted": "Intervention terminée",
+  "missionStatusClosed": "Mission clôturée",
+  "missionStatusCancelled": "Mission annulée",
+  "missionStatusDisputed": "En litige",
+  "missionReferenceLabel": "Mission {reference}",
+  "@missionReferenceLabel": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  }
 }

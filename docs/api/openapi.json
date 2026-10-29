@@ -1532,6 +1532,169 @@
         ]
       }
     },
+    "/v1/requests/{id}/offers": {
+      "get": {
+        "operationId": "RequestsController_listOffers",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Propositions reçues et professionnel réservé",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/offers/{offerId}/choose": {
+      "post": {
+        "operationId": "RequestsController_choose",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "offerId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Programmé : choisir une proposition (à confirmer ensuite)",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/confirm": {
+      "post": {
+        "operationId": "RequestsController_confirm",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirmer le professionnel réservé : la mission est créée",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/decline-reservation": {
+      "post": {
+        "operationId": "RequestsController_declineReservation",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Ne pas retenir le professionnel réservé : la recherche continue",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
+    "/v1/requests/{id}/retry": {
+      "post": {
+        "operationId": "RequestsController_retry",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RetryRequestDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Aucun professionnel trouvé : relancer la recherche, éventuellement sur un créneau programmé",
+        "tags": [
+          "Demandes"
+        ]
+      }
+    },
     "/v1/requests/{id}/cancel": {
       "post": {
         "operationId": "RequestsController_cancel",
@@ -1565,7 +1728,7 @@
             "bearer": []
           }
         ],
-        "summary": "Annule une demande tant qu’aucun professionnel n’est réservé",
+        "summary": "Annule une demande tant qu’aucune mission n’est confirmée",
         "tags": [
           "Demandes"
         ]
@@ -1642,6 +1805,753 @@
         ],
         "tags": [
           "Administration — demandes"
+        ]
+      }
+    },
+    "/v1/pro/offers": {
+      "get": {
+        "operationId": "ProOffersController_list",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Demandes en attente de ma réponse et réponses récentes",
+        "tags": [
+          "Professionnel — demandes reçues"
+        ]
+      }
+    },
+    "/v1/pro/offers/{id}": {
+      "get": {
+        "operationId": "ProOffersController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Détail d’une demande reçue (quartier et distance approximative ; l’adresse est donnée après confirmation)",
+        "tags": [
+          "Professionnel — demandes reçues"
+        ]
+      }
+    },
+    "/v1/pro/offers/{id}/accept": {
+      "post": {
+        "operationId": "ProOffersController_accept",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Urgence : accepter (le premier qui accepte est réservé, le client confirme ensuite)",
+        "tags": [
+          "Professionnel — demandes reçues"
+        ]
+      }
+    },
+    "/v1/pro/offers/{id}/propose": {
+      "post": {
+        "operationId": "ProOffersController_propose",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ProposalDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Programmé : envoyer une proposition (heure d’arrivée, prix facultatif)",
+        "tags": [
+          "Professionnel — demandes reçues"
+        ]
+      }
+    },
+    "/v1/pro/offers/{id}/decline": {
+      "post": {
+        "operationId": "ProOffersController_decline",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DeclineOfferDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Refuser une demande",
+        "tags": [
+          "Professionnel — demandes reçues"
+        ]
+      }
+    },
+    "/v1/missions": {
+      "get": {
+        "operationId": "ClientMissionsController_list",
+        "parameters": [
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "history"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Missions"
+        ]
+      }
+    },
+    "/v1/missions/{id}": {
+      "get": {
+        "operationId": "ClientMissionsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Suivi de la mission : étapes, position du professionnel pendant le trajet, conditions d’annulation",
+        "tags": [
+          "Missions"
+        ]
+      }
+    },
+    "/v1/missions/{id}/cancel": {
+      "post": {
+        "operationId": "ClientMissionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MissionReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Annuler (gratuit avant le départ du professionnel ; impossible une fois les travaux commencés)",
+        "tags": [
+          "Missions"
+        ]
+      }
+    },
+    "/v1/missions/{id}/confirm-completion": {
+      "post": {
+        "operationId": "ClientMissionsController_confirmCompletion",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Confirmer la fin de l’intervention (clôture la mission)",
+        "tags": [
+          "Missions"
+        ]
+      }
+    },
+    "/v1/missions/{id}/problem": {
+      "post": {
+        "operationId": "ClientMissionsController_problem",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequiredReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Signaler un problème (litige examiné par l’équipe Ineed)",
+        "tags": [
+          "Missions"
+        ]
+      }
+    },
+    "/v1/pro/missions": {
+      "get": {
+        "operationId": "ProMissionsController_list",
+        "parameters": [
+          {
+            "name": "scope",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "active",
+                "history"
+              ]
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}": {
+      "get": {
+        "operationId": "ProMissionsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Mission : adresse précise, indications et prénom du client",
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/depart": {
+      "post": {
+        "operationId": "ProMissionsController_depart",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "« Je pars » : le client est prévenu et suit le trajet",
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/arrive": {
+      "post": {
+        "operationId": "ProMissionsController_arrive",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/start": {
+      "post": {
+        "operationId": "ProMissionsController_start",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/complete": {
+      "post": {
+        "operationId": "ProMissionsController_complete",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompleteMissionDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Terminer l’intervention (le client confirme ; sinon clôture automatique)",
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/cancel": {
+      "post": {
+        "operationId": "ProMissionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequiredReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Se désister (compte dans le taux de fiabilité ; la demande repart en recherche)",
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/pro/missions/{id}/locations": {
+      "post": {
+        "operationId": "ProMissionsController_locations",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LocationBatchDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Positions du trajet (uniquement en route ; doublons ignorés)",
+        "tags": [
+          "Professionnel — missions"
+        ]
+      }
+    },
+    "/v1/admin/missions": {
+      "get": {
+        "operationId": "AdminMissionsController_list",
+        "parameters": [
+          {
+            "name": "status",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "default": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — missions"
+        ]
+      }
+    },
+    "/v1/admin/missions/{id}": {
+      "get": {
+        "operationId": "AdminMissionsController_get",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — missions"
+        ]
+      }
+    },
+    "/v1/admin/missions/{id}/cancel": {
+      "post": {
+        "operationId": "AdminMissionsController_cancel",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequiredReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "tags": [
+          "Administration — missions"
+        ]
+      }
+    },
+    "/v1/admin/missions/{id}/resolve": {
+      "post": {
+        "operationId": "AdminMissionsController_resolve",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequiredReasonDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Clore un litige (le remboursement éventuel relève du module de paiement)",
+        "tags": [
+          "Administration — missions"
         ]
       }
     },
@@ -3360,6 +4270,19 @@
           "description"
         ]
       },
+      "RetryRequestDto": {
+        "type": "object",
+        "properties": {
+          "window": {
+            "description": "Passer en demande programmée sur ce créneau",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/WindowDto"
+              }
+            ]
+          }
+        }
+      },
       "CancelRequestDto": {
         "type": "object",
         "properties": {
@@ -3368,6 +4291,108 @@
             "example": "Problème réglé entre-temps"
           }
         }
+      },
+      "ProposalDto": {
+        "type": "object",
+        "properties": {
+          "proposedStartAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Heure d’arrivée proposée, dans le créneau du client"
+          },
+          "proposedPriceXof": {
+            "type": "number",
+            "description": "Prix proposé (F CFA)"
+          },
+          "proposedTravelFeeXof": {
+            "type": "number",
+            "description": "Frais de déplacement (F CFA)"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "proposedStartAt"
+        ]
+      },
+      "DeclineOfferDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Je suis occupé"
+          }
+        }
+      },
+      "MissionReasonDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string"
+          }
+        }
+      },
+      "RequiredReasonDto": {
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": "string",
+            "example": "Le robinet fuit toujours"
+          }
+        },
+        "required": [
+          "reason"
+        ]
+      },
+      "CompleteMissionDto": {
+        "type": "object",
+        "properties": {
+          "report": {
+            "type": "string",
+            "description": "Compte rendu : travaux réalisés, pièces changées, conseils"
+          }
+        }
+      },
+      "LocationPointDto": {
+        "type": "object",
+        "properties": {
+          "lat": {
+            "type": "number"
+          },
+          "lng": {
+            "type": "number"
+          },
+          "accuracyM": {
+            "type": "number",
+            "description": "Précision annoncée par le téléphone (m)"
+          },
+          "recordedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Horodatage du téléphone"
+          }
+        },
+        "required": [
+          "lat",
+          "lng",
+          "recordedAt"
+        ]
+      },
+      "LocationBatchDto": {
+        "type": "object",
+        "properties": {
+          "points": {
+            "description": "Positions du trajet ; après une coupure, l’application envoie celles en attente",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LocationPointDto"
+            }
+          }
+        },
+        "required": [
+          "points"
+        ]
       },
       "GeoPointDto": {
         "type": "object",

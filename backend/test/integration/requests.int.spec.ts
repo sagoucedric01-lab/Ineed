@@ -151,15 +151,15 @@ describe('Adresses et demandes', () => {
       expect((await ctx.prisma.file.findUniqueOrThrow({ where: { id: removed } })).status).toBe('DELETED');
     });
 
-    it('publication : statut publié, date et historique ; plus de modification possible', async () => {
+    it('publication : recherche lancée aussitôt (aucun professionnel ici), date et historique ; plus de modification possible', async () => {
       const r = await ctx.http.post(`/v1/requests/${requestId}/publish`).set(bearer(client)).expect(200);
-      expect(r.body.status).toBe('PUBLISHED');
+      expect(r.body.status).toBe('NO_PROVIDER_FOUND');
       expect(r.body.publishedAt).not.toBeNull();
-      expect(r.body.history.map((h: { to: string }) => h.to)).toEqual(['DRAFT', 'PUBLISHED']);
+      expect(r.body.history.map((h: { to: string }) => h.to)).toEqual(['DRAFT', 'PUBLISHED', 'MATCHING', 'NO_PROVIDER_FOUND']);
       expect((await ctx.http.post(`/v1/requests/${requestId}/publish`).set(bearer(client)).expect(409)).body.error.code).toBe('REQUEST_NOT_DRAFT');
       expect((await ctx.http.put(`/v1/requests/${requestId}`).set(bearer(client)).send(draft()).expect(409)).body.error.code).toBe('REQUEST_NOT_DRAFT');
       const list = await ctx.http.get('/v1/requests').set(bearer(client)).expect(200);
-      expect(list.body[0]).toMatchObject({ id: requestId, status: 'PUBLISHED', zoneName: 'Cocody' });
+      expect(list.body[0]).toMatchObject({ id: requestId, status: 'NO_PROVIDER_FOUND', zoneName: 'Cocody' });
     });
 
     it('une demande n’est visible que par son auteur, et pas depuis l’application Pro', async () => {
@@ -192,7 +192,7 @@ describe('Adresses et demandes', () => {
       const ok = await ctx.http.put(`/v1/requests/${d.body.id}`).set(bearer(client))
         .send(draft({ mode: 'SCHEDULED', window: { start: tomorrowAt(9), end: tomorrowAt(11) } })).expect(200);
       expect(ok.body.window).toEqual({ start: tomorrowAt(9), end: tomorrowAt(11) });
-      expect((await ctx.http.post(`/v1/requests/${d.body.id}/publish`).set(bearer(client)).expect(200)).body.status).toBe('PUBLISHED');
+      expect((await ctx.http.post(`/v1/requests/${d.body.id}/publish`).set(bearer(client)).expect(200)).body.status).toBe('NO_PROVIDER_FOUND');
     });
 
     it('adresse enregistrée : copie figée dans la demande', async () => {
@@ -228,7 +228,7 @@ describe('Adresses et demandes', () => {
 
     it('administration : liste et détail en lecture seule, sans les photos du domicile', async () => {
       const support = await adminLogin(ctx, await createAdmin(ctx, 'ADMIN_SUPPORT', 'support@ineed.test'));
-      const list = await ctx.http.get('/v1/admin/requests').set(bearer(support)).query({ status: 'PUBLISHED' }).expect(200);
+      const list = await ctx.http.get('/v1/admin/requests').set(bearer(support)).query({ status: 'NO_PROVIDER_FOUND' }).expect(200);
       expect(list.body.total).toBeGreaterThan(0);
       const detail = await ctx.http.get(`/v1/admin/requests/${list.body.items[0].id}`).set(bearer(support)).expect(200);
       expect(detail.body.media.every((m: { url?: string }) => m.url === undefined)).toBe(true);
