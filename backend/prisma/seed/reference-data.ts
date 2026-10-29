@@ -245,6 +245,8 @@ export const SETTINGS: { key: string; value: unknown; description: string }[] = 
   { key: 'request.max_schedule_days', value: 30, description: 'Délai maximal pour programmer une intervention' },
   { key: 'request.min_schedule_lead_minutes', value: 60, description: 'Délai minimal avant le début d’une intervention programmée' },
   { key: 'address.max_per_user', value: 10, description: 'Nombre d’adresses enregistrées par client' },
+  { key: 'dispatch.urgent_max_minutes', value: 30, description: 'Durée maximale de recherche d’un professionnel pour une urgence' },
+  { key: 'mission.reassign_on_pro_cancel', value: true, description: 'Relancer la recherche quand un professionnel se désiste avant l’intervention' },
   { key: 'app.min_version.client', value: '0.1.0', description: 'Version minimale de l’application client' },
   { key: 'app.min_version.pro', value: '0.1.0', description: 'Version minimale de l’application professionnel' },
 ];

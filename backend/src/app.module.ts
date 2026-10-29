@@ -8,10 +8,12 @@ import { CatalogModule } from './catalog/catalog.module.js';
 import { ConfigModule } from './config/config.module.js';
 import { ENV, type Env } from './config/env.js';
 import { loggerParams } from './common/http/logger.config.js';
+import { DispatchModule } from './dispatch/dispatch.module.js';
 import { FilesModule } from './files/files.module.js';
 import { GeoModule } from './geo/geo.module.js';
 import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
+import { MissionsModule } from './missions/missions.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
 import { ProsModule } from './pros/pros.module.js';
 import { RequestsModule } from './requests/requests.module.js';
@@ -35,6 +37,8 @@ import { UsersModule } from './users/users.module.js';
     CatalogModule,
     SearchModule,
     RequestsModule,
+    DispatchModule,
+    MissionsModule,
     ProsModule,
     AdminAuthModule,
     HealthModule,

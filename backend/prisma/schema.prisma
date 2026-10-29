@@ -379,6 +379,7 @@ model LocationPing {
   mission      Mission                  @relation(fields: [missionId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   user         User                     @relation(fields: [userId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
+  @@unique([missionId, userId, recordedAt], map: "location_pings_dedupe_uq")
   @@index([missionId, receivedAt(sort: Desc)], map: "location_pings_mission_idx")
   @@map("location_pings")
 }
@@ -1057,6 +1058,7 @@ model ServiceRequest {
   version                Int                       @default(0)
   createdAt              DateTime                  @default(now()) @map("created_at") @db.Timestamptz(6)
   updatedAt              DateTime                  @default(now()) @map("updated_at") @db.Timestamptz(6)
+  nextWaveAt             DateTime?                 @map("next_wave_at") @db.Timestamptz(6)
   conversations          Conversation[]
   mission                Mission?
   requestMedia           RequestMedia[]
@@ -1072,6 +1074,8 @@ model ServiceRequest {
 
   @@index([clientId, createdAt(sort: Desc)], map: "service_requests_client_idx")
   @@index([location], map: "service_requests_location_gix", type: Gist)
+  @@index([nextWaveAt], map: "service_requests_next_wave_idx", where: raw("(status = 'MATCHING'::request_status)"))
+  @@index([publishedAt], map: "service_requests_published_idx", where: raw("(status = 'PUBLISHED'::request_status)"))
   @@index([status, reservationExpiresAt], map: "service_requests_open_idx", where: raw("(status = ANY (ARRAY['PUBLISHED'::request_status, 'MATCHING'::request_status, 'OFFERS_RECEIVED'::request_status, 'PROVISIONALLY_RESERVED'::request_status, 'AWAITING_CLIENT_CONFIRMATION'::request_status]))"))
   @@map("service_requests")
 }

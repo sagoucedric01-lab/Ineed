@@ -2,6 +2,10 @@ import { Body, Controller, Get, HttpCode, Param, ParseUUIDPipe, Post, Put, Query
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { AuthUser } from '../auth/auth-user.js';
 import { Access, AdminOnly, CurrentUser } from '../auth/decorators.js';
+import { checkWindow } from '../search/window.js';
+import { DispatchService } from '../dispatch/dispatch.service.js';
+import { RetryRequestDto } from '../dispatch/dto.js';
+import { OffersService } from '../dispatch/offers.service.js';
 import { AdminListRequestsQueryDto, CancelRequestDto, ListRequestsQueryDto, RequestInputDto } from './dto.js';
 import { RequestsService } from './requests.service.js';
 
@@ -10,7 +14,11 @@ import { RequestsService } from './requests.service.js';
 @Access({ app: 'CLIENT' })
 @Controller('v1/requests')
 export class RequestsController {
-  constructor(private readonly requests: RequestsService) {}
+  constructor(
+    private readonly requests: RequestsService,
+    private readonly dispatch: DispatchService,
+    private readonly offers: OffersService,
+  ) {}
 
   @Post()
   @ApiOperation({ summary: 'Crée un brouillon de demande (à relire puis publier)' })
@@ -42,9 +50,52 @@ export class RequestsController {
     return this.requests.publish(user.userId, id);
   }
 
+  @Get(':id/offers')
+  @ApiOperation({ summary: 'Propositions reçues et professionnel réservé' })
+  listOffers(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    return this.offers.listForClient(user.userId, id);
+  }
+
+  @Post(':id/offers/:offerId/choose')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Programmé : choisir une proposition (à confirmer ensuite)' })
+  async choose(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Param('offerId', ParseUUIDPipe) offerId: string) {
+    await this.dispatch.choose(user.userId, id, offerId);
+    return this.requests.get(user.userId, id);
+  }
+
+  @Post(':id/confirm')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Confirmer le professionnel réservé : la mission est créée' })
+  async confirm(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    await this.dispatch.confirm(user.userId, id);
+    return this.requests.get(user.userId, id);
+  }
+
+  @Post(':id/decline-reservation')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Ne pas retenir le professionnel réservé : la recherche continue' })
+  async declineReservation(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string) {
+    await this.dispatch.declineReservation(user.userId, id);
+    return this.requests.get(user.userId, id);
+  }
+
+  @Post(':id/retry')
+  @HttpCode(200)
+  @ApiOperation({ summary: 'Aucun professionnel trouvé : relancer la recherche, éventuellement sur un créneau programmé' })
+  async retry(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: RetryRequestDto) {
+    let window: { start: Date; end: Date } | undefined;
+    if (dto.window) {
+      window = { start: new Date(dto.window.start), end: new Date(dto.window.end) };
+      checkWindow(window, await this.requests.windowRules());
+    }
+    await this.dispatch.retry(user.userId, id, { window });
+    return this.requests.get(user.userId, id);
+  }
+
   @Post(':id/cancel')
   @HttpCode(200)
-  @ApiOperation({ summary: 'Annule une demande tant qu’aucun professionnel n’est réservé' })
+  @ApiOperation({ summary: 'Annule une demande tant qu’aucune mission n’est confirmée' })
   cancel(@CurrentUser() user: AuthUser, @Param('id', ParseUUIDPipe) id: string, @Body() dto: CancelRequestDto) {
     return this.requests.cancel(user.userId, id, dto.reason);
   }

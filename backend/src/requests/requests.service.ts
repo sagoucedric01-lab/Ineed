@@ -7,6 +7,8 @@ import { GeoService, pointSql } from '../geo/geo.service.js';
 import { PrismaService } from '../infra/prisma.service.js';
 import { ProSearchService } from '../search/pro-search.service.js';
 import { checkWindow } from '../search/window.js';
+import { DispatchService } from '../dispatch/dispatch.service.js';
+import { Logger } from '@nestjs/common';
 import { SettingsService } from '../settings/settings.service.js';
 import type { RequestInputDto } from './dto.js';
 
@@ -17,7 +19,7 @@ export const ACTIVE_STATUSES: RequestStatus[] = [
   'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'NO_PROVIDER_FOUND', 'PROVISIONALLY_RESERVED', 'AWAITING_CLIENT_CONFIRMATION',
 ];
 /** États depuis lesquels le client peut annuler sans pénalité (aucun professionnel réservé). */
-const CANCELLABLE: RequestStatus[] = ['DRAFT', 'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'NO_PROVIDER_FOUND'];
+const CANCELLABLE: RequestStatus[] = ['DRAFT', 'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'NO_PROVIDER_FOUND', 'PROVISIONALLY_RESERVED', 'AWAITING_CLIENT_CONFIRMATION'];
 const TERMINAL: RequestStatus[] = ['ASSIGNED', 'EXPIRED', 'CANCELLED'];
 const MEDIA_URL_TTL_S = 600;
 
@@ -30,6 +32,8 @@ interface Extra {
 
 @Injectable()
 export class RequestsService {
+  private readonly logger = new Logger('Demandes');
+
   constructor(
     private readonly prisma: PrismaService,
     private readonly addresses: AddressesService,
@@ -37,6 +41,7 @@ export class RequestsService {
     private readonly files: FilesService,
     private readonly settings: SettingsService,
     private readonly search: ProSearchService,
+    private readonly dispatch: DispatchService,
   ) {}
 
   // ------------------------------------------------------------------ lecture
@@ -95,6 +100,10 @@ export class RequestsService {
       publishedAt: r.publishedAt?.toISOString() ?? null,
       cancelledAt: r.cancelledAt?.toISOString() ?? null,
       cancelReason: r.cancelReason,
+      reservedProId: r.reservedProId,
+      reservationExpiresAt: r.reservationExpiresAt?.toISOString() ?? null,
+      searchRadiusM: r.currentRadiusM,
+      missionId: (await db.mission.findFirst({ where: { requestId: r.id, status: { not: 'CANCELLED' } }, select: { id: true } }))?.id ?? null,
     };
   }
 
@@ -258,11 +267,17 @@ export class RequestsService {
       if (n.count === 0) throw new AppError(409, 'REQUEST_CHANGED', 'La demande a été modifiée entre-temps. Rechargez-la puis recommencez.');
       await tx.requestStatusHistory.create({ data: { requestId: id, fromStatus: 'DRAFT', toStatus: 'PUBLISHED', actorId: clientId } });
     });
+    // Recherche lancée tout de suite ; en cas d'échec, le worker la reprend au tick suivant.
+    await this.dispatch.kick(id).catch((e: unknown) => {
+      this.logger.error({ err: e, requestId: id }, 'Lancement immédiat de la recherche impossible');
+    });
     return this.get(clientId, id);
   }
 
   async cancel(clientId: string, id: string, reason?: string) {
     await this.prisma.$transaction(async (tx) => {
+      // Verrou : une acceptation simultanée par un professionnel ne peut pas croiser l'annulation.
+      await tx.$executeRaw`SELECT 1 FROM service_requests WHERE id = ${id}::uuid FOR UPDATE`;
       const r = await tx.serviceRequest.findFirst({ where: { id, clientId } });
       if (!r) throw new AppError(404, 'NOT_FOUND', 'Cette demande n’existe pas.');
       if (r.status === 'CANCELLED') return;
@@ -273,12 +288,20 @@ export class RequestsService {
       }
       const n = await tx.serviceRequest.updateMany({
         where: { id, status: r.status, version: r.version },
-        data: { status: 'CANCELLED', cancelledAt: new Date(), cancelReason: reason ?? null, version: { increment: 1 }, updatedAt: new Date() },
+        data: {
+          status: 'CANCELLED', cancelledAt: new Date(), cancelReason: reason ?? null, reservedProId: null, reservationExpiresAt: null, nextWaveAt: null,
+          version: { increment: 1 }, updatedAt: new Date(),
+        },
       });
       if (n.count === 0) throw new AppError(409, 'REQUEST_CHANGED', 'La demande a changé entre-temps. Rechargez-la puis recommencez.');
       await tx.requestStatusHistory.create({ data: { requestId: id, fromStatus: r.status, toStatus: 'CANCELLED', actorId: clientId, reason: reason ?? null } });
+      await this.dispatch.onRequestCancelled(tx, id, r.reservedProId);
     });
     return this.get(clientId, id);
+  }
+
+  windowRules() {
+    return this.search.windowRules();
   }
 
   // ------------------------------------------------------------------ administration

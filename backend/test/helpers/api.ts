@@ -183,3 +183,31 @@ export async function createTestPro(ctx: TestContext, o: TestProOptions): Promis
   }
   return { userId: login.userId, tokens: login.tokens };
 }
+
+/**
+ * Arrête puis relance l'API sur la même base (simulation d'un redémarrage ou d'une panne du serveur) :
+ * rien n'est conservé en mémoire, seul l'état en base subsiste.
+ */
+export async function restartApi(ctx: TestContext): Promise<void> {
+  await ctx.app.close();
+  const app = await createApp();
+  app.useLogger(false);
+  await app.listen(0, '127.0.0.1');
+  ctx.app = app;
+  ctx.http = request(await app.getUrl());
+  ctx.otp = app.get<DevConsoleOtpProvider>(OTP_PROVIDER);
+}
+
+/** Simule la confirmation d'un paiement vérifié (module de paiement : phase 7). Réservé aux tests. */
+export async function simulateConfirmedPayment(ctx: TestContext, missionId: string): Promise<void> {
+  const { MissionsService } = await import('../../src/missions/missions.service.js');
+  const missions = ctx.app.get(MissionsService);
+  const m = await ctx.prisma.mission.findUniqueOrThrow({ where: { id: missionId } });
+  if (m.status === 'AWAITING_QUOTE') {
+    // Devis soumis puis accepté : remplacé en phase 7 par le vrai parcours de devis.
+    await missions.transition(missionId, 'QUOTE_PENDING_APPROVAL', 'PRO', m.proId);
+    await missions.transition(missionId, 'CONFIRMED', 'CLIENT', m.clientId);
+  }
+  await missions.transition(missionId, 'PAYMENT_PENDING', 'SYSTEM', null);
+  await missions.transition(missionId, 'PAYMENT_CONFIRMED', 'PAYMENT', null);
+}

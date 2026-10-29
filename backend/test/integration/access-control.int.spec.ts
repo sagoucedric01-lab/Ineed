@@ -38,6 +38,13 @@ const MATRIX: { method: 'get' | 'post' | 'put' | 'patch' | 'delete'; path: strin
   { method: 'post', path: '/v1/admin/geo/zones', body: {}, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
   { method: 'get', path: '/v1/admin/dispatch-rules', expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 403, super: 'ok' } },
   { method: 'put', path: '/v1/admin/settings/request.max_photos', body: { value: 5 }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 403, finance: 403, super: 'ok' } },
+  { method: 'get', path: '/v1/pro/offers', expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/pro/offers/${UUID}/accept`, expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/requests/${UUID}/confirm`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: `/v1/missions/${UUID}`, expect: { anonyme: 401, client: 'ok', pro: 403, support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'post', path: `/v1/pro/missions/${UUID}/depart`, expect: { anonyme: 401, client: 403, pro: 'ok', support: 403, ops: 403, finance: 403, super: 403 } },
+  { method: 'get', path: '/v1/admin/missions', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 'ok', super: 'ok' } },
+  { method: 'post', path: `/v1/admin/missions/${UUID}/cancel`, body: { reason: 'Test' }, expect: { anonyme: 401, client: 403, pro: 403, support: 403, ops: 'ok', finance: 403, super: 'ok' } },
   { method: 'get', path: '/v1/admin/requests', expect: { anonyme: 401, client: 403, pro: 403, support: 'ok', ops: 'ok', finance: 403, super: 'ok' } },
 ];
 

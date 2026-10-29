@@ -3,17 +3,30 @@ import { LoggerModule, PinoLogger } from 'nestjs-pino';
 import { ConfigModule } from '../config/config.module.js';
 import { ENV, type Env } from '../config/env.js';
 import { loggerParams } from '../common/http/logger.config.js';
+import { AuditModule } from '../audit/audit.module.js';
+import { DispatchModule } from '../dispatch/dispatch.module.js';
 import { InfraModule } from '../infra/infra.module.js';
+import { NotificationsModule } from '../notifications/notifications.module.js';
+import { SettingsModule } from '../settings/settings.module.js';
+import { DispatchLoop } from './dispatch-loop.js';
 import { RedisService } from '../infra/redis.service.js';
 import { WORKER_HEARTBEAT_INTERVAL_MS, WORKER_HEARTBEAT_KEY, WORKER_HEARTBEAT_TTL_S } from './heartbeat.js';
 
 /**
- * Processus des tâches de fond. En phase 3 il ne fait que signaler sa présence ;
- * les files BullMQ (vagues d'attribution, expirations, relances de paiement, notifications)
- * y seront branchées à partir de la phase 6.
+ * Processus des tâches de fond : signale sa présence et fait tourner le moteur d'attribution
+ * (vagues, expirations des offres et réservations, clôtures automatiques, purge des positions).
  */
 @Module({
-  imports: [ConfigModule, LoggerModule.forRootAsync({ inject: [ENV], useFactory: (env: Env) => loggerParams(env) }), InfraModule],
+  imports: [
+    ConfigModule,
+    LoggerModule.forRootAsync({ inject: [ENV], useFactory: (env: Env) => loggerParams(env) }),
+    InfraModule,
+    SettingsModule,
+    AuditModule,
+    NotificationsModule,
+    DispatchModule,
+  ],
+  providers: [DispatchLoop],
 })
 export class WorkerModule implements OnApplicationBootstrap, OnApplicationShutdown {
   private timer?: NodeJS.Timeout;
