@@ -94,6 +94,7 @@ Les notifications restent créées en base et visibles dans les applications.
 - **Arrêt de l'API** : les connexions WebSocket ouvertes bloquaient l'arrêt. Elles sont maintenant fermées.
 - **Détection de numéros** : elle prenait les références de mission (`IN-2026-000042`) pour des numéros. Elle est restreinte aux formats ivoiriens à 10 chiffres et internationaux.
 - **Formulaire de réclamation** : un bouton pleine largeur placé dans une ligne cassait la mise en page (détecté par les tests mobiles).
+- **Textes de réclamation** : ils étaient définis deux fois, dans les textes du client (phase 2) et dans les textes communs. La CI l'a détecté (contrôle du système de design). La formulation validée en phase 2 est reprise dans les textes communs, et la liste déroulante passe en pleine largeur pour ses libellés plus longs.
 
 ## Tests exécutés dans cet environnement
 
