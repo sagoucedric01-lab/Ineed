@@ -105,6 +105,20 @@ WARN [OTP (développement)] [DÉVELOPPEMENT — aucun SMS envoyé] Code pour +22
 Les applications affichent « Mode développement » sur l'écran de saisie du code. Ce mode est refusé au démarrage quand `APP_ENV=production`.
 Pour de vrais SMS, renseignez `OTP_PROVIDER=twilio_verify` et les trois variables `TWILIO_*` (voir `backend/.env.example`).
 
+## 4 bis. Paiements en mode développement (simulateur)
+
+Aucun compte marchand n'est configuré : avec `PAYMENT_PROVIDER=sandbox` (valeur par défaut hors production), **aucun argent réel ne circule**.
+Quand le client appuie sur « Payer », l'application ouvre la page `/v1/payments/sandbox/checkout/<référence>` servie par l'API,
+marquée d'un bandeau rouge « SIMULATION ». On y choisit l'issue (réussite, refus de l'opérateur, abandon) ; l'API reçoit alors une
+notification signée, vérifie le paiement auprès du simulateur et fait avancer la mission. Le worker revérifie les paiements en attente,
+relance le client et exécute les remboursements toutes les 15 s.
+
+- Pour que le téléphone (ou l'émulateur Android) ouvre cette page, renseignez `PUBLIC_API_URL` avec l'adresse de l'API vue par
+  l'appareil (par exemple `http://10.0.2.2:3000` pour l'émulateur). Sans elle, le lien est relatif à l'adresse de l'API configurée dans l'application.
+- Ce mode est refusé au démarrage quand `APP_ENV=production` ; la page simulée n'existe pas avec un vrai prestataire.
+- Pour encaisser réellement : `PAYMENT_PROVIDER=cinetpay`, les clés `CINETPAY_*` du compte marchand, `PUBLIC_API_URL` (adresse publique
+  en https, déclarée comme adresse de notification) et `PAYMENT_RETURN_URL` (voir `backend/.env.example`).
+
 ## 5. Premier compte administrateur
 
 Aucun compte administrateur n'existe par défaut et aucun mot de passe n'est écrit dans le code. Le premier super-administrateur se crée en ligne de commande (refusé s'il en existe déjà un) :

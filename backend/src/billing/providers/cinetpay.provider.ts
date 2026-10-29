@@ -41,8 +41,8 @@ const WAITING_CODES = new Set(['662', '623']);
  * documentation (tests de contrat). Il n'a PAS été essayé sur un compte marchand : à valider sur
  * l'environnement de test de CinetPay dès réception des clés (voir docs/phase-7/rapport-phase-7.md).
  *
- * Le remboursement n'existe pas dans l'API Checkout : il est exécuté depuis l'espace marchand CinetPay,
- * puis sa référence est saisie dans Ineed par un administrateur habilité.
+ * Remboursement : pas d'opération connue dans l'API Checkout (à confirmer avec CinetPay) ; il est exécuté depuis
+ * l'espace marchand, puis sa référence est saisie dans Ineed par un administrateur habilité.
  */
 export class CinetPayProvider implements PaymentProvider {
   readonly name = 'cinetpay';
