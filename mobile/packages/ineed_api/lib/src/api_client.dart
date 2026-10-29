@@ -7,6 +7,7 @@ import 'api_failure.dart';
 import 'marketplace.dart';
 import 'missions.dart';
 import 'models.dart';
+import 'money.dart';
 import 'readiness.dart';
 import 'tokens.dart';
 
@@ -45,6 +46,9 @@ class IneedApiClient {
 
   final TokenStore tokenStore;
   final void Function()? onSessionExpired;
+
+  /// Adresse absolue d'un lien renvoyé par l'API (une page de paiement peut être relative à l'API).
+  Uri resolve(String link) => Uri.parse(_dio.options.baseUrl).resolve(link);
   final Dio _dio;
   final Dio _upload;
   Completer<StoredTokens?>? _refreshing;
@@ -398,6 +402,34 @@ class IneedApiClient {
   /// Positions du trajet ; renvoyer un lot déjà reçu est sans effet (dédoublonnage par horodatage).
   Future<void> sendTripPoints(String missionId, List<TripPoint> points) =>
       _guard(() => _dio.post<void>('/v1/pro/missions/$missionId/locations', data: {'points': [for (final p in points) p.toJson()]}, options: _auth()));
+
+  // ---------------------------------------------------------------- Devis et paiements
+
+  Options _idem(String key) => _auth(Options(headers: {'Idempotency-Key': key}));
+
+  Future<Quote> acceptQuote(String missionId, String quoteId, {required String idempotencyKey}) =>
+      _guard(() async => Quote.fromJson(await _json(_dio.post('/v1/missions/$missionId/quotes/$quoteId/accept', options: _idem(idempotencyKey)))));
+
+  Future<Quote> rejectQuote(String missionId, String quoteId, {required String idempotencyKey, String? reason}) => _guard(
+        () async => Quote.fromJson(await _json(_dio.post('/v1/missions/$missionId/quotes/$quoteId/reject', data: {'reason': ?reason}, options: _idem(idempotencyKey)))),
+      );
+
+  /// Paiement de ce qui est dû (montant calculé par le serveur) ; renvoie la page de paiement du prestataire.
+  Future<Payment> payMission(String missionId, {required String idempotencyKey}) =>
+      _guard(() async => Payment.fromJson(await _json(_dio.post('/v1/missions/$missionId/payments', options: _idem(idempotencyKey)))));
+
+  /// État du paiement, vérifié par le serveur auprès du prestataire.
+  Future<Payment> payment(String id) => _guard(() async => Payment.fromJson(await _json(_dio.get('/v1/payments/$id', options: _auth()))));
+
+  Future<Receipt> receipt(String paymentId) => _guard(() async => Receipt.fromJson(await _json(_dio.get('/v1/payments/$paymentId/receipt', options: _auth()))));
+
+  Future<Quote> submitQuote(String missionId, QuoteDraft draft, {required String idempotencyKey}) =>
+      _guard(() async => Quote.fromJson(await _json(_dio.post('/v1/pro/missions/$missionId/quotes', data: draft.toJson(), options: _idem(idempotencyKey)))));
+
+  Future<Quote> withdrawQuote(String missionId, String quoteId) =>
+      _guard(() async => Quote.fromJson(await _json(_dio.post('/v1/pro/missions/$missionId/quotes/$quoteId/withdraw', options: _auth()))));
+
+  Future<Earnings> earnings() => _guard(() async => Earnings.fromJson(await _json(_dio.get('/v1/pro/earnings', options: _auth()))));
 
   // ---------------------------------------------------------------- Notifications
 

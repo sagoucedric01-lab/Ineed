@@ -11,6 +11,7 @@ import '../l10n/gen/app_localizations.dart';
 import '../providers.dart';
 import '../widgets/pro_card_tile.dart';
 import '../widgets/request_status.dart';
+import 'mission_money_section.dart';
 
 /// C-21 à C-24 : suivi de la mission (étapes, trajet du professionnel, fin d'intervention, annulation).
 class MissionScreen extends ConsumerStatefulWidget {
@@ -65,7 +66,7 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l.trackingCancelConfirm),
-        content: Text(m.cancelTerms == 'TRAVEL_FEE_DUE' ? l.trackingCancelFeeNoAmount : l.trackingCancelFree),
+        content: Text(m.cancelTerms == 'TRAVEL_FEE_DUE' ? l.trackingCancelFeeDue : l.trackingCancelFree),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: Text(common.actionBack)),
           TextButton(onPressed: () => Navigator.pop(context, true), child: Text(l.trackingCancel)),
@@ -129,7 +130,8 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
                   Text('${m.service?.name ?? m.category.name} · ${m.proName}', style: text.titleMedium),
                   if (m.scheduledStartAt != null) Text(formatAbidjanDateTime(m.scheduledStartAt!)),
                   const SizedBox(height: IneedSpacing.s4),
-                  if (m.waitsForQuoteOrPayment) IneedBanner(message: l.missionNextStepPending),
+                  MissionMoneySection(mission: m),
+                  const SizedBox(height: IneedSpacing.s2),
                   if (m.status == 'EN_ROUTE')
                     Card(
                       child: Padding(
@@ -176,7 +178,7 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
                     ),
                   if (m.cancelTerms != null) ...[
                     const SizedBox(height: IneedSpacing.s4),
-                    Text(m.cancelTerms == 'TRAVEL_FEE_DUE' ? l.trackingCancelFeeNoAmount : l.trackingCancelFree, style: text.bodySmall?.copyWith(color: c.textMuted)),
+                    Text(m.cancelTerms == 'TRAVEL_FEE_DUE' ? l.trackingCancelFeeDue : l.trackingCancelFree, style: text.bodySmall?.copyWith(color: c.textMuted)),
                     TextButton(onPressed: _busy ? null : () => _cancel(m), child: Text(l.trackingCancel, style: TextStyle(color: c.danger))),
                   ],
                 ],

@@ -84,8 +84,7 @@ void main() {
     expect(find.text('Suivi de la mission'), findsOneWidget);
     expect(find.text('Mission IN-2026-000042'), findsOneWidget);
     expect(find.text('En attente de devis'), findsWidgets);
-    // Honnêteté : devis et paiement arrivent à la phase suivante.
-    expect(find.textContaining('Le devis et le paiement dans l’application arrivent dans la prochaine version'), findsOneWidget);
+    expect(find.text('Le professionnel prépare son devis\u00A0: vous le recevrez ici.'), findsOneWidget);
   });
 
   testWidgets('le client ne retient pas le professionnel réservé : recherche relancée', (tester) async {

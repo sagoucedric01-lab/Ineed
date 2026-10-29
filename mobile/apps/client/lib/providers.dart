@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:ineed_api/ineed_api.dart';
 import 'package:ineed_shared/ineed_shared.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 final categoriesProvider = FutureProvider.autoDispose<List<Category>>((ref) => ref.read(apiProvider).categories());
 
@@ -42,3 +43,8 @@ const liveRequestStatuses = {'PUBLISHED', 'MATCHING', 'OFFERS_RECEIVED', 'PROVIS
 
 /// Rafraîchissement automatique (en attendant les notifications push de la phase 8).
 const liveRefreshInterval = Duration(seconds: 5);
+
+/// Ouvre la page de paiement du prestataire (navigateur ou application de l'opérateur). Remplacé dans les tests.
+typedef CheckoutLauncher = Future<bool> Function(Uri url);
+
+final checkoutLauncherProvider = Provider<CheckoutLauncher>((ref) => (url) => launchUrl(url, mode: LaunchMode.externalApplication));

@@ -13,6 +13,7 @@ import 'screens/mission_screen.dart';
 import 'screens/notifications_screen.dart';
 import 'screens/onboarding_screen.dart';
 import 'screens/pro_profile_screen.dart';
+import 'screens/receipt_screen.dart';
 import 'screens/request_detail_screen.dart';
 import 'screens/request_form_screen.dart';
 import 'screens/requests_screen.dart';
@@ -94,6 +95,7 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
       ),
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: '/missions/:id', builder: (_, state) => MissionScreen(missionId: state.pathParameters['id']!)),
+      GoRoute(path: '/paiements/:id/recu', builder: (_, state) => ReceiptScreen(paymentId: state.pathParameters['id']!)),
       GoRoute(
         path: '/compte',
         builder: (context, _) => AccountScreen(
