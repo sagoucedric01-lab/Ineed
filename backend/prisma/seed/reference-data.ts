@@ -247,6 +247,18 @@ export const SETTINGS: { key: string; value: unknown; description: string }[] = 
   { key: 'address.max_per_user', value: 10, description: 'Nombre d’adresses enregistrées par client' },
   { key: 'dispatch.urgent_max_minutes', value: 30, description: 'Durée maximale de recherche d’un professionnel pour une urgence' },
   { key: 'mission.reassign_on_pro_cancel', value: true, description: 'Relancer la recherche quand un professionnel se désiste avant l’intervention' },
+  { key: 'quote.default_validity_hours', value: 48, description: 'Durée de validité d’un devis sans autre précision du professionnel' },
+  { key: 'quote.max_total_xof', value: 5_000_000, description: 'Montant maximal d’un devis (F CFA)' },
+  { key: 'payment.checkout_ttl_minutes', value: 30, description: 'Durée pendant laquelle une page de paiement reste utilisable' },
+  { key: 'payment.reminder_minutes', value: 15, description: 'Relance du client qui n’a pas payé après ce délai' },
+  { key: 'payment.timeout_minutes', value: 120, description: 'Annulation sans frais d’une mission non payée avant le déplacement du professionnel' },
   { key: 'app.min_version.client', value: '0.1.0', description: 'Version minimale de l’application client' },
   { key: 'app.min_version.pro', value: '0.1.0', description: 'Version minimale de l’application professionnel' },
 ];
+
+/**
+ * Règle de commission par défaut (décision D9 : taux unique, hors matériaux et hors déplacement).
+ * VALEUR PROVISOIRE de 10 % en attendant le taux validé ; créée seulement si aucune règle par défaut n'existe,
+ * puis modifiable dans l'administration (permission commission.write).
+ */
+export const DEFAULT_COMMISSION_RULE = { rateBps: 1000, minXof: 0n, appliesToTravelFee: false } as const;

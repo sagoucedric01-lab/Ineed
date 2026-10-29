@@ -95,6 +95,10 @@ describe('API : santé et format des erreurs', () => {
   it('ne sert pas la documentation en production (sauf demande explicite)', async () => {
     app = await startApi(apiEnv(db.url, productionOverrides));
     await request(app.getHttpServer()).get('/docs/openapi.json').expect(404);
+    // Aucun simulateur de paiement : ni page de paiement simulée, ni notification « sandbox » acceptée.
+    await request(app.getHttpServer()).get('/v1/payments/sandbox/checkout/INP2026000001ABCD').expect(404);
+    await request(app.getHttpServer()).post('/v1/payments/sandbox/checkout/INP2026000001ABCD').type('form').send({ outcome: 'SUCCEEDED' }).expect(404);
+    await request(app.getHttpServer()).post('/v1/payments/notify/sandbox').send({ merchantReference: 'INP2026000001ABCD', nonce: 'x' }).expect(404);
   });
 
   it('ajoute les en-têtes de sécurité HTTP', async () => {

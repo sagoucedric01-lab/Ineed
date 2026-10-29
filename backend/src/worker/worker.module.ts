@@ -4,17 +4,21 @@ import { ConfigModule } from '../config/config.module.js';
 import { ENV, type Env } from '../config/env.js';
 import { loggerParams } from '../common/http/logger.config.js';
 import { AuditModule } from '../audit/audit.module.js';
+import { BillingModule } from '../billing/billing.module.js';
 import { DispatchModule } from '../dispatch/dispatch.module.js';
 import { InfraModule } from '../infra/infra.module.js';
 import { NotificationsModule } from '../notifications/notifications.module.js';
+import { PaymentsModule } from '../payments/payments.module.js';
+import { QuotesModule } from '../quotes/quotes.module.js';
 import { SettingsModule } from '../settings/settings.module.js';
 import { DispatchLoop } from './dispatch-loop.js';
+import { MoneyLoop } from './money-loop.js';
 import { RedisService } from '../infra/redis.service.js';
 import { WORKER_HEARTBEAT_INTERVAL_MS, WORKER_HEARTBEAT_KEY, WORKER_HEARTBEAT_TTL_S } from './heartbeat.js';
 
 /**
- * Processus des tâches de fond : signale sa présence et fait tourner le moteur d'attribution
- * (vagues, expirations des offres et réservations, clôtures automatiques, purge des positions).
+ * Processus des tâches de fond : signale sa présence, fait tourner le moteur d'attribution (vagues, expirations
+ * des offres et réservations, clôtures automatiques, purge des positions) et les tâches de l'argent (MoneyLoop).
  */
 @Module({
   imports: [
@@ -24,9 +28,12 @@ import { WORKER_HEARTBEAT_INTERVAL_MS, WORKER_HEARTBEAT_KEY, WORKER_HEARTBEAT_TT
     SettingsModule,
     AuditModule,
     NotificationsModule,
+    BillingModule,
     DispatchModule,
+    QuotesModule,
+    PaymentsModule,
   ],
-  providers: [DispatchLoop],
+  providers: [DispatchLoop, MoneyLoop],
 })
 export class WorkerModule implements OnApplicationBootstrap, OnApplicationShutdown {
   private timer?: NodeJS.Timeout;

@@ -1,6 +1,6 @@
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { DispatchService } from '../../src/dispatch/dispatch.service.js';
-import { bearer, createTestPro, flushRedis, loginWithPhone, restartApi, simulateConfirmedPayment, startTestContext, type TestContext, type Tokens } from '../helpers/api.js';
+import { bearer, createTestPro, flushRedis, loginWithPhone, restartApi, payWithSandbox, startTestContext, type TestContext, type Tokens } from '../helpers/api.js';
 
 /** Client à Cocody. */
 const PLACE = { location: { lat: 5.36, lng: -3.97 }, landmark: 'Derrière la pharmacie, portail vert' };
@@ -278,7 +278,7 @@ describe('Mise en relation et missions', () => {
     });
 
     it('T20 — suivi du professionnel : départ, positions du trajet, distance et délai, arrivée', async () => {
-      await simulateConfirmedPayment(ctx, missionId);
+      await payWithSandbox(ctx, missionId);
       await ctx.http.post(`/v1/pro/missions/${missionId}/depart`).set(bearer(proTokens)).expect(200);
       expect(await notified((await ctx.prisma.mission.findUniqueOrThrow({ where: { id: missionId } })).clientId, 'client.PRO_EN_ROUTE')).toBe(1);
 
@@ -334,7 +334,7 @@ describe('Mise en relation et missions', () => {
 
     it('clôture automatique sans réponse du client', async () => {
       const a = await assigned();
-      await simulateConfirmedPayment(ctx, a.missionId);
+      await payWithSandbox(ctx, a.missionId);
       for (const step of ['depart', 'arrive', 'start', 'complete']) await ctx.http.post(`/v1/pro/missions/${a.missionId}/${step}`).set(bearer(a.pro.tokens)).send({}).expect(200);
       expect((await dispatch().tick(later(3600))).missionsClosed).toBe(0);
       expect((await dispatch().tick(later(49 * 3600))).missionsClosed).toBe(1);
@@ -354,7 +354,7 @@ describe('Mise en relation et missions', () => {
 
     it('T19 — annulation après confirmation, professionnel en route : frais de déplacement dus', async () => {
       const a = await assigned();
-      await simulateConfirmedPayment(ctx, a.missionId);
+      await payWithSandbox(ctx, a.missionId);
       await ctx.http.post(`/v1/pro/missions/${a.missionId}/depart`).set(bearer(a.pro.tokens)).expect(200);
       await ctx.http.post(`/v1/missions/${a.missionId}/cancel`).set(bearer(a.client)).send({}).expect(200);
       const h = await ctx.prisma.missionStatusHistory.findFirstOrThrow({ where: { missionId: a.missionId, toStatus: 'CANCELLED' } });
@@ -381,7 +381,7 @@ describe('Mise en relation et missions', () => {
 
     it('T26 — perte de connexion : actions et positions renvoyées sans doublon', async () => {
       const a = await assigned();
-      await simulateConfirmedPayment(ctx, a.missionId);
+      await payWithSandbox(ctx, a.missionId);
       const depart = () => ctx.http.post(`/v1/pro/missions/${a.missionId}/depart`).set(bearer(a.pro.tokens));
       await depart().expect(200);
       await depart().expect(200);

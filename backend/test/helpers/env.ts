@@ -49,4 +49,9 @@ export const productionOverrides = {
   TWILIO_AUTH_TOKEN: 'test',
   TWILIO_VERIFY_SERVICE_SID: 'VAtest',
   PAYMENT_PROVIDER: 'cinetpay',
+  CINETPAY_API_KEY: 'test-api-key',
+  CINETPAY_SITE_ID: '000000',
+  CINETPAY_SECRET_KEY: 'test-secret',
+  PUBLIC_API_URL: 'https://api.ineed.test',
+  PAYMENT_RETURN_URL: 'https://ineed.test/paiement/retour',
 };

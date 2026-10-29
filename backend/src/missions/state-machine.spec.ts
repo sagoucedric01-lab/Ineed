@@ -8,7 +8,7 @@ const STATUSES: MissionStatus[] = [
 ];
 const ACTORS: MissionActor[] = ['CLIENT', 'PRO', 'ADMIN', 'SYSTEM', 'PAYMENT'];
 const now = new Date('2026-10-29T10:00:00Z');
-const ctx = (over: Partial<MissionContext> = {}): MissionContext => ({ pricingModel: 'QUOTE', arrivedAt: null, autoCloseAt: null, hasPendingQuote: false, now, ...over });
+const ctx = (over: Partial<MissionContext> = {}): MissionContext => ({ pricingModel: 'QUOTE', arrivedAt: null, autoCloseAt: null, hasPendingQuote: false, hasUnpaidSupplement: false, now, ...over });
 
 describe('machine à états des missions', () => {
   it('énumère toutes les paires (de, vers, acteur) : seules les transitions déclarées sont permises', () => {
@@ -57,6 +57,7 @@ describe('machine à états des missions', () => {
     expect(checkTransition('PAYMENT_CONFIRMED', 'IN_PROGRESS', 'PRO', ctx({ arrivedAt: now })).ok).toBe(true);
     expect(checkTransition('PAYMENT_CONFIRMED', 'EN_ROUTE', 'PRO', ctx({ arrivedAt: now })).ok).toBe(false);
     expect(checkTransition('IN_PROGRESS', 'WORK_COMPLETED', 'PRO', ctx({ hasPendingQuote: true })).ok).toBe(false);
+    expect(checkTransition('IN_PROGRESS', 'WORK_COMPLETED', 'PRO', ctx({ hasUnpaidSupplement: true })).ok).toBe(false);
     const later = new Date(now.getTime() + 3_600_000);
     expect(checkTransition('WORK_COMPLETED', 'CLOSED', 'SYSTEM', ctx({ autoCloseAt: later })).ok).toBe(false);
     expect(checkTransition('WORK_COMPLETED', 'CLOSED', 'SYSTEM', ctx({ autoCloseAt: now })).ok).toBe(true);
@@ -76,5 +77,8 @@ describe('machine à états des missions', () => {
     expect(cancellationTerms('CONFIRMED', 'CLIENT')).toBe('FREE');
     expect(cancellationTerms('EN_ROUTE', 'CLIENT')).toBe('TRAVEL_FEE_DUE');
     expect(cancellationTerms('EN_ROUTE', 'PRO')).toBe('FREE');
+    // Diagnostic sur place : le professionnel s'est déplacé, même si la mission attend le devis des travaux.
+    expect(cancellationTerms('AWAITING_QUOTE', 'CLIENT', new Date())).toBe('TRAVEL_FEE_DUE');
+    expect(cancellationTerms('PAYMENT_CONFIRMED', 'ADMIN', new Date())).toBe('FREE');
   });
 });

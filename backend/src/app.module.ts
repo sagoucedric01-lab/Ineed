@@ -1,9 +1,12 @@
 import { Module } from '@nestjs/common';
+import { APP_INTERCEPTOR } from '@nestjs/core';
+import { IdempotencyInterceptor } from './common/idempotency/idempotency.js';
 import { LoggerModule } from 'nestjs-pino';
 import { AddressesModule } from './addresses/addresses.module.js';
 import { AdminAuthModule } from './admin-auth/admin-auth.module.js';
 import { AuditModule } from './audit/audit.module.js';
 import { AuthModule } from './auth/auth.module.js';
+import { BillingModule } from './billing/billing.module.js';
 import { CatalogModule } from './catalog/catalog.module.js';
 import { ConfigModule } from './config/config.module.js';
 import { ENV, type Env } from './config/env.js';
@@ -15,7 +18,9 @@ import { HealthModule } from './health/health.module.js';
 import { InfraModule } from './infra/infra.module.js';
 import { MissionsModule } from './missions/missions.module.js';
 import { NotificationsModule } from './notifications/notifications.module.js';
+import { PaymentsModule } from './payments/payments.module.js';
 import { ProsModule } from './pros/pros.module.js';
+import { QuotesModule } from './quotes/quotes.module.js';
 import { RequestsModule } from './requests/requests.module.js';
 import { SearchModule } from './search/search.module.js';
 import { SettingsModule } from './settings/settings.module.js';
@@ -29,6 +34,7 @@ import { UsersModule } from './users/users.module.js';
     SettingsModule,
     AuditModule,
     NotificationsModule,
+    BillingModule,
     AuthModule,
     FilesModule,
     UsersModule,
@@ -39,9 +45,12 @@ import { UsersModule } from './users/users.module.js';
     RequestsModule,
     DispatchModule,
     MissionsModule,
+    QuotesModule,
+    PaymentsModule,
     ProsModule,
     AdminAuthModule,
     HealthModule,
   ],
+  providers: [{ provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor }],
 })
 export class AppModule {}
