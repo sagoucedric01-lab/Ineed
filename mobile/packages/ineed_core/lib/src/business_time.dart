@@ -7,3 +7,9 @@ String formatAbidjanDateTime(DateTime instant) {
   final t = instant.toUtc();
   return '${_two(t.day)}/${_two(t.month)}/${t.year} à ${_two(t.hour)}:${_two(t.minute)}';
 }
+
+/// « 10:23 » à l'heure d'Abidjan.
+String formatAbidjanTime(DateTime instant) {
+  final t = instant.toUtc();
+  return '${_two(t.hour)}:${_two(t.minute)}';
+}

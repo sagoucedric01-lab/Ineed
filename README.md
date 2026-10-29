@@ -2,9 +2,10 @@
 
 Marketplace de services de proximité (plombiers, électriciens, mécaniciens…) — marché initial : Abidjan, Côte d'Ivoire.
 
-**État actuel : phase 7 (devis, paiements, remboursements) terminée, en mode développement pour les SMS et les paiements.**
+**État actuel : phase 8 (notifications, messagerie, avis, réclamations) terminée, en mode développement pour les SMS, les notifications push et les paiements.**
 Connexion, inscription et validation des professionnels, recherche, demandes, mise en relation, devis, paiement, suivi des
-missions et remboursements fonctionnent et sont testés. **Les paiements passent par un simulateur** (aucun argent réel) tant
+missions, remboursements, messagerie, avis et réclamations fonctionnent et sont testés. **Les notifications push ne partent pas
+encore vers les téléphones** : le projet Firebase n'est pas configuré (elles restent visibles dans les applications). **Les paiements passent par un simulateur** (aucun argent réel) tant
 que le compte marchand CinetPay n'est pas configuré ; l'adaptateur CinetPay est écrit mais pas encore essayé sur un compte réel.
 Détail : [statut des fonctionnalités](docs/statut-fonctionnalites.md).
 

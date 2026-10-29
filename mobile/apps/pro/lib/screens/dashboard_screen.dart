@@ -113,11 +113,23 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
       appBar: AppBar(
         title: Text(CommonLocalizations.of(context).appNamePro),
         actions: [
+          IconButton(
+            tooltip: CommonLocalizations.of(context).chatListTitle,
+            icon: Badge(
+              isLabelVisible: (ref.watch(unreadMessagesProvider).value ?? 0) > 0,
+              label: Text('${ref.watch(unreadMessagesProvider).value ?? 0}'),
+              child: const Icon(Icons.chat_bubble_outline),
+            ),
+            onPressed: () async {
+              await context.push('/messages');
+              ref.invalidate(unreadMessagesProvider);
+            },
+          ),
           IconButton(tooltip: l.earningsTitle, icon: const Icon(Icons.account_balance_wallet_outlined), onPressed: () => context.push('/revenus')),
           IconButton(tooltip: CommonLocalizations.of(context).profileTitle, icon: const Icon(Icons.person_outline), onPressed: () => context.push('/compte')),
         ],
       ),
-      body: AsyncBody(
+      body: PushRegistrar(child: AsyncBody(
         value: ref.watch(proProfileProvider),
         onRetry: () => ref.invalidate(proProfileProvider),
         builder: (p) {
@@ -169,7 +181,7 @@ class _DashboardScreenState extends ConsumerState<DashboardScreen> {
             ],
           );
         },
-      ),
+      )),
     );
   }
 }

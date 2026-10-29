@@ -1,6 +1,6 @@
 /** Règles de téléversement par usage. Toute image est ré-encodée côté serveur (métadonnées EXIF/GPS supprimées). */
-export type FilePurpose = 'AVATAR' | 'VERIFICATION_DOC' | 'REQUEST_PHOTO' | 'REQUEST_VOICE';
-export const FILE_PURPOSES: FilePurpose[] = ['AVATAR', 'VERIFICATION_DOC', 'REQUEST_PHOTO', 'REQUEST_VOICE'];
+export type FilePurpose = 'AVATAR' | 'VERIFICATION_DOC' | 'REQUEST_PHOTO' | 'REQUEST_VOICE' | 'MESSAGE_PHOTO' | 'COMPLAINT_ATTACHMENT';
+export const FILE_PURPOSES: FilePurpose[] = ['AVATAR', 'VERIFICATION_DOC', 'REQUEST_PHOTO', 'REQUEST_VOICE', 'MESSAGE_PHOTO', 'COMPLAINT_ATTACHMENT'];
 
 export interface FileRule {
   visibility: 'PUBLIC' | 'PRIVATE';
@@ -18,6 +18,10 @@ export const FILE_RULES: Record<FilePurpose, FileRule> = {
   REQUEST_PHOTO: { visibility: 'PRIVATE', mimeTypes: IMAGES, maxBytes: 10 * 1024 * 1024 },
   // Notes vocales AAC (format enregistré par défaut sur Android et iOS) ; durée vérifiée dans l'en-tête du fichier.
   REQUEST_VOICE: { visibility: 'PRIVATE', mimeTypes: [AUDIO_MP4], maxBytes: 5 * 1024 * 1024 },
+  // Photo envoyée dans une conversation : visible des deux seuls participants, par liens temporaires.
+  MESSAGE_PHOTO: { visibility: 'PRIVATE', mimeTypes: IMAGES, maxBytes: 10 * 1024 * 1024 },
+  // Pièce jointe d'une réclamation (photo du problème, capture) : visible du demandeur et du support.
+  COMPLAINT_ATTACHMENT: { visibility: 'PRIVATE', mimeTypes: [...IMAGES, 'application/pdf'], maxBytes: 10 * 1024 * 1024 },
 };
 
 /**

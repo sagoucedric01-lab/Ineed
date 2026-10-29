@@ -213,6 +213,8 @@ class Mission {
     this.clientFirstName,
     this.proAvatarUrl,
     this.money,
+    this.requestId = '',
+    this.proId = '',
   });
   factory Mission.fromJson(Map<String, Object?> j) {
     final request = req<Map<String, Object?>>(j, 'request');
@@ -238,6 +240,8 @@ class Mission {
       clientFirstName: mapOrNull(j, 'client')?['firstName'] as String?,
       timeline: listOf(j, 'timeline').map(TimelineEvent.fromJson).toList(),
       money: mapOrNull(j, 'money') == null ? null : MissionMoney.fromJson(mapOrNull(j, 'money')!),
+      requestId: request['id'] as String? ?? '',
+      proId: pro['id'] as String? ?? '',
     );
   }
   final String id;
@@ -264,6 +268,10 @@ class Mission {
 
   /// Devis, paiements, montant dû (absent des réponses antérieures à la phase 7).
   final MissionMoney? money;
+
+  /// Demande d'origine et professionnel (ouverture de la conversation).
+  final String requestId;
+  final String proId;
 
   /// Étapes qui dépendent du devis et du paiement dans l'application (phase suivante).
   bool get waitsForQuoteOrPayment => const {'AWAITING_QUOTE', 'QUOTE_PENDING_APPROVAL', 'CONFIRMED', 'PAYMENT_PENDING'}.contains(status);

@@ -11,6 +11,7 @@ import '../l10n/gen/app_localizations.dart';
 import '../providers.dart';
 import '../widgets/pro_card_tile.dart';
 import '../widgets/request_status.dart';
+import 'mission_engagement.dart';
 import 'mission_money_section.dart';
 
 /// C-21 à C-24 : suivi de la mission (étapes, trajet du professionnel, fin d'intervention, annulation).
@@ -166,6 +167,8 @@ class _MissionScreenState extends ConsumerState<MissionScreen> {
                       ),
                     ),
                   if (m.status == 'CLOSED') IneedBanner(message: l.completionClosed, tone: IneedBannerTone.success),
+                  const SizedBox(height: IneedSpacing.s3),
+                  MissionEngagement(mission: m),
                   const SizedBox(height: IneedSpacing.s4),
                   Text(l.trackingTimeline, style: text.titleMedium),
                   for (final e in m.timeline)

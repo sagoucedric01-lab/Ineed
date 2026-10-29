@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import 'package:ineed_core/ineed_core.dart';
 import 'package:ineed_shared/ineed_shared.dart';
 import 'package:ineed_ui/ineed_ui.dart';
 
 import '../providers.dart';
 
-/// C-31 : notifications reçues dans l'application (l'envoi push arrive en phase 8).
+/// C-31 : notifications reçues (aussi envoyées en push quand l'appareil est enregistré) ; un appui ouvre l'écran concerné.
 class NotificationsScreen extends ConsumerWidget {
   const NotificationsScreen({super.key});
 
@@ -41,6 +42,7 @@ class NotificationsScreen extends ConsumerWidget {
                     title: Text(n.title, style: TextStyle(fontWeight: n.read ? FontWeight.normal : FontWeight.w600)),
                     subtitle: Text('${n.body}\n${formatAbidjanDateTime(n.createdAt)}'),
                     isThreeLine: true,
+                    onTap: notificationRoute(n.data) == null ? null : () => context.push(notificationRoute(n.data)!),
                   ),
               ]),
       ),

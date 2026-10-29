@@ -20,6 +20,9 @@ export const testServices = {
 
 /** Secrets générés une fois par fichier de test (jamais réutilisés ailleurs). */
 const { privateKey } = generateKeyPairSync('ec', { namedCurve: 'P-256' });
+/** Compte de service Firebase factice (clé générée pour les tests, aucun projet réel). */
+const fcmKey = generateKeyPairSync('rsa', { modulusLength: 2048 }).privateKey.export({ type: 'pkcs8', format: 'pem' }).toString();
+export const fakeFcmServiceAccountB64 = Buffer.from(JSON.stringify({ project_id: 'ineed-test', client_email: 'push@ineed-test.iam.gserviceaccount.com', private_key: fcmKey })).toString('base64');
 export const testSecrets = {
   JWT_PRIVATE_KEY_B64: privateKey.export({ format: 'der', type: 'pkcs8' }).toString('base64'),
   DATA_ENCRYPTION_KEY_B64: randomBytes(32).toString('base64'),
@@ -49,6 +52,8 @@ export const productionOverrides = {
   TWILIO_AUTH_TOKEN: 'test',
   TWILIO_VERIFY_SERVICE_SID: 'VAtest',
   PAYMENT_PROVIDER: 'cinetpay',
+  PUSH_PROVIDER: 'fcm',
+  FCM_SERVICE_ACCOUNT_B64: fakeFcmServiceAccountB64,
   CINETPAY_API_KEY: 'test-api-key',
   CINETPAY_SITE_ID: '000000',
   CINETPAY_SECRET_KEY: 'test-secret',

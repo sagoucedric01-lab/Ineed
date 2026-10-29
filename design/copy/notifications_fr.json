@@ -158,6 +158,14 @@
     "QUOTE_EXPIRED": {
       "title": "Devis expiré",
       "body": "Votre devis pour la mission {{reference}} a expiré sans réponse. Vous pouvez en envoyer une nouvelle version."
+    },
+    "COMPLAINT_UPDATED": {
+      "title": "Réponse à votre réclamation",
+      "body": "L’équipe Ineed a répondu à votre réclamation {{reference}}."
+    },
+    "COMPLAINT_OPENED": {
+      "title": "Réclamation sur une mission",
+      "body": "Le client a ouvert la réclamation {{reference}} sur la mission {{missionReference}}. L’équipe Ineed va l’examiner."
     }
   },
   "sms": {

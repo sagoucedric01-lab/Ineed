@@ -18,6 +18,7 @@ import 'screens/request_detail_screen.dart';
 import 'screens/request_form_screen.dart';
 import 'screens/requests_screen.dart';
 import 'screens/results_screen.dart';
+import 'screens/review_screen.dart';
 import 'screens/search_screen.dart';
 
 /// Écrans accessibles sans être connecté.
@@ -96,6 +97,8 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
       GoRoute(path: '/notifications', builder: (_, _) => const NotificationsScreen()),
       GoRoute(path: '/missions/:id', builder: (_, state) => MissionScreen(missionId: state.pathParameters['id']!)),
       GoRoute(path: '/paiements/:id/recu', builder: (_, state) => ReceiptScreen(paymentId: state.pathParameters['id']!)),
+      GoRoute(path: '/missions/:id/avis', builder: (_, state) => ReviewScreen(missionId: state.pathParameters['id']!, proName: state.extra as String? ?? '')),
+      ...engagementRoutes(),
       GoRoute(
         path: '/compte',
         builder: (context, _) => AccountScreen(
@@ -103,6 +106,12 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
           onOpenDevices: () => context.push('/compte/appareils'),
           onDeleteAccount: () => context.push('/compte/supprimer'),
           extraTiles: [
+            ListTile(
+              leading: const Icon(Icons.support_agent),
+              title: Text(CommonLocalizations.of(context).complaintsTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/reclamations'),
+            ),
             if (!env.isProduction)
               ListTile(
                 leading: const Icon(Icons.wifi_tethering),

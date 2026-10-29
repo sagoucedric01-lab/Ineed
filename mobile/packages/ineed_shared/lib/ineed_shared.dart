@@ -2,6 +2,13 @@
 library;
 
 export 'l10n/gen/common_localizations.dart';
+export 'src/engagement/complaints_screens.dart';
+export 'src/engagement/conversation_screen.dart';
+export 'src/engagement/conversations_screen.dart';
+export 'src/engagement/providers.dart';
+export 'src/engagement/push_registrar.dart';
+export 'src/engagement/report_dialog.dart';
+export 'src/engagement/routes.dart';
 export 'src/errors.dart';
 export 'src/mission_status.dart';
 export 'src/screens/account_screen.dart';

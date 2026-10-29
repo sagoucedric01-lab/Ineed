@@ -69,8 +69,9 @@ export class ReceiptsService {
    * avec l'administration (phase 9).
    */
   async earnings(proId: string) {
-    const rows = await this.prisma.$queryRaw<{ missionId: string; reference: string; status: string; net: bigint; gross: bigint; commission: bigint; refunded: bigint }[]>`
+    const rows = await this.prisma.$queryRaw<{ missionId: string; reference: string; status: string; net: bigint; gross: bigint; commission: bigint; refunded: bigint; disputed: boolean }[]>`
       SELECT m.id AS "missionId", m.reference, m.status::text AS status,
+             EXISTS (SELECT 1 FROM complaints c WHERE c.mission_id = m.id AND c.status IN ('OPEN','IN_REVIEW','WAITING_USER')) AS disputed,
              COALESCE(-sum(e.amount_xof) FILTER (WHERE e.account = 'PRO_PAYABLE'), 0)::bigint AS net,
              COALESCE(-sum(e.amount_xof) FILTER (WHERE e.account = 'PRO_PAYABLE' AND t.kind = 'PAYMENT_CAPTURED'), 0)::bigint AS gross,
              COALESCE(sum(e.amount_xof) FILTER (WHERE e.account = 'PRO_PAYABLE' AND t.kind = 'COMMISSION'), 0)::bigint AS commission,
@@ -78,18 +79,19 @@ export class ReceiptsService {
       FROM ledger_entries e JOIN ledger_transactions t ON t.id = e.transaction_id JOIN missions m ON m.id = t.mission_id
       WHERE e.pro_id = ${proId}::uuid
       GROUP BY m.id ORDER BY max(t.created_at) DESC LIMIT 100`;
-    const available = (s: string) => s === 'CLOSED' || s === 'CANCELLED';
+    // Disponible : mission terminée (clôturée ou annulée) et aucune réclamation en cours (reversement gelé).
+    const available = (r: { status: string; disputed: boolean }) => (r.status === 'CLOSED' || r.status === 'CANCELLED') && !r.disputed;
     let held = 0n;
     let free = 0n;
     for (const r of rows) {
-      if (available(r.status)) free += r.net;
+      if (available(r)) free += r.net;
       else held += r.net;
     }
     return {
       totalDueXof: Number(await this.ledger.proPayable(proId)),
       heldXof: Number(held),
       availableXof: Number(free),
-      missions: rows.map((r) => ({ missionId: r.missionId, reference: r.reference, status: r.status, grossXof: Number(r.gross), commissionXof: Number(r.commission), refundedXof: Number(r.refunded), netXof: Number(r.net), available: available(r.status) })),
+      missions: rows.map((r) => ({ missionId: r.missionId, reference: r.reference, status: r.status, grossXof: Number(r.gross), commissionXof: Number(r.commission), refundedXof: Number(r.refunded), netXof: Number(r.net), available: available(r), disputed: r.disputed })),
     };
   }
 }

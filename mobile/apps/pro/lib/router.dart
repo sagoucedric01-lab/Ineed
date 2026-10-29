@@ -16,6 +16,7 @@ import 'screens/earnings_screen.dart';
 import 'screens/mission_screen.dart';
 import 'screens/offer_screen.dart';
 import 'screens/quote_editor_screen.dart';
+import 'screens/reviews_screen.dart';
 import 'screens/status_screen.dart';
 
 const publicRoutes = {'/connexion', '/connexion/code'};
@@ -85,6 +86,8 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
         builder: (_, state) => QuoteEditorScreen(missionId: state.pathParameters['id']!, supplement: state.uri.queryParameters['supplement'] == '1'),
       ),
       GoRoute(path: '/revenus', builder: (_, _) => const EarningsScreen()),
+      GoRoute(path: '/avis', builder: (_, _) => const ProReviewsScreen()),
+      ...engagementRoutes(),
       GoRoute(
         path: '/compte',
         builder: (context, _) => AccountScreen(
@@ -97,6 +100,18 @@ final routerProvider = Provider.family<GoRouter, AppEnvironment>((ref, env) {
               title: Text(AppLocalizations.of(context).dossierTitle),
               trailing: const Icon(Icons.chevron_right),
               onTap: () => context.go('/'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.star_outline),
+              title: Text(AppLocalizations.of(context).reviewsTitlePro),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/avis'),
+            ),
+            ListTile(
+              leading: const Icon(Icons.support_agent),
+              title: Text(CommonLocalizations.of(context).complaintsTitle),
+              trailing: const Icon(Icons.chevron_right),
+              onTap: () => context.push('/reclamations'),
             ),
             if (!env.isProduction)
               ListTile(

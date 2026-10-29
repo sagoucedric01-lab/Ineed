@@ -47,10 +47,10 @@ Dernière mise à jour : fin de la phase 6 (29/10/2026).
 | Recherche par mots du client (synonymes, sans accents), recherches récentes | ✅ | |
 | Adresses avec repère, commune vérifiée, point sur la carte | ✅ | Carte affichée seulement si un fond de carte est configuré (`INEED_MAP_TILE_URL`) ; **aucun géocodage d'adresse textuelle** (pas de clé Google Maps) |
 | Recherche de professionnels proches (urgence et programmé), classement, délai estimé, pistes sans résultat | ✅ | T4, T6. Délai = estimation à vitesse urbaine moyenne, pas un calcul d'itinéraire |
-| Profil public d'un professionnel | 🟡 | Sans avis (phase 8) |
+| Profil public d'un professionnel | ✅ | Avec les avis vérifiés (prénom et initiale de l'auteur seulement) |
 | Création de demande (photos, note vocale, budget, relecture, publication, annulation) | ✅ | T5 |
 | Position du professionnel disponible, point de départ, rayon | ✅ | Une seule position conservée, effacée au passage hors ligne |
-| Notifications dans l'application (liste, lecture) | 🟡 | Sans push (phase 8) |
+| Notifications dans l'application (liste, lecture, ouverture de l'écran concerné) | ✅ | |
 | Mise en relation : vagues d'alertes, acceptation (urgence), propositions et choix (programmé), confirmation du client | ✅ | T7, T8 (acceptations simultanées : une seule réservation), T9, T10, T11. **Alertes visibles dans Ineed Pro ouverte** (rafraîchissement toutes les 10 s) : pas de notification push avant la phase 8 |
 | Missions : étapes, trajet suivi par le client, fin d'intervention, clôture (client ou automatique), litige, annulations | ✅ | T18 à T21, T26, T27, avec le vrai parcours devis → paiement (simulateur) |
 | Reprise après redémarrage du serveur | ✅ | T27 : tout l'état d'attribution est en base |
@@ -61,7 +61,11 @@ Dernière mise à jour : fin de la phase 6 (29/10/2026).
 | Reçus de paiement | 🟡 | Reçu dans l'application ; **pas une facture** : mentions fiscales à définir (conseil) ; pas de PDF ni d'envoi par e-mail |
 | Revenus du professionnel | 🟡 | Montant dû par mission (après commission) ; **reversements : phase 9** (validation administrative, fournisseur de transfert) |
 | Promotions | ⏳ | Tables prêtes ; non utilisées (phase 9) |
-| Notifications push, messagerie, avis, réclamations | ⏳ | Phase 8 |
+| Notifications push : file d'envoi, reprises, appareils, gabarits administrables | 🟡 | Backend complet et testé ; adaptateur **FCM** couvert par des tests de contrat, **aucun envoi réel** (projet Firebase non fourni). **Les applications n'obtiennent pas encore de jeton push** : Firebase doit être ajouté aux deux apps (fichiers de configuration, clé APNs) |
+| Messagerie : texte, photos, non-lus, accusés de lecture, temps réel, renvoi sans doublon | ✅ | API et applications ; WebSocket authentifié, rechargement de secours toutes les 10 s |
+| Signalements d'abus | 🟡 | Enregistrés ; traitement par la modération : phase 9 |
+| Avis : après clôture, une fois, réponse du professionnel | ✅ | T22. Commentaire contenant des coordonnées : en attente de modération (écran de modération : phase 9) |
+| Réclamations et assistance : fil avec le support, litige, gel du reversement | ✅ | T23 sur API (routes du support) et applications ; écran du support : phase 9 |
 | Administration (23 modules) | ⏳ | Phase 9 |
 
 ## Simulations en place
@@ -69,4 +73,5 @@ Dernière mise à jour : fin de la phase 6 (29/10/2026).
 | Simulation | Où | Garde-fou |
 |---|---|---|
 | Codes SMS affichés dans les journaux (`OTP_PROVIDER=dev_console`) | **Actif** : valeur par défaut hors production ; les applications affichent « Mode développement » | Démarrage refusé en production |
+| Notifications push non envoyées (`PUSH_PROVIDER=dev_log`) | **Actif** : valeur par défaut hors production ; le contenu est écrit dans les journaux, la notification reste visible dans l'application | Démarrage refusé en production (configuration et construction du fournisseur) |
 | Paiements simulés (`PAYMENT_PROVIDER=sandbox`) | **Actif** : valeur par défaut hors production. Page de paiement simulée (bandeau rouge « SIMULATION »), notification signée, remboursement immédiat ; applications et reçus affichent « simulation » | Démarrage refusé en production (configuration **et** construction du prestataire) ; page simulée et notification « sandbox » en 404 en production (testé) ; paiements marqués `is_sandbox` |

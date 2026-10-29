@@ -119,6 +119,16 @@ relance le client et exécute les remboursements toutes les 15 s.
 - Pour encaisser réellement : `PAYMENT_PROVIDER=cinetpay`, les clés `CINETPAY_*` du compte marchand, `PUBLIC_API_URL` (adresse publique
   en https, déclarée comme adresse de notification) et `PAYMENT_RETURN_URL` (voir `backend/.env.example`).
 
+## 4 ter. Notifications push et temps réel en développement
+
+- Avec `PUSH_PROVIDER=dev_log` (valeur par défaut hors production), **aucune notification n'est envoyée aux téléphones** : le worker
+  écrit leur contenu dans ses journaux (`[DÉVELOPPEMENT — aucune notification envoyée]`). Elles restent visibles dans les applications.
+- Pour de vraies notifications : créer un projet Firebase, y déclarer les deux applications (Android et iOS, avec la clé APNs),
+  placer `google-services.json` et `GoogleService-Info.plist` dans les applications, puis renseigner côté serveur `PUSH_PROVIDER=fcm`
+  et `FCM_SERVICE_ACCOUNT_B64` (compte de service encodé en base64, jamais commité).
+- Messagerie en direct : WebSocket `ws://localhost:3000/v1/realtime` (authentification par le premier message). Sans ce canal,
+  les écrans se rechargent seuls toutes les 10 s.
+
 ## 5. Premier compte administrateur
 
 Aucun compte administrateur n'existe par défaut et aucun mot de passe n'est écrit dans le code. Le premier super-administrateur se crée en ligne de commande (refusé s'il en existe déjà un) :

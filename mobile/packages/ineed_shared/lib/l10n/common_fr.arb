@@ -247,22 +247,22 @@
   },
   "paymentTestBadge": "PAIEMENT DE TEST : aucun argent réel n’est débité",
   "chatTitle": "Messages",
-  "chatInputHint": "Écrire un message",
+  "chatInputHint": "Votre message",
   "chatEmpty": "Aucun message pour l’instant. Posez vos questions ici, l’historique reste attaché à la mission.",
   "chatPhoneWarning": "Pour votre sécurité, gardez les échanges et les paiements dans Ineed. En cas de problème, l’assistance pourra vous aider.",
   "chatSendFailed": "Message non envoyé. Touchez pour réessayer.",
   "chatReportMessage": "Signaler ce message",
   "chatLocked": "Cette conversation est terminée. Elle reste consultable mais vous ne pouvez plus écrire.",
   "chatPhoto": "Photo",
-  "reportTitle": "Signaler un problème",
-  "reportReasonSpam": "Message indésirable",
-  "reportReasonHarassment": "Propos insultants ou harcèlement",
-  "reportReasonFraud": "Tentative d’arnaque",
-  "reportReasonOffPlatform": "Demande de paiement en dehors d’Ineed",
-  "reportReasonInappropriate": "Contenu inapproprié",
-  "reportReasonOther": "Autre raison",
+  "reportTitle": "Signaler ce message",
+  "reportReasonSpam": "Publicité ou messages indésirables",
+  "reportReasonHarassment": "Harcèlement ou menaces",
+  "reportReasonFraud": "Arnaque",
+  "reportReasonOffPlatform": "Paiement demandé en dehors d’Ineed",
+  "reportReasonInappropriate": "Contenu choquant",
+  "reportReasonOther": "Autre",
   "reportDetailsHint": "Décrivez ce qui s’est passé (facultatif)",
-  "reportSent": "Merci. Votre signalement a été transmis à l’équipe Ineed.",
+  "reportSent": "Merci. L’équipe Ineed va examiner ce signalement.",
   "notificationsTitle": "Notifications",
   "notificationsEmpty": "Aucune notification. Vous serez prévenu ici de chaque étape de vos missions.",
   "notificationsMarkAllRead": "Tout marquer comme lu",
@@ -364,5 +364,99 @@
         "type": "String"
       }
     }
-  }
+  },
+  "chatListTitle": "Messages",
+  "chatListEmpty": "Aucune conversation pour le moment. La messagerie s’ouvre avec un professionnel qui a accepté votre demande, ou pendant une mission.",
+  "chatListEmptyPro": "Aucune conversation pour le moment. La messagerie s’ouvre avec le client quand vous acceptez une demande.",
+  "chatPhotoPreview": "Photo",
+  "chatYou": "Vous : {text}",
+  "@chatYou": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "chatSend": "Envoyer",
+  "chatAddPhoto": "Ajouter une photo",
+  "chatSending": "Envoi…",
+  "chatNotSent": "Non envoyé. Touchez pour réessayer.",
+  "chatRead": "Lu",
+  "chatHidden": "Message masqué par la modération.",
+  "chatReadOnly": "Cette conversation est terminée : vous pouvez la relire mais plus y écrire. Pour un problème, ouvrez une réclamation.",
+  "chatContactWarning": "Pour votre sécurité, gardez les échanges et le paiement sur Ineed : en dehors de l’application, nous ne pouvons ni vous protéger ni vous rembourser.",
+  "chatPrivacyNote": "Vos numéros de téléphone ne sont jamais partagés.",
+  "chatOpen": "Envoyer un message",
+  "chatLoadEarlier": "Messages précédents",
+  "chatPhotoFailed": "La photo n’a pas pu être envoyée. Réessayez.",
+  "complaintsTitle": "Réclamations",
+  "complaintsEmpty": "Aucune réclamation. En cas de problème, l’équipe Ineed vous répond ici.",
+  "complaintNew": "Faire une réclamation",
+  "complaintNewGeneral": "Contacter l’assistance",
+  "complaintCategory": "Motif",
+  "complaintCatQuality": "Travail mal réalisé",
+  "complaintCatPrice": "Prix différent de celui convenu",
+  "complaintCatNoShow": "Le professionnel n’est pas venu",
+  "complaintCatDamage": "Dégât causé",
+  "complaintCatPayment": "Problème de paiement",
+  "complaintCatBehaviour": "Comportement",
+  "complaintCatOther": "Autre",
+  "complaintDescription": "Décrivez la situation",
+  "complaintDescriptionHint": "10 caractères au moins. Indiquez ce que vous attendez (reprise du travail, remboursement…).",
+  "complaintDescriptionTooShort": "Décrivez le problème en 10 caractères au moins.",
+  "complaintAddPhoto": "Ajouter une photo",
+  "complaintPhotos": "{count} photo(s) jointe(s)",
+  "@complaintPhotos": {
+    "placeholders": {
+      "count": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintSubmit": "Envoyer la réclamation",
+  "complaintSent": "Réclamation {reference} envoyée. L’équipe Ineed vous répond ici.",
+  "@complaintSent": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintDisputeNote": "Tant que la réclamation est en cours, la mission n’est pas clôturée et le professionnel n’est pas payé.",
+  "complaintReference": "Réclamation {reference}",
+  "@complaintReference": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintMission": "Mission {reference}",
+  "@complaintMission": {
+    "placeholders": {
+      "reference": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintStatusOpen": "Ouverte",
+  "complaintStatusInReview": "En cours d’examen",
+  "complaintStatusWaitingUser": "Réponse attendue de votre part",
+  "complaintStatusResolved": "Résolue",
+  "complaintStatusRejected": "Close sans suite",
+  "complaintSupport": "Équipe Ineed",
+  "complaintMe": "Vous",
+  "complaintReplyHint": "Votre réponse",
+  "complaintReply": "Répondre",
+  "complaintDecision": "Décision : {text}",
+  "@complaintDecision": {
+    "placeholders": {
+      "text": {
+        "type": "String"
+      }
+    }
+  },
+  "complaintClosed": "Cette réclamation est close.",
+  "complaintAttachment": "Pièce jointe",
+  "pushPermissionNote": "Activez les notifications pour être prévenu même quand l’application est fermée."
 }

@@ -197,6 +197,7 @@ export class MissionsService {
       case 'CLOSED':
         await tx.proProfile.update({ where: { userId: m.proId }, data: { missionsCompleted: { increment: 1 } } });
         await this.notifications.notify(m.proId, 'pro.MISSION_VALIDATED', { reference: m.reference }, ids, tx);
+        await this.notifications.notify(m.clientId, 'client.REVIEW_REQUEST', { proName: pro.businessName }, ids, tx);
         break;
       case 'DISPUTED':
         if (actor === 'CLIENT') await this.notifications.notify(m.proId, 'pro.MISSION_DISPUTED', { reference: m.reference }, ids, tx);

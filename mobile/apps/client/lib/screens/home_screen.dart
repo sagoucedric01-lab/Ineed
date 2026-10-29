@@ -33,12 +33,21 @@ class HomeScreen extends ConsumerWidget {
     final session = ref.watch(sessionProvider).value;
     final firstName = session is SignedIn ? session.me.firstName : null;
     final unread = ref.watch(notificationsProvider).value?.unread ?? 0;
+    final unreadMessages = ref.watch(unreadMessagesProvider).value ?? 0;
     final address = ref.watch(selectedAddressProvider).value;
 
     return Scaffold(
       appBar: AppBar(
         title: Text(firstName == null ? l.homeGreetingAnonymous : l.homeGreeting(firstName)),
         actions: [
+          IconButton(
+            tooltip: common.chatListTitle,
+            icon: Badge(isLabelVisible: unreadMessages > 0, label: Text('$unreadMessages'), child: const Icon(Icons.chat_bubble_outline)),
+            onPressed: () async {
+              await context.push('/messages');
+              ref.invalidate(unreadMessagesProvider);
+            },
+          ),
           IconButton(
             tooltip: common.notificationsTitle,
             icon: Badge(isLabelVisible: unread > 0, label: Text('$unread'), child: const Icon(Icons.notifications_outlined)),
@@ -47,7 +56,7 @@ class HomeScreen extends ConsumerWidget {
           IconButton(tooltip: common.profileTitle, icon: const Icon(Icons.account_circle_outlined), onPressed: () => context.push('/compte')),
         ],
       ),
-      body: RefreshIndicator(
+      body: PushRegistrar(child: RefreshIndicator(
         onRefresh: () => _refresh(ref),
         child: ListView(
           padding: const EdgeInsets.all(IneedSpacing.s4),
@@ -87,7 +96,7 @@ class HomeScreen extends ConsumerWidget {
             const _RecentSearches(),
           ],
         ),
-      ),
+      )),
     );
   }
 }

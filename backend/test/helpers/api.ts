@@ -113,7 +113,7 @@ export async function adminLogin(ctx: TestContext, admin: TestAdmin, at = Date.n
 export async function uploadFile(
   ctx: TestContext,
   tokens: Tokens,
-  purpose: 'AVATAR' | 'VERIFICATION_DOC' | 'REQUEST_PHOTO' | 'REQUEST_VOICE',
+  purpose: 'AVATAR' | 'VERIFICATION_DOC' | 'REQUEST_PHOTO' | 'REQUEST_VOICE' | 'MESSAGE_PHOTO' | 'COMPLAINT_ATTACHMENT',
   body: Buffer,
   mimeType: string,
   expectStatus = 200,

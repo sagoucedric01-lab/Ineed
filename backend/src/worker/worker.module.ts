@@ -13,6 +13,7 @@ import { QuotesModule } from '../quotes/quotes.module.js';
 import { SettingsModule } from '../settings/settings.module.js';
 import { DispatchLoop } from './dispatch-loop.js';
 import { MoneyLoop } from './money-loop.js';
+import { NotificationsLoop } from './notifications-loop.js';
 import { RedisService } from '../infra/redis.service.js';
 import { WORKER_HEARTBEAT_INTERVAL_MS, WORKER_HEARTBEAT_KEY, WORKER_HEARTBEAT_TTL_S } from './heartbeat.js';
 
@@ -33,7 +34,7 @@ import { WORKER_HEARTBEAT_INTERVAL_MS, WORKER_HEARTBEAT_KEY, WORKER_HEARTBEAT_TT
     QuotesModule,
     PaymentsModule,
   ],
-  providers: [DispatchLoop, MoneyLoop],
+  providers: [DispatchLoop, MoneyLoop, NotificationsLoop],
 })
 export class WorkerModule implements OnApplicationBootstrap, OnApplicationShutdown {
   private timer?: NodeJS.Timeout;
